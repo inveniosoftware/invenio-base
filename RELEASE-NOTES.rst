@@ -2,7 +2,7 @@
  Invenio-Base v0.1.0
 =====================
 
-Invenio-Base v0.1.0 was released on TBD, 2015.
+Invenio-Base v0.1.0 was released on September 9, 2015.
 
 About
 -----
