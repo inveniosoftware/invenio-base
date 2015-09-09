@@ -19,6 +19,8 @@
 
 """Unit tests for the inveniomanage script."""
 
+from __future__ import absolute_import
+
 from flask import escape, url_for
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, \
@@ -33,7 +35,7 @@ class FlashMessageSecurityTest(InvenioTestCase):
         # add the test flask application to loaded packages
         cfg = super(FlashMessageSecurityTest, self).config
         cfg['PACKAGES'] = [
-            'invenio.base.testsuite.test_apps.flash_msg',
+            'test_apps.flash_msg',
             'invenio.base',
         ]
         return cfg

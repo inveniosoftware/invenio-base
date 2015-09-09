@@ -82,7 +82,7 @@ PACKAGES = [
     'invenio_access',
     'invenio_accounts',
     'invenio_upgrader',
-    'invenio.base',
+    'invenio_base',
 ]
 
 PACKAGES_EXCLUDE = [
