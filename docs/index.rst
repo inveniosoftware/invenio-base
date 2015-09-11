@@ -37,3 +37,26 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+API
+===
+
+.. automodule:: invenio_base
+   :members:
+
+Wrappers
+--------
+
+.. automodule:: invenio_base.wrappers
+   :members:
+
+Factory
+-------
+
+.. automodule:: invenio_base.factory
+   :members:
+
+Bundles
+-------
+
+.. automodule:: invenio_base.bundles
+   :members:
