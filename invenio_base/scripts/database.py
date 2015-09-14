@@ -106,7 +106,6 @@ def drop(yes_i_know=False, quiet=False):
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
-    from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -147,10 +146,6 @@ def drop(yes_i_know=False, quiet=False):
             print("ERROR: not all items were properly dropped.")
             print(">>> Dropped", dropped, 'out of', N)
 
-    _dropper(StorageEngine.__storage_engine_registry__,
-             '>>> Dropping {0} storage engines ...',
-             lambda api: api.storage_engine.drop())
-
     _dropper(tables, '>>> Dropping {0} tables ...',
              lambda table: table.drop(bind=db.engine, checkfirst=True))
 
@@ -165,7 +160,6 @@ def create(default_data=True, quiet=False):
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
-    from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
     test_sqla_connection()
     test_sqla_utf8_chain()
@@ -202,10 +196,6 @@ def create(default_data=True, quiet=False):
 
     _creator(tables, '>>> Creating {0} tables ...',
              lambda table: table.create(bind=db.engine))
-
-    _creator(StorageEngine.__storage_engine_registry__,
-             '>>> Creating {0} storage engines ...',
-             lambda api: api.storage_engine.create())
 
 
 @manager.command
