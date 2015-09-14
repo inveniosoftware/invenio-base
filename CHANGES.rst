@@ -24,6 +24,15 @@
 Changes
 =======
 
+Version 0.2.1 (released 2015-09-14)
+-----------------------------------
+
+Bug fixes
+~~~~~~~~~
+
+- Amends legacy imports and mentions of `invenio.base` module.
+- Removes dependency on JSONAlchemy in `database` command.
+
 Version 0.2.0 (released 2015-09-14)
 -----------------------------------
 
