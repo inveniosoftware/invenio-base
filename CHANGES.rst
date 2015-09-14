@@ -24,6 +24,31 @@
 Changes
 =======
 
+Version 0.2.0 (released 2015-09-14)
+-----------------------------------
+
+Incompatible changes
+~~~~~~~~~~~~~~~~~~~~
+
+- Removes deprecated `demosite` command.
+
+New features
+~~~~~~~~~~~~
+
+- Adds `jsoneditor` dependency to r.js settings.
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
+- Replaces `select2.min` with `select2` to simplify debugging.
+
+Bug fixes
+~~~~~~~~~
+
+- Fixes a bug which, under certain conditions, led to wrong asset
+  links when working with ASSET_DEBUG=True.
+
 Version 0.1.0 (released 2015-09-09)
+-----------------------------------
 
 - Initial public release.

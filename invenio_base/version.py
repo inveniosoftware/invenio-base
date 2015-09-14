@@ -28,4 +28,4 @@ This file is imported by ``invenio_base.__init__``,
 and parsed by ``setup.py``.
 """
 
-__version__ = "0.1.1.dev20150909"
+__version__ = "0.2.0"

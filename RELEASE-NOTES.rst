@@ -1,8 +1,8 @@
 =====================
- Invenio-Base v0.1.0
+ Invenio-Base v0.2.0
 =====================
 
-Invenio-Base v0.1.0 was released on September 9, 2015.
+Invenio-Base v0.2.0 was released on September 14, 2015.
 
 About
 -----
@@ -11,20 +11,36 @@ Base package for building the Invenio application.
 
 *This is an experimental developer preview release.*
 
-What's new
-----------
+Incompatible changes
+--------------------
 
-- Initial public release.
+- Removes deprecated `demosite` command.
+
+New features
+------------
+
+- Adds `jsoneditor` dependency to r.js settings.
+
+Improved features
+-----------------
+
+- Replaces `select2.min` with `select2` to simplify debugging.
+
+Bug fixes
+---------
+
+- Fixes a bug which, under certain conditions, led to wrong asset
+  links when working with ASSET_DEBUG=True.
 
 Installation
 ------------
 
-   $ pip install invenio-base==0.1.0
+   $ pip install invenio-base==0.2.0
 
 Documentation
 -------------
 
-   http://invenio-base.readthedocs.org/en/v0.1.0
+   http://invenio-base.readthedocs.org/en/v0.2.0
 
 Happy hacking and thanks for flying Invenio-Base.
 
