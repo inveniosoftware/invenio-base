@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,18 +17,19 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.A
 
-"""Test invenio.base.scripts.config."""
+"""Test invenio_base.scripts.config."""
 
 import os
 import sys
-import mock
 import tempfile
 
 from flask import current_app
-from invenio_base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, InvenioTestCase
 
-config = lazy_import("invenio.base.scripts.config")
+from invenio.testsuite import InvenioTestCase
+
+from invenio_base.scripts import config
+
+import mock
 
 
 class TestConfig(InvenioTestCase):
@@ -138,6 +140,3 @@ DEBUG = True
             self.assertRegexpMatches(f.read(), "DEBUG\s*=\s*False")
 
         sys.stdout = _stdout
-
-
-TEST_SUITE = make_test_suite(TestConfig)

@@ -232,7 +232,7 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
     #
 
     # Load default configuration
-    app.config.from_object('invenio.base.config')
+    app.config.from_object('invenio_base.config')
 
     # Load site specific default configuration from entry points
     load_site_config(app)

@@ -23,8 +23,7 @@ from __future__ import absolute_import
 
 from flask import escape, url_for
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, \
-    run_test_suite
+from invenio.testsuite import InvenioTestCase
 
 
 class FlashMessageSecurityTest(InvenioTestCase):
@@ -36,7 +35,7 @@ class FlashMessageSecurityTest(InvenioTestCase):
         cfg = super(FlashMessageSecurityTest, self).config
         cfg['PACKAGES'] = [
             'test_apps.flash_msg',
-            'invenio.base',
+            'invenio_base',
         ]
         return cfg
 
@@ -65,8 +64,3 @@ class FlashMessageSecurityTest(InvenioTestCase):
             self.assertTrue(message in response.data,
                             'flash message should not have been escaped for ' +
                             'context "{}"'.format(context))
-
-TEST_SUITE = make_test_suite(FlashMessageSecurityTest)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

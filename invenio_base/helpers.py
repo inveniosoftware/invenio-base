@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,23 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.base.helpers
-    --------------------
 
-    Implements various helpers.
-"""
+"""Implement various helpers."""
 
 from functools import wraps
+
 from flask import Flask, current_app, has_app_context
-from six import iteritems, text_type, string_types
+
+from six import iteritems, string_types, text_type
 
 
 def with_app_context(app=None, new_context=False, **kwargs_config):
-    """Run function within the application context"""
-
+    """Run function within the application context."""
     def get_application():
-        """Returns an application instance."""
+        """Return an application instance."""
         if app is not None and not isinstance(app, Flask) and callable(app):
             return app(**kwargs_config)
         else:
@@ -41,8 +39,7 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
     def decorator(f):
         @wraps(f)
         def decorated_func(*args, **kwargs):
-            """This function has to run within the application context."""
-
+            """Force this function to run within the application context."""
             if not has_app_context() or new_context:
                 with get_application().test_request_context('/'):
                     # FIXME we should use maybe app_context()
@@ -56,9 +53,9 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
 
 
 def unicodifier(obj):
-    """
-    Tries to (recursively) convert the given object into Unicode, assuming
-    a UTF-8 encoding)
+    """Try to (recursively) convert the given object into Unicode.
+
+    It assumes a UTF-8 encoding.
 
     :param obj: the object to convert
         (can be e.g. unicode, str, list, tuple, dict)
@@ -77,8 +74,7 @@ def unicodifier(obj):
 
 
 def utf8ifier(obj):
-    """
-    Tries to (recursively) convert the given object into utf8.
+    """Try to (recursively) convert the given object into utf8.
 
     :param obj: the object to convert
         (can be e.g. unicode, str, list, tuple, dict)
