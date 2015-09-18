@@ -25,7 +25,7 @@ import datetime
 
 from flask import current_app
 
-from invenio.ext.script import Manager, change_command_name, print_progress
+from invenio_ext.script import Manager, change_command_name, print_progress
 
 manager = Manager(usage="Perform database operations")
 
@@ -46,7 +46,7 @@ option_default_data = manager.option(
 @option_yes_i_know
 def init(user='root', password='', yes_i_know=False):
     """Initialize database and user."""
-    from invenio.ext.sqlalchemy.utils import initialize_database_user
+    from invenio_ext.sqlalchemy.utils import initialize_database_user
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
     from sqlalchemy_utils.functions import database_exists, create_database, \
@@ -103,9 +103,9 @@ def drop(yes_i_know=False, quiet=False):
 
     from invenio.utils.date import get_time_estimator
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+    from invenio_ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
-    from invenio.ext.sqlalchemy import db, models
+    from invenio_ext.sqlalchemy import db, models
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -157,9 +157,9 @@ def create(default_data=True, quiet=False):
     print(">>> Going to create tables...")
 
     from invenio.utils.date import get_time_estimator
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+    from invenio_ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
-    from invenio.ext.sqlalchemy import db, models
+    from invenio_ext.sqlalchemy import db, models
 
     test_sqla_connection()
     test_sqla_utf8_chain()
@@ -215,7 +215,7 @@ def diff():
         print(">>> pip install sqlalchemy-migrate")
         return
 
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     print(db.schemadiff())
 
 
@@ -237,7 +237,7 @@ def uri():
 
 def version():
     """Get running version of database driver."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     return db.engine.dialect.dbapi.__version__
 
 
@@ -246,7 +246,7 @@ def version():
 @change_command_name
 def driver_info(verbose=False):
     """Get name of running database driver."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     return db.engine.dialect.dbapi.__name__ + (('==' + version())
                                                if verbose else '')
 
@@ -259,7 +259,7 @@ def mysql_info(separator=None, line_format=None):
 
     Useful for debugging problems on various OS.
     """
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     if db.engine.name != 'mysql':
         raise Exception('Database engine is not mysql.')
 

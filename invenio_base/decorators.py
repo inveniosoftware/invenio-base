@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,8 +24,8 @@ from flask import request, jsonify, current_app, stream_with_context, \
 from functools import wraps
 from sqlalchemy.sql import operators
 
-from invenio.ext.sqlalchemy import db
-from invenio.ext.template.context_processor import \
+from invenio_ext.sqlalchemy import db
+from invenio_ext.template.context_processor import \
     register_template_context_processor
 
 

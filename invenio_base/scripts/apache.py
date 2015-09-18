@@ -22,7 +22,7 @@ from __future__ import print_function
 import os
 import socket
 
-from invenio.ext.script import Manager, change_command_name
+from invenio_ext.script import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
 
@@ -107,7 +107,7 @@ def create_config(force=False, no_ssl=False):
     import shutil
     from flask import current_app
     from jinja2 import TemplateNotFound
-    from invenio.ext.template import render_template_to_string
+    from invenio_ext.template import render_template_to_string
     from invenio.utils.text import wrap_text_in_a_box
 
     CFG_ETCDIR = current_app.config.get('CFG_ETCDIR', '')
