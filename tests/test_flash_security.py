@@ -55,7 +55,7 @@ class FlashMessageSecurityTest(InvenioTestCase):
                                                context=context))
             self.assertTrue(escaped_message in response.data,
                             'flash message should have been escaped for ' +
-                            'context "{}"'.format(context))
+                            'context "{0}"'.format(context))
 
         for context in safe_flash_contexts:
             # test safe contexts
@@ -63,4 +63,4 @@ class FlashMessageSecurityTest(InvenioTestCase):
                                                context=context))
             self.assertTrue(message in response.data,
                             'flash message should not have been escaped for ' +
-                            'context "{}"'.format(context))
+                            'context "{0}"'.format(context))

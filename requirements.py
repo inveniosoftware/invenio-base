@@ -161,11 +161,11 @@ if __name__ == '__main__':
             sys.exit(1)
 
         if '==' in specs:
-            result[pkg.key] = '{}=={}'.format(pkg.project_name, specs['=='])
+            result[pkg.key] = '{0}=={1}'.format(pkg.project_name, specs['=='])
 
         elif '>=' in specs:
             if args.level == 'min':
-                result[pkg.key] = '{}=={}'.format(
+                result[pkg.key] = '{0}=={1}'.format(
                     pkg.project_name,
                     specs['>=']
                 )
