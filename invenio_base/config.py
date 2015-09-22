@@ -64,9 +64,9 @@ EXTENSIONS = [
     'invenio_ext.menu',
     'invenio_ext.jasmine',  # after assets
     'flask_breadcrumbs:Breadcrumbs',
-    'invenio_deposit.url_converters',
+    # FIXME 'invenio_deposit.url_converters',
     # TODO 'invenio_ext.iiif',
-    'invenio_ext.es',
+    # FIXME 'invenio_ext.es',
 ]
 
 PACKAGES = [
