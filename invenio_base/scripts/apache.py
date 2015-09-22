@@ -57,7 +57,7 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
     Grep in its binary PATH_TO_EXEC and looking for VERSION_REGEXP.  Return
     program version as a string.  Return empty string if not succeeded.
     """
-    from invenio.utils.shell import run_shell_command
+    from invenio_utils.shell import run_shell_command
     exec_version = ""
     if os.path.exists(path_to_exec):
         dummy1, cmd2_out, dummy2 = run_shell_command(
@@ -79,7 +79,7 @@ def version(separator='\n', formatting='{version} [{executable}]'):
     returned format is 'apache_version [apache_path]'.)  Return empty
     list if no success.
     """
-    from invenio.utils.shell import run_shell_command
+    from invenio_utils.shell import run_shell_command
     out = []
     dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
     for apache in cmd_out.split("\n"):
@@ -108,7 +108,7 @@ def create_config(force=False, no_ssl=False):
     from flask import current_app
     from jinja2 import TemplateNotFound
     from invenio_ext.template import render_template_to_string
-    from invenio.utils.text import wrap_text_in_a_box
+    from invenio_utils.text import wrap_text_in_a_box
 
     CFG_ETCDIR = current_app.config.get('CFG_ETCDIR', '')
 

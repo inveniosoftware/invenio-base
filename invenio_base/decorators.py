@@ -189,7 +189,7 @@ def wash_arguments(config):
     def _decorated(f):
         @wraps(f)
         def decorator(*args, **kwargs):
-            from invenio.utils.washers import wash_urlargd
+            from invenio_utils.washers import wash_urlargd
             argd = wash_urlargd(request.values, config)
             argd.update(kwargs)
             return f(*args, **argd)

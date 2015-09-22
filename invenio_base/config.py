@@ -22,10 +22,19 @@
 from __future__ import unicode_literals
 
 import distutils.sysconfig
+
 from os.path import join
 
-from invenio.utils.shell import which
-from invenio.version import __version__
+try:
+    from shutil import which
+except ImportError:
+    # CPython <3.3
+    from distutils.spawn import find_executable as which
+
+try:
+    from invenio.version import __version__
+except ImportError:
+    __version__ = None
 
 
 EXTENSIONS = [
@@ -67,7 +76,6 @@ PACKAGES = [
     'invenio_collections',
     'invenio_documents',
     'invenio_pidstore',
-    'invenio.modules.*',
     'invenio_formatter',
     'invenio_unapi',
     'invenio_webhooks',
@@ -85,37 +93,7 @@ PACKAGES = [
     'invenio_base',
 ]
 
-PACKAGES_EXCLUDE = [
-    'invenio.modules.access',
-    'invenio.modules.accounts',
-    'invenio.modules.annotations',
-    'invenio.modules.archiver',
-    'invenio.modules.cloudconnector',
-    'invenio.modules.comments',
-    'invenio.modules.collections',
-    'invenio.modules.communities',
-    'invenio.modules.deposit',
-    'invenio.modules.documentation',
-    'invenio.modules.documents',
-    'invenio.modules.formatter',
-    'invenio.modules.groups',
-    'invenio.modules.knowledge',
-    'invenio.modules.messages',
-    'invenio.modules.multimedia',
-    'invenio.modules.oaiharvester',
-    'invenio.modules.oauth2server',
-    'invenio.modules.oauthclient',
-    'invenio.modules.pages',
-    'invenio.modules.pidstore',
-    'invenio.modules.previewer',
-    'invenio.modules.records',
-    'invenio.modules.search',
-    'invenio.modules.tags',
-    'invenio.modules.unapi',
-    'invenio.modules.upgrader',
-    'invenio.modules.webhooks',
-    'invenio.modules.workflows',
-]
+PACKAGES_EXCLUDE = []
 
 LEGACY_WEBINTERFACE_EXCLUDE = []
 

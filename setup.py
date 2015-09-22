@@ -42,6 +42,7 @@ requirements = [
 
 test_requirements = [
     'Flask-Testing>=0.4.1',
+    'invenio-testing>=0.1.0',
     'coverage>=4.0.0',
     'httpretty>=0.8.10',
     'mock>=1.0.0',

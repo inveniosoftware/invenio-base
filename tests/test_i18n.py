@@ -19,17 +19,15 @@
 
 """Unit tests for messages library."""
 
-__revision__ = "$Id$"
-
 from invenio_base import i18n as messages
 from invenio_base.globals import cfg
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
+from invenio_testing import InvenioTestCase
 
 
 class MessagesLanguageTest(InvenioTestCase):
-    """
-    Testing language-related functions
-    """
+
+    """Testing language-related functions."""
 
     def test_lang_list_long_ordering(self):
         """messages - preserving language order"""
@@ -38,7 +36,6 @@ class MessagesLanguageTest(InvenioTestCase):
         # Preliminary test: same number of languages in both lists
         self.assertEqual(len(lang_list_long),
                          len(cfg['CFG_SITE_LANGS']))
-
 
         for lang, cfg_lang in zip(lang_list_long,
                                   cfg['CFG_SITE_LANGS']):
@@ -63,16 +60,16 @@ class MessagesLanguageTest(InvenioTestCase):
         """messages - washing multiple languages"""
         if 'de' not in cfg['CFG_SITE_LANGS']:
             self.assertEqual(messages.wash_languages(['00',
-                                                  '11',
-                                                  '22',
-                                                  'de']),
-                         cfg['CFG_SITE_LANG'])
+                                                      '11',
+                                                      '22',
+                                                      'de']),
+                             cfg['CFG_SITE_LANG'])
         else:
             self.assertEqual(messages.wash_languages(['00',
-                                                  '11',
-                                                  '22',
-                                                  'de']),
-                         'de')
+                                                      '11',
+                                                      '22',
+                                                      'de']),
+                             'de')
         self.assertEqual(messages.wash_languages(['00',
                                                   '11',
                                                   '22']),
@@ -84,9 +81,3 @@ class MessagesLanguageTest(InvenioTestCase):
         self.assertEqual(messages.is_language_rtl('ar'), True)
         # English is not right-to-left:
         self.assertEqual(messages.is_language_rtl('en'), False)
-
-
-TEST_SUITE = make_test_suite(MessagesLanguageTest,)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
