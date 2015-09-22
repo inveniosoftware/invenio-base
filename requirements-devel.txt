@@ -30,4 +30,6 @@
 -e git+git://github.com/mitsuhiko/flask.git#egg=flask
 
 -e git+git://github.com/inveniosoftware/flask-registry.git#egg=flask-registry
+-e git+git://github.com/inveniosoftware/invenio-ext.git#egg=invenio-ext
 -e git+git://github.com/inveniosoftware/invenio-testing.git#egg=invenio-testing
+-e git+git://github.com/inveniosoftware/invenio-utils.git#egg=invenio-utils
