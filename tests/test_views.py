@@ -19,7 +19,7 @@
 
 """Test base views."""
 
-from invenio.testsuite import InvenioTestCase
+from invenio_testing import InvenioTestCase
 
 
 class ViewsTest(InvenioTestCase):

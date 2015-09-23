@@ -23,7 +23,7 @@ from __future__ import absolute_import
 
 from flask import escape, url_for
 
-from invenio.testsuite import InvenioTestCase
+from invenio_testing import InvenioTestCase
 
 
 class FlashMessageSecurityTest(InvenioTestCase):

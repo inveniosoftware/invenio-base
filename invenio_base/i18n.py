@@ -58,7 +58,7 @@ def gettext_set_language(ln):
     """
     warnings.warn('"gettext_set_language" is going to be removed.',
                   DeprecationWarning)
-    from invenio.ext.babel import set_locale
+    from invenio_ext.babel import set_locale
     with set_locale(ln):
         return gettext
 

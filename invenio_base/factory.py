@@ -181,7 +181,7 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
 
     # Flask application name
     # FIXME app_name = '.'.join(__name__.split('.')[0:2])
-    app_name = 'invenio.base'
+    app_name = 'invenio_base'
 
     # Prefix for env variables
     env_prefix = re.sub('[^A-Z]', '', app_name.upper())
@@ -190,7 +190,9 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
     instance_path = instance_path or \
         os.getenv(env_prefix + '_INSTANCE_PATH') or \
         os.path.join(
-            sys.prefix, 'var', app_name + '-instance'
+            # FIXME remove replacement when not needed
+            #       s/invenio_base/invenio.base/
+            sys.prefix, 'var', app_name.replace('_', '.') + '-instance'
         )
 
     # Detect static files path

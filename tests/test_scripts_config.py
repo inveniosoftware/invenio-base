@@ -25,7 +25,7 @@ import tempfile
 
 from flask import current_app
 
-from invenio.testsuite import InvenioTestCase
+from invenio_testing import InvenioTestCase
 
 from invenio_base.scripts import config
 

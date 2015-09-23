@@ -31,7 +31,7 @@ from pprint import pformat
 
 from flask import current_app
 
-from invenio.ext.script import Manager, change_command_name, \
+from invenio_ext.script import Manager, change_command_name, \
     generate_secret_key
 
 try:
