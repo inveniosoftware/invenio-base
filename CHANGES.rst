@@ -24,6 +24,24 @@
 Changes
 =======
 
+Version 0.3.0 (released 2015-09-22)
+-----------------------------------
+
+Incompatible changes
+~~~~~~~~~~~~~~~~~~~~
+
+- Disables non-core extensions for Invenio deposit and Elastic search,
+  that requires Invenio-Records to be installed.
+- Removes database mysql-info command.
+
+Bug fixes
+~~~~~~~~~
+
+- Removes dependencies on Invenio package.
+- Removes calls to PluginManager consider_setuptools_entrypoints()
+  removed in PyTest 2.8.0.
+- Adds missing invenio_ext dependency and fixes its imports.
+
 Version 0.2.1 (released 2015-09-14)
 -----------------------------------
 

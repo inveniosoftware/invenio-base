@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ from __future__ import print_function
 
 from flask import current_app
 from .factory import create_app
-from invenio.ext.script import Manager, change_command_name, register_manager
+from invenio_ext.script import Manager, change_command_name, register_manager
 
 manager = Manager(create_app(), with_default_commands=False)
 
@@ -31,7 +31,7 @@ manager = Manager(create_app(), with_default_commands=False)
 @manager.shell
 def make_shell_context():
     """Extend shell context."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     return dict(current_app=current_app, db=db)
 
 
@@ -46,7 +46,7 @@ def version():
 def check_for_software_updates():
     """Check software updates."""
     from flask import get_flashed_messages
-    from invenio.ext.script import check_for_software_updates
+    from invenio_ext.script import check_for_software_updates
     print(">>> Going to check software updates ...")
     result = check_for_software_updates()
     messages = list(get_flashed_messages(with_categories=True))

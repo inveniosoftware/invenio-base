@@ -66,7 +66,7 @@ import mimetypes
 
 from flask import current_app
 
-from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio_ext.assets import Bundle, RequireJSFilter
 
 mimetypes.add_type("text/css", ".less")
 

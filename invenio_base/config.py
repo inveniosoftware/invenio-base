@@ -22,42 +22,51 @@
 from __future__ import unicode_literals
 
 import distutils.sysconfig
+
 from os.path import join
 
-from invenio.utils.shell import which
-from invenio.version import __version__
+try:
+    from shutil import which
+except ImportError:
+    # CPython <3.3
+    from distutils.spawn import find_executable as which
+
+try:
+    from invenio.version import __version__
+except ImportError:
+    __version__ = None
 
 
 EXTENSIONS = [
-    'invenio.ext.confighacks',
-    'invenio.ext.passlib:Passlib',
-    'invenio.ext.debug_toolbar',
-    'invenio.ext.babel',
-    'invenio.ext.sqlalchemy',
-    'invenio.ext.sslify',
-    'invenio.ext.cache',
-    'invenio.ext.session',
-    'invenio.ext.login',
-    'invenio.ext.principal',
-    'invenio.ext.email',
-    'invenio.ext.fixtures',  # before legacy
-    'invenio.ext.legacy',
-    'invenio.ext.assets',
-    'invenio.ext.template',
-    'invenio.ext.admin',
-    'invenio.ext.logging',
-    'invenio.ext.logging.backends.fs',
-    'invenio.ext.logging.backends.legacy',
-    'invenio.ext.logging.backends.sentry',
-    'invenio.ext.gravatar',
-    'invenio.ext.collect',
-    'invenio.ext.restful',
-    'invenio.ext.menu',
-    'invenio.ext.jasmine',  # after assets
+    'invenio_ext.confighacks',
+    'invenio_ext.passlib:Passlib',
+    'invenio_ext.debug_toolbar',
+    'invenio_ext.babel',
+    'invenio_ext.sqlalchemy',
+    'invenio_ext.sslify',
+    'invenio_ext.cache',
+    'invenio_ext.session',
+    'invenio_ext.login',
+    'invenio_ext.principal',
+    'invenio_ext.email',
+    'invenio_ext.fixtures',  # before legacy
+    'invenio_ext.legacy',
+    'invenio_ext.assets',
+    'invenio_ext.template',
+    'invenio_ext.admin',
+    'invenio_ext.logging',
+    'invenio_ext.logging.backends.fs',
+    'invenio_ext.logging.backends.legacy',
+    'invenio_ext.logging.backends.sentry',
+    'invenio_ext.gravatar',
+    'invenio_ext.collect',
+    'invenio_ext.restful',
+    'invenio_ext.menu',
+    'invenio_ext.jasmine',  # after assets
     'flask_breadcrumbs:Breadcrumbs',
-    'invenio_deposit.url_converters',
-    # TODO 'invenio.ext.iiif',
-    'invenio.ext.es',
+    # FIXME 'invenio_deposit.url_converters',
+    # TODO 'invenio_ext.iiif',
+    # FIXME 'invenio_ext.es',
 ]
 
 PACKAGES = [
@@ -67,7 +76,6 @@ PACKAGES = [
     'invenio_collections',
     'invenio_documents',
     'invenio_pidstore',
-    'invenio.modules.*',
     'invenio_formatter',
     'invenio_unapi',
     'invenio_webhooks',
@@ -85,37 +93,7 @@ PACKAGES = [
     'invenio_base',
 ]
 
-PACKAGES_EXCLUDE = [
-    'invenio.modules.access',
-    'invenio.modules.accounts',
-    'invenio.modules.annotations',
-    'invenio.modules.archiver',
-    'invenio.modules.cloudconnector',
-    'invenio.modules.comments',
-    'invenio.modules.collections',
-    'invenio.modules.communities',
-    'invenio.modules.deposit',
-    'invenio.modules.documentation',
-    'invenio.modules.documents',
-    'invenio.modules.formatter',
-    'invenio.modules.groups',
-    'invenio.modules.knowledge',
-    'invenio.modules.messages',
-    'invenio.modules.multimedia',
-    'invenio.modules.oaiharvester',
-    'invenio.modules.oauth2server',
-    'invenio.modules.oauthclient',
-    'invenio.modules.pages',
-    'invenio.modules.pidstore',
-    'invenio.modules.previewer',
-    'invenio.modules.records',
-    'invenio.modules.search',
-    'invenio.modules.tags',
-    'invenio.modules.unapi',
-    'invenio.modules.upgrader',
-    'invenio.modules.webhooks',
-    'invenio.modules.workflows',
-]
+PACKAGES_EXCLUDE = []
 
 LEGACY_WEBINTERFACE_EXCLUDE = []
 

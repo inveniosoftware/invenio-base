@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,16 +18,16 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Implement custom decorators."""
+
+from functools import wraps
+
+from flask import Response, current_app, flash, g, get_flashed_messages, \
+    jsonify, render_template, request, stream_with_context
+
 from six import iteritems
 
-from flask import request, jsonify, current_app, stream_with_context, \
-    Response, render_template, get_flashed_messages, flash, g
-from functools import wraps
+from sqlalchemy.sql import expression as sae
 from sqlalchemy.sql import operators
-
-from invenio.ext.sqlalchemy import db
-from invenio.ext.template.context_processor import \
-    register_template_context_processor
 
 
 def templated(template=None, stream=False, mimetype='text/html'):
@@ -107,9 +108,9 @@ def sorted_by(model=None, cols=None):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             sort_by = request.args.get('sort_by', None)
-            order_fn = {'asc': db.asc,
-                        'desc': db.desc}.get(request.args.get('order', 'asc'),
-                                             db.asc)
+            order_fn = {'asc': sae.asc,
+                        'desc': sae.desc}.get(request.args.get('order', 'asc'),
+                                              sae.asc)
             sort = False
             if model is not None and sort_by is not None and (
                     cols is None or sort_by in cols):
@@ -161,12 +162,12 @@ def filtered_by(model=None, columns=None, form=None, filter_empty=False):
                             values = [value for value in values
                                       if len(value) > 0 or filter_empty]
                             if op == operators.eq:
-                                where.append(db.in_(values))
+                                where.append(sae.in_(values))
                             else:
                                 or_list = []
                                 for value in values:
                                     or_list.append(op(cond, value))
-                                where.append(db.or_(*or_list))
+                                where.append(sae.or_(*or_list))
                         else:
                             where.append(op(cond, value))
                 except:
@@ -175,11 +176,15 @@ def filtered_by(model=None, columns=None, form=None, filter_empty=False):
             if form is not None:
                 filter_form = form(request.values)
 
+                # FIXME replace by signal when Flask 1.0 is out
+                from invenio_ext.template.context_processor import \
+                    register_template_context_processor
+
                 @register_template_context_processor
                 def inject_filter_form():
                     return dict(filter_form=filter_form)
             # Generate ClauseElement for filtered columns.
-            kwargs['filter'] = db.and_(*where)
+            kwargs['filter'] = sae.and_(*where)
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -189,7 +194,7 @@ def wash_arguments(config):
     def _decorated(f):
         @wraps(f)
         def decorator(*args, **kwargs):
-            from invenio.utils.washers import wash_urlargd
+            from invenio_utils.washers import wash_urlargd
             argd = wash_urlargd(request.values, config)
             argd.update(kwargs)
             return f(*args, **argd)

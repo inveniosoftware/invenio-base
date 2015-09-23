@@ -22,10 +22,11 @@
 from __future__ import print_function
 
 import datetime
+import warnings
 
 from flask import current_app
 
-from invenio.ext.script import Manager, change_command_name, print_progress
+from invenio_ext.script import Manager, change_command_name, print_progress
 
 manager = Manager(usage="Perform database operations")
 
@@ -46,8 +47,8 @@ option_default_data = manager.option(
 @option_yes_i_know
 def init(user='root', password='', yes_i_know=False):
     """Initialize database and user."""
-    from invenio.ext.sqlalchemy.utils import initialize_database_user
-    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
+    from invenio_ext.sqlalchemy.utils import initialize_database_user
+    from invenio_utils.text import wrap_text_in_a_box, wait_for_user
 
     from sqlalchemy_utils.functions import database_exists, create_database, \
         drop_database
@@ -101,11 +102,11 @@ def drop(yes_i_know=False, quiet=False):
     """Drop database tables."""
     print(">>> Going to drop tables and related data on filesystem ...")
 
-    from invenio.utils.date import get_time_estimator
-    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+    from invenio_utils.date import get_time_estimator
+    from invenio_utils.text import wrap_text_in_a_box, wait_for_user
+    from invenio_ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
-    from invenio.ext.sqlalchemy import db, models
+    from invenio_ext.sqlalchemy import db, models
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -156,10 +157,10 @@ def create(default_data=True, quiet=False):
     """Create database tables from sqlalchemy models."""
     print(">>> Going to create tables...")
 
-    from invenio.utils.date import get_time_estimator
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+    from invenio_utils.date import get_time_estimator
+    from invenio_ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
-    from invenio.ext.sqlalchemy import db, models
+    from invenio_ext.sqlalchemy import db, models
 
     test_sqla_connection()
     test_sqla_utf8_chain()
@@ -215,7 +216,7 @@ def diff():
         print(">>> pip install sqlalchemy-migrate")
         return
 
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     print(db.schemadiff())
 
 
@@ -237,7 +238,7 @@ def uri():
 
 def version():
     """Get running version of database driver."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     return db.engine.dialect.dbapi.__version__
 
 
@@ -246,7 +247,7 @@ def version():
 @change_command_name
 def driver_info(verbose=False):
     """Get name of running database driver."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     return db.engine.dialect.dbapi.__name__ + (('==' + version())
                                                if verbose else '')
 
@@ -259,35 +260,7 @@ def mysql_info(separator=None, line_format=None):
 
     Useful for debugging problems on various OS.
     """
-    from invenio.ext.sqlalchemy import db
-    if db.engine.name != 'mysql':
-        raise Exception('Database engine is not mysql.')
-
-    from invenio.legacy.dbquery import run_sql
-    out = []
-    for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
-            run_sql("SHOW VARIABLES LIKE 'charact%'") + \
-            run_sql("SHOW VARIABLES LIKE 'collat%'"):
-        if False:
-            print("    - %s: %s" % (key, val))
-        elif key in ['version',
-                     'character_set_client',
-                     'character_set_connection',
-                     'character_set_database',
-                     'character_set_results',
-                     'character_set_server',
-                     'character_set_system',
-                     'collation_connection',
-                     'collation_database',
-                     'collation_server']:
-            out.append((key, val))
-
-    if separator is not None:
-        if line_format is None:
-            line_format = "%s: %s"
-        return separator.join(map(lambda i: line_format % i, out))
-
-    return dict(out)
+    warnigns.warn("mysql-info command has been removed", DeprecationWarning)
 
 
 def main():
