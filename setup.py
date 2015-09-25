@@ -34,9 +34,10 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
-    'Flask>=0.10.1',
     'Flask-Babel>=0.9',
     'Flask-Registry>=0.2',
+    'Flask>=0.10.1',
+    'invenio-ext>=0.2.1',
     'six>=1.7.2',
 ]
 
@@ -44,7 +45,6 @@ test_requirements = [
     'Flask-Testing>=0.4.1',
     'coverage>=4.0.0',
     'httpretty>=0.8.10',
-    'invenio-ext>=0.1.0',
     'invenio-testing>=0.1.0',
     'invenio-utils>=0.1.0',
     'mock>=1.0.0',
