@@ -24,6 +24,14 @@
 Changes
 =======
 
+Version 0.3.1 (released 2015-10-06)
+-----------------------------------
+
+Bug fixes
+~~~~~~~~~
+
+- Corrects the d3.js library path.
+
 Version 0.3.0 (released 2015-09-22)
 -----------------------------------
 
