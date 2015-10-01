@@ -54,6 +54,14 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
   - "travis_retry pip install -e .[$REXTRAS]"
+  - "npm update"
+  - "npm install --silent -g bower less clean-css uglify-js requirejs"
+  # All the step below this points are solely for test purposes, don't use them
+  # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
+  - "inveniomanage bower -i bower-base.json > bower.json"
+  - "bower install --silent"
+  - "inveniomanage collect > /dev/null"
+  - "inveniomanage assets build"
 
 before_script:
   - "inveniomanage database init --yes-i-know"
