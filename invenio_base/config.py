@@ -70,26 +70,6 @@ EXTENSIONS = [
 ]
 
 PACKAGES = [
-    'invenio_records',
-    'invenio_search',
-    'invenio_comments',
-    'invenio_collections',
-    'invenio_documents',
-    'invenio_pidstore',
-    'invenio_formatter',
-    'invenio_unapi',
-    'invenio_webhooks',
-    'invenio_deposit',
-    'invenio_workflows',
-    'invenio_knowledge',
-    'invenio_oauthclient',
-    'invenio_oauth2server',
-    'invenio_previewer',
-    # TODO 'invenio_messages',
-    'invenio_groups',
-    'invenio_access',
-    'invenio_accounts',
-    'invenio_upgrader',
     'invenio_base',
 ]
 
