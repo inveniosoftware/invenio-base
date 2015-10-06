@@ -23,6 +23,8 @@ from __future__ import absolute_import
 
 from flask import escape, url_for
 
+from mock import patch
+
 from invenio_testing import InvenioTestCase
 
 
@@ -39,8 +41,10 @@ class FlashMessageSecurityTest(InvenioTestCase):
         ]
         return cfg
 
-    def test_flash_message_escaping(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_flash_message_escaping(self, _render_assets):
         """Test that flash messages are escaped by default."""
+        _render_assets.return_value = '/ping'
 
         flash_contexts = ['', 'info', 'danger', 'error', 'warning', 'success']
         safe_flash_contexts = [context + '(html_safe)' for context in
