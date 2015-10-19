@@ -54,9 +54,3 @@ Factory
 
 .. automodule:: invenio_base.factory
    :members:
-
-Bundles
--------
-
-.. automodule:: invenio_base.bundles
-   :members:

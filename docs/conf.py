@@ -47,6 +47,7 @@ ultramock.activate()
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
 ]
 
@@ -320,4 +321,17 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'flask': ('http://flask.pocoo.org/docs/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None)
+}
+
+# Monkeypatch sphinx for shields.io images.
+import sphinx.environment
+from docutils.utils import get_source_line
+def _warn_node(self, msg, node):
+    if not msg.startswith('nonlocal image URI'):
+        self._warnfunc(msg, '{}:{}'.format(*get_source_line(node)))
+
+sphinx.environment.BuildEnvironment.warn_node = _warn_node

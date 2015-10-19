@@ -61,7 +61,7 @@ before_script:
 
 script:
   - "check-manifest --ignore .travis-\\*-requirements.txt"
-  - "sphinx-build -qnN docs docs/_build/html"
+  - "sphinx-build -qnNW docs docs/_build/html"
   - "python setup.py test"
 
 after_success:
