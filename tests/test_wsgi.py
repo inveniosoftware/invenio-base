@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,12 +21,35 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-"""Version information for Invenio-Base.
+"""Test wsgi application."""
 
-This file is imported by ``invenio_base.__init__``, and parsed by
-``setup.py`` as well as ``docs/conf.py``.
-"""
+from __future__ import absolute_import, print_function, unicode_literals
 
-from __future__ import absolute_import, print_function
+from flask import Flask
 
-__version__ = "1.0.0.dev20151002"
+from invenio_base.wsgi import create_wsgi_factory
+
+
+def test_create_wsgi_factory():
+    """Test wsgi factory creation."""
+    api = Flask('api')
+
+    @api.route("/")
+    def apiview():
+        return "api"
+
+    app = Flask('app')
+
+    @app.route("/")
+    def appview():
+        return "app"
+
+    # Test factory creation
+    factory = create_wsgi_factory({'/api': lambda: api})
+    app.wsgi_app = factory(app)
+
+    with app.test_client() as client:
+        assert client.get('/').status_code == 200
+        assert b'app' in client.get('/').data
+        assert client.get('/api/').status_code == 200
+        assert b'api' in client.get('/api/').data

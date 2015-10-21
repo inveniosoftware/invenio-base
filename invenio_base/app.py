@@ -1,0 +1,250 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization or
+# submit itself to any jurisdiction.
+
+"""Invenio application factory."""
+
+from __future__ import absolute_import, print_function
+
+import logging
+import os.path
+import sys
+import warnings
+
+import click
+import pkg_resources
+from flask import Flask
+from flask_cli import FlaskCLI, FlaskGroup
+
+from .cmd import startproject
+
+
+def create_app_factory(app_name, conf_loader=None,
+                       ext_entry_points=None, extensions=None,
+                       bp_entry_points=None, blueprints=None,
+                       wsgi_factory=None, **app_kwargs):
+    """Create a Flask application factory.
+
+    The application factory will load Flask extensions and blueprints specified
+    using both entry points and directly in the arguments. Loading order of
+    entry points are not guaranteed and can happen in any order.
+
+    :param app_name: Flask application name.
+    :param conf_loader: Callable which will be invoked on application creation
+        in order to load the Flask configuration. See example below.
+    :param ext_entry_points: List of entry points, which specifies Flask
+        extensions that will be initialized only by passing in the Flask
+        application object
+    :param extensions: List of Flask extensions that can be initialized only by
+        passing in the Flask application object.
+    :param bp_entry_points: List of entry points, which specifies Blueprints
+        that will be registered on the Flask application.
+    :param blueprints: List of Blueprints that will be registered on the
+        Flask application.
+    :param wsgi_factory: A callable that will be passed the Flask application
+        object in order to overwrite the default WSGI application (e.g. to
+        install ``DispatcherMiddleware``).
+    :param app_kwargs: Keyword arguments passed to :py:meth:`base_app`.
+    :return: Flask application factory.
+
+    Example of a configuration loader:
+
+    .. code-block:: python
+
+       def my_conf_loader(app, **kwargs):
+           app.config.from_module('mysite.config')
+           app.config.update(**kwargs)
+
+    Note that Invenio-Config provides a default configuration loader which is
+    sufficient for most cases.
+
+    Example of a WSGI factory:
+
+    .. code-block:: python
+
+       def my_wsgi_factory(app):
+           return DispatcherMiddleware(app.wsgi_app, {'/api': api_app})
+
+    """
+    def _create_app(**kwargs):
+        app = base_app(app_name, **app_kwargs)
+
+        # Load configuration
+        if conf_loader:
+            conf_loader(app, **kwargs)
+
+        # Load application based on entrypoints.
+        app_loader(
+            app,
+            entry_points=ext_entry_points,
+            modules=extensions,
+        )
+
+        # Load blueprints
+        blueprint_loader(
+            app,
+            entry_points=bp_entry_points,
+            modules=blueprints,
+        )
+
+        # Replace WSGI application using factory if provided (e.g. to install
+        # WSGI middleware).
+        if wsgi_factory:
+            app.wsgi_app = wsgi_factory(app)
+
+        return app
+
+    return _create_app
+
+
+def create_cli(create_app=None):
+    """Create CLI for ``inveniomanage`` command.
+
+    :param create_app: Flask application factory.
+    :return: Click command group.
+    """
+    def create_cli_app(info):
+        """Application factory for CLI app.
+
+        Internal function for creating the CLI. When invoked via
+        ``inveniomanage`` FLASK_APP must be set.
+        """
+        if create_app is None:
+            # Fallback to normal Flask behavior
+            info.create_app = None
+            app = info.load_app()
+        else:
+            app = create_app()
+            if info.debug is not None:
+                app.debug = info.debug
+            return app
+
+    @click.group(cls=FlaskGroup, create_app=create_cli_app,
+                 add_app_option=True)
+    def cli(**params):
+        """Command Line Interface for Invenio."""
+        pass
+
+    # Add command for startin new Invenio instances.
+    cli.add_command(startproject)
+
+    return cli
+
+
+def app_loader(app, entry_points=None, modules=None):
+    """Default application loader.
+
+    :param entry_points: List of entry points providing to Flask extensions.
+    :param modules: List of Flask extensions.
+    """
+    _loader(lambda ext: ext(app), entry_points=entry_points, modules=modules)
+
+
+def blueprint_loader(app, entry_points=None, modules=None):
+    """Default blueprint loader.
+
+    :param entry_points: List of entry points providing to Blueprints.
+    :param modules: List of Blueprints.
+    """
+    _loader(
+        lambda bp: app.register_blueprint(bp),
+        entry_points=entry_points, modules=modules)
+
+
+def _loader(init_func, entry_points=None, modules=None):
+    """Generic loader.
+
+    Used to load and initialize entry points and modules using an custom
+    initialization function.
+    """
+    if entry_points:
+        for entry_point in entry_points:
+            for ep in pkg_resources.iter_entry_points(entry_point):
+                init_func(ep.load())
+    if modules:
+        for m in modules:
+            init_func(m)
+
+
+def base_app(app_name, env_prefix='APP', instance_path=None,
+             static_folder=None, static_url_path='/static',
+             template_folder='templates'):
+    """Invenio base application factory.
+
+    If the instance folder does not exists, it will be created.
+
+    :param app_name: Flask application name.
+    :param env_prefix: Environment variable prefix.
+    :param instance_path: Instance path for Flask application. Defaults to
+        ``<env_prefix>_INSTANCE_PATH`` or if environment variable is not set
+        ``<sys.prefix>/var/<app_name>-instance``.
+    :param static_folder: Static folder path.  Defaults to
+        ``<env_prefix>_STATIC_FOLDER`` or if environment variable is not set
+        ``<sys.prefix>/var/<app_name>-instance/static``.
+    :return: Flask application instance.
+    """
+    configure_warnings()
+
+    # Detect instance path
+    instance_path = instance_path or \
+        os.getenv(env_prefix + '_INSTANCE_PATH') or \
+        os.path.join(sys.prefix, 'var', app_name + '-instance')
+
+    # Detect static files path
+    static_folder = static_folder or \
+        os.getenv(env_prefix + '_STATIC_FOLDER') or \
+        os.path.join(instance_path, 'static')
+
+    # Create instance path if it doesn't exists
+    try:
+        if not os.path.exists(instance_path):
+            os.makedirs(instance_path)
+    except Exception:  # pragma: no cover
+        pass
+
+    # Create the Flask application instance
+    app = Flask(
+        app_name,
+        instance_path=instance_path,
+        instance_relative_config=True,
+        static_folder=static_folder,
+        static_url_path=static_url_path,
+        template_folder=template_folder,
+    )
+    FlaskCLI(app)
+
+    return app
+
+
+def configure_warnings():
+    """Configure warnings by routing warnings to the logging system.
+
+    It also unhides ``DeprecationWarning``.
+    """
+    if not sys.warnoptions:
+        # Route warnings through python logging
+        logging.captureWarnings(True)
+
+        # DeprecationWarning is by default hidden, hence we force the
+        # "default" behavior on deprecation warnings which is not to hide
+        # errors.
+        warnings.simplefilter("default", DeprecationWarning)

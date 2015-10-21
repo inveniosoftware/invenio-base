@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,12 +21,10 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-"""Version information for Invenio-Base.
-
-This file is imported by ``invenio_base.__init__``, and parsed by
-``setup.py`` as well as ``docs/conf.py``.
-"""
+"""Command Line Interface for Invenio."""
 
 from __future__ import absolute_import, print_function
 
-__version__ = "1.0.0.dev20151002"
+from .app import create_cli
+
+cli = create_cli()
