@@ -29,6 +29,7 @@ include *.txt
 include *.yml
 include .dockerignore
 include .editorconfig
+include .coveragerc
 include LICENSE
 include babel.ini
 include invenio_base/static/img/test
@@ -45,6 +46,7 @@ recursive-include invenio_base *.gif
 recursive-include invenio_base *.html
 recursive-include invenio_base *.ico
 recursive-include invenio_base *.js
+recursive-include invenio_base *.json
 recursive-include invenio_base *.less
 recursive-include invenio_base *.mo
 recursive-include invenio_base *.png

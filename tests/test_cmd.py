@@ -25,6 +25,9 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import os
+from subprocess import call
+
 from click.testing import CliRunner
 
 from invenio_base.cmd import startproject
@@ -42,3 +45,20 @@ def test_startproject():
     with runner.isolated_filesystem():
         result = runner.invoke(startproject, ['mysite'])
         assert result.exit_code == 0
+
+
+def test_startproject_created_project():
+    """Test startproject command checking the result project."""
+    runner = CliRunner()
+
+    # Missing arg
+    result = runner.invoke(startproject, [])
+    assert result.exit_code != 0
+
+    # With arg
+    with runner.isolated_filesystem():
+        site_name = 'mysite2'
+        result = runner.invoke(startproject, [site_name])
+        path_to_folder = os.path.join(os.getcwd(), site_name)
+        path_to_manage = os.path.join(path_to_folder, 'manage.py')
+        assert call(['python',  path_to_manage]) == 0

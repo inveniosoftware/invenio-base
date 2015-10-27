@@ -84,6 +84,7 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
+    'invenio-config>=1.0.0a1'
 ]
 
 extras_require = {
@@ -104,6 +105,7 @@ setup_requires = [
 install_requires = [
     'Flask-CLI>=0.2.1',
     'Flask>=0.10',
+    'cookiecutter>=1.2.1',
 ]
 
 packages = find_packages()

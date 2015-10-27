@@ -1,0 +1,2 @@
+[run]
+omit = invenio_base/cookiecutter-invenio-base/*

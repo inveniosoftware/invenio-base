@@ -23,14 +23,35 @@
 
 """Application bootstraping."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
 import click
+from cookiecutter.main import cookiecutter
+from pkg_resources import resource_filename
 
 
 @click.command()
 @click.argument('name')
 def startproject(name):
     """Create a new project from template."""
-    # TODO: Use cookiecutter to create project template
-    click.echo("Creating project...")
+    path = resource_filename(__name__, "cookiecutter-invenio-base")
+
+    result = cookiecutter(path, no_input=True,
+                          extra_context={
+                              "site_name": name,
+                              "secret_key": generate_secret_key()
+                              })
+    click.secho("Created project...", fg="green")
+    return result
+
+
+def generate_secret_key():
+    """Generate secret key."""
+    import string
+    import random
+
+    rng = random.SystemRandom()
+    return ''.join(
+        rng.choice(string.ascii_letters + string.digits)
+        for dummy in range(0, 256)
+        )

@@ -1,0 +1,5 @@
+{
+    "site_name": "MySite",
+    "package_name": "{{ cookiecutter.site_name | replace('-', '_') }}",
+    "secret_key": "default_key"
+}
