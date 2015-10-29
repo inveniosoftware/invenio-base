@@ -1,8 +1,8 @@
 =====================
- Invenio-Base v0.3.1
+ Invenio-Base v1.0.0
 =====================
 
-Invenio-Base v0.3.1 was released on October 6, 2015.
+Invenio-Base v1.0.0 was released on October 30, 2015.
 
 About
 -----
@@ -11,20 +11,15 @@ Base package for building the Invenio application.
 
 *This is an experimental developer preview release.*
 
-Bug fixes
----------
-
-- Corrects the d3.js library path.
-
 Installation
 ------------
 
-   $ pip install invenio-base==0.3.1
+   $ pip install invenio-base==1.0.0
 
 Documentation
 -------------
 
-   http://invenio-base.readthedocs.org/en/v0.3.1
+   http://pythonhosted.org/invenio-base/
 
 Happy hacking and thanks for flying Invenio-Base.
 
