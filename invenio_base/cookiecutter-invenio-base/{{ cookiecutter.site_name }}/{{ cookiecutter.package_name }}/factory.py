@@ -13,19 +13,19 @@ env_prefix = 'APP'
 conf_loader = create_conf_loader(config=config, env_prefix=env_prefix)
 
 create_api = create_app_factory(
-    '{{ cookiecutter.site_name }}',
+    '{{ cookiecutter.package_name }}',
     env_prefix=env_prefix,
     conf_loader=conf_loader,
-    bp_entry_point='invenio_base.api_blueprints',
-    ext_entry_point='invenio_base.api_apps',
+    bp_entry_points=['invenio_base.api_blueprints'],
+    ext_entry_points=['invenio_base.api_apps'],
 )
 
 
 create_app = create_app_factory(
-    '{{ cookiecutter.site_name }}',
+    '{{ cookiecutter.package_name }}',
     env_prefix=env_prefix,
     conf_loader=conf_loader,
-    bp_entry_point='invenio_base.blueprints',
-    ext_entry_point='invenio_base.apps',
+    bp_entry_points=['invenio_base.blueprints'],
+    ext_entry_points=['invenio_base.apps'],
     wsgi_factory=create_wsgi_factory({'/api': create_api})
 )

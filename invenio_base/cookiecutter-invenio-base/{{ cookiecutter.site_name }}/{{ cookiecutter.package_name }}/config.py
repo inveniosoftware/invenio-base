@@ -16,6 +16,8 @@ I18N_LANGUAGES = [
 ]
 
 BASE_TEMPLATE = "invenio_theme/page.html"
+COVER_TEMPLATE = "invenio_theme/page_cover.html"
+SETTINGS_TEMPLATE = "invenio_theme/settings/content.html"
 
 SECRET_KEY = "{{cookiecutter.secret_key }}"
 

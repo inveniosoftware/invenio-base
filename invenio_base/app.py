@@ -185,14 +185,14 @@ def _loader(init_func, entry_points=None, modules=None):
             init_func(m)
 
 
-def base_app(app_name, env_prefix='APP', instance_path=None,
+def base_app(import_name, env_prefix='APP', instance_path=None,
              static_folder=None, static_url_path='/static',
-             template_folder='templates'):
+             template_folder='templates', instance_relative_config=True):
     """Invenio base application factory.
 
     If the instance folder does not exists, it will be created.
 
-    :param app_name: Flask application name.
+    :param import_name: The name of the application package.
     :param env_prefix: Environment variable prefix.
     :param instance_path: Instance path for Flask application. Defaults to
         ``<env_prefix>_INSTANCE_PATH`` or if environment variable is not set
@@ -207,7 +207,7 @@ def base_app(app_name, env_prefix='APP', instance_path=None,
     # Detect instance path
     instance_path = instance_path or \
         os.getenv(env_prefix + '_INSTANCE_PATH') or \
-        os.path.join(sys.prefix, 'var', app_name + '-instance')
+        os.path.join(sys.prefix, 'var', import_name + '-instance')
 
     # Detect static files path
     static_folder = static_folder or \
@@ -223,13 +223,14 @@ def base_app(app_name, env_prefix='APP', instance_path=None,
 
     # Create the Flask application instance
     app = Flask(
-        app_name,
+        import_name,
         instance_path=instance_path,
-        instance_relative_config=True,
+        instance_relative_config=instance_relative_config,
         static_folder=static_folder,
         static_url_path=static_url_path,
         template_folder=template_folder,
     )
+    # Ensure we have Click available for Flask <1.0
     FlaskCLI(app)
 
     return app
