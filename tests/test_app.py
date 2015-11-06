@@ -26,7 +26,6 @@
 from __future__ import absolute_import, print_function
 
 import logging
-import os
 import warnings
 from os.path import exists, join
 
@@ -180,41 +179,44 @@ def test_blueprint_loader():
 def test_base_app(tmppath):
     """Test base app creation."""
     # Test default static_url_path and CLI initialization
-    app = base_app('test', 'TEST')
+    app = base_app('test')
     assert app.name == 'test'
     assert app.cli
     assert app.static_url_path == '/static'
     assert app.instance_path != tmppath
 
     # Test specifying instance path
-    app = base_app('test', 'TEST', instance_path=tmppath)
+    app = base_app('test', instance_path=tmppath)
     assert app.instance_path == tmppath
     assert exists(app.instance_path)
-    assert app.static_folder == join(app.instance_path, 'static')
-
-    # Test specifying instance path via ENV
-    os.environ['TEST_INSTANCE_PATH'] = tmppath
-    app = base_app('test', 'TEST')
-    assert app.instance_path == tmppath
+    assert app.static_folder is None
 
     # Test automatic instance path creation
     newpath = join(tmppath, 'test')
     assert not exists(newpath)
-    app = base_app('test', 'TEST', instance_path=newpath)
+    app = base_app('test', instance_path=newpath)
     assert exists(newpath)
-    assert app.static_folder == join(newpath, 'static')
+    assert app.static_folder is None
 
     # Test static folder
     staticpath = join(tmppath, 'teststatic')
-    app = base_app('test', 'TEST', static_folder=staticpath)
+    app = base_app('test', static_folder=staticpath)
     assert app.static_folder == staticpath
+    assert app.instance_path is not None
+
+    # Test static + instance folder
+    staticpath = join(tmppath, 'teststatic')
+    app = base_app('test', instance_path=tmppath,
+                   static_folder=staticpath)
+    assert app.static_folder == staticpath
+    assert app.instance_path == tmppath
 
     # Test choice loader
     searchpath = join(tmppath, "tpls")
-    app = base_app('test', 'TEST', template_folder=searchpath)
+    app = base_app('test', template_folder=searchpath)
     assert app.jinja_loader.searchpath == [searchpath]
 
-    app = base_app('test', 'TEST')
+    app = base_app('test')
     assert app.jinja_loader.searchpath == [join(app.root_path, 'templates')]
 
 
