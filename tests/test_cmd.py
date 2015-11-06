@@ -30,35 +30,36 @@ from subprocess import call
 
 from click.testing import CliRunner
 
-from invenio_base.cmd import startproject
+from invenio_base.cmd import instance
 
 
-def test_startproject():
+def test_instance_create():
     """Test startproject command."""
     runner = CliRunner()
 
     # Missing arg
-    result = runner.invoke(startproject, [])
+    result = runner.invoke(instance, ['create'])
     assert result.exit_code != 0
 
     # With arg
     with runner.isolated_filesystem():
-        result = runner.invoke(startproject, ['mysite'])
+        result = runner.invoke(instance, ['create', 'mysite'])
         assert result.exit_code == 0
 
 
-def test_startproject_created_project():
+def test_instance_create_created_project():
     """Test startproject command checking the result project."""
     runner = CliRunner()
 
     # Missing arg
-    result = runner.invoke(startproject, [])
+    result = runner.invoke(instance, ['create'])
     assert result.exit_code != 0
 
     # With arg
     with runner.isolated_filesystem():
         site_name = 'mysite2'
-        result = runner.invoke(startproject, [site_name])
+        result = runner.invoke(instance, ['create', site_name])
+        assert result.exit_code == 0
         path_to_folder = os.path.join(os.getcwd(), site_name)
         path_to_manage = os.path.join(path_to_folder, 'manage.py')
         assert call(['python',  path_to_manage]) == 0

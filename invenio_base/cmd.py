@@ -30,9 +30,14 @@ from cookiecutter.main import cookiecutter
 from pkg_resources import resource_filename
 
 
-@click.command()
+@click.group()
+def instance():
+    """Instance commands."""
+
+
+@instance.command('create')
 @click.argument('name')
-def startproject(name):
+def create(name):
     """Create a new project from template."""
     path = resource_filename(__name__, "cookiecutter-invenio-base")
 

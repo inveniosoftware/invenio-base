@@ -35,7 +35,7 @@ import pkg_resources
 from flask import Flask
 from flask_cli import FlaskCLI, FlaskGroup
 
-from .cmd import startproject
+from .cmd import instance
 
 
 def create_app_factory(app_name, conf_loader=None,
@@ -145,7 +145,7 @@ def create_cli(create_app=None):
         pass
 
     # Add command for startin new Invenio instances.
-    cli.add_command(startproject)
+    cli.add_command(instance)
 
     return cli
 

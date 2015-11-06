@@ -42,9 +42,9 @@ subcommands are available:
      --help                Show this message and exit.
 
    Commands:
-     run           Runs a development server.
-     shell         Runs a shell in the app context.
-     startproject  Create a new project from template.
+     run              Runs a development server.
+     shell            Runs a shell in the app context.
+     instance create  Create a new project from template.
 
 
 The ``run`` and ``shell`` commands only works if you have specified the
@@ -55,12 +55,12 @@ information.
 
 Starting a new project
 ~~~~~~~~~~~~~~~~~~~~~~
-The ``startproject`` subcommand helps you bootstrap a minimal Invenio
+The ``instance create`` subcommand helps you bootstrap a minimal Invenio
 application:
 
 .. code-block:: console
 
-   $ inveniomanage startproject mysite
+   $ inveniomanage instance create mysite
    $ find mysite
 
 
