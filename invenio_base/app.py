@@ -185,41 +185,20 @@ def _loader(init_func, entry_points=None, modules=None):
             init_func(m)
 
 
-def base_app(import_name, env_prefix='APP', instance_path=None,
-             static_folder=None, static_url_path='/static',
-             template_folder='templates', instance_relative_config=True):
+def base_app(import_name, instance_path=None, static_folder=None,
+             static_url_path='/static', template_folder='templates',
+             instance_relative_config=True):
     """Invenio base application factory.
 
     If the instance folder does not exists, it will be created.
 
     :param import_name: The name of the application package.
     :param env_prefix: Environment variable prefix.
-    :param instance_path: Instance path for Flask application. Defaults to
-        ``<env_prefix>_INSTANCE_PATH`` or if environment variable is not set
-        ``<sys.prefix>/var/<app_name>-instance``.
-    :param static_folder: Static folder path.  Defaults to
-        ``<env_prefix>_STATIC_FOLDER`` or if environment variable is not set
-        ``<sys.prefix>/var/<app_name>-instance/static``.
+    :param instance_path: Instance path for Flask application.
+    :param static_folder: Static folder path.
     :return: Flask application instance.
     """
     configure_warnings()
-
-    # Detect instance path
-    instance_path = instance_path or \
-        os.getenv(env_prefix + '_INSTANCE_PATH') or \
-        os.path.join(sys.prefix, 'var', import_name + '-instance')
-
-    # Detect static files path
-    static_folder = static_folder or \
-        os.getenv(env_prefix + '_STATIC_FOLDER') or \
-        os.path.join(instance_path, 'static')
-
-    # Create instance path if it doesn't exists
-    try:
-        if not os.path.exists(instance_path):
-            os.makedirs(instance_path)
-    except Exception:  # pragma: no cover
-        pass
 
     # Create the Flask application instance
     app = Flask(
@@ -232,6 +211,13 @@ def base_app(import_name, env_prefix='APP', instance_path=None,
     )
     # Ensure we have Click available for Flask <1.0
     FlaskCLI(app)
+
+    # Create instance path if it doesn't exists
+    try:
+        if not os.path.exists(instance_path):
+            os.makedirs(instance_path)
+    except Exception:  # pragma: no cover
+        pass
 
     return app
 
