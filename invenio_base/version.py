@@ -29,4 +29,4 @@ This file is imported by ``invenio_base.__init__``, and parsed by
 
 from __future__ import absolute_import, print_function
 
-__version__ = "1.0.0a3.dev20150000"
+__version__ = "1.0.0a3"
