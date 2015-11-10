@@ -38,9 +38,9 @@ from flask_cli import FlaskCLI, FlaskGroup
 from .cmd import instance
 
 
-def create_app_factory(app_name, conf_loader=None,
-                       ext_entry_points=None, extensions=None,
-                       bp_entry_points=None, blueprints=None,
+def create_app_factory(app_name, config_loader=None,
+                       extension_entry_points=None, extensions=None,
+                       blueprint_entry_points=None, blueprints=None,
                        wsgi_factory=None, **app_kwargs):
     """Create a Flask application factory.
 
@@ -49,15 +49,15 @@ def create_app_factory(app_name, conf_loader=None,
     entry points are not guaranteed and can happen in any order.
 
     :param app_name: Flask application name.
-    :param conf_loader: Callable which will be invoked on application creation
-        in order to load the Flask configuration. See example below.
-    :param ext_entry_points: List of entry points, which specifies Flask
+    :param config_loader: Callable which will be invoked on application
+        creation in order to load the Flask configuration. See example below.
+    :param extension_entry_points: List of entry points, which specifies Flask
         extensions that will be initialized only by passing in the Flask
         application object
     :param extensions: List of Flask extensions that can be initialized only by
         passing in the Flask application object.
-    :param bp_entry_points: List of entry points, which specifies Blueprints
-        that will be registered on the Flask application.
+    :param blueprint_entry_points: List of entry points, which specifies
+        Blueprints that will be registered on the Flask application.
     :param blueprints: List of Blueprints that will be registered on the
         Flask application.
     :param wsgi_factory: A callable that will be passed the Flask application
@@ -70,7 +70,7 @@ def create_app_factory(app_name, conf_loader=None,
 
     .. code-block:: python
 
-       def my_conf_loader(app, **kwargs):
+       def my_config_loader(app, **kwargs):
            app.config.from_module('mysite.config')
            app.config.update(**kwargs)
 
@@ -89,20 +89,20 @@ def create_app_factory(app_name, conf_loader=None,
         app = base_app(app_name, **app_kwargs)
 
         # Load configuration
-        if conf_loader:
-            conf_loader(app, **kwargs)
+        if config_loader:
+            config_loader(app, **kwargs)
 
         # Load application based on entrypoints.
         app_loader(
             app,
-            entry_points=ext_entry_points,
+            entry_points=extension_entry_points,
             modules=extensions,
         )
 
         # Load blueprints
         blueprint_loader(
             app,
-            entry_points=bp_entry_points,
+            entry_points=blueprint_entry_points,
             modules=blueprints,
         )
 

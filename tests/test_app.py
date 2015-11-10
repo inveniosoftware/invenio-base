@@ -240,15 +240,15 @@ def test_create_app_factory():
     assert 'ext' in app.extensions
 
 
-def test_create_app_factory_conf_loader():
+def test_create_app_factory_config_loader():
     """Test app factory conf loader."""
-    def _conf_loader(app, **kwargs):
-        app.config['CONF_LOADER'] = True
+    def _config_loader(app, **kwargs):
+        app.config['CONFIG_LOADER'] = True
         app.config.update(kwargs)
 
-    create_app = create_app_factory('test', conf_loader=_conf_loader)
+    create_app = create_app_factory('test', config_loader=_config_loader)
     app = create_app(KWARGS_TEST=True)
-    assert app.config['CONF_LOADER']
+    assert app.config['CONFIG_LOADER']
     assert app.config['KWARGS_TEST']
 
 
