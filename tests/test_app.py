@@ -278,11 +278,11 @@ def test_create_cli_with_app():
 
     result = runner.invoke(cli, ['test_cmd'])
     assert result.exit_code == 0
-    assert result.output == '{0} False\n'.format(app_name)
+    assert u'{0} False\n'.format(app_name) in result.output
 
     result = runner.invoke(cli, ['--debug', 'test_cmd'])
     assert result.exit_code == 0
-    assert result.output == '{0} True\n'.format(app_name)
+    assert u'{0} True\n'.format(app_name) in result.output
 
 
 def test_create_cli_without_app():

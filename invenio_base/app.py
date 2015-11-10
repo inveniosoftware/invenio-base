@@ -216,8 +216,8 @@ def base_app(import_name, instance_path=None, static_folder=None,
     try:
         if not os.path.exists(instance_path):
             os.makedirs(instance_path)
-    except Exception:  # pragma: no cover
-        pass
+    except Exception as ex:  # pragma: no cover
+        app.logger.exception(ex)
 
     return app
 
