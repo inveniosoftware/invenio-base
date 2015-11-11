@@ -106,6 +106,10 @@ def create_app_factory(app_name, config_loader=None,
             modules=blueprints,
         )
 
+        debug = kwargs.get('debug')
+        if debug is not None:
+            app.debug = debug
+
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
@@ -133,10 +137,8 @@ def create_cli(create_app=None):
             info.create_app = None
             app = info.load_app()
         else:
-            app = create_app()
-            if info.debug is not None:
-                app.debug = info.debug
-            return app
+            app = create_app(debug=info.debug)
+        return app
 
     @click.group(cls=FlaskGroup, create_app=create_cli_app,
                  add_app_option=True)
@@ -216,8 +218,10 @@ def base_app(import_name, instance_path=None, static_folder=None,
     try:
         if not os.path.exists(instance_path):
             os.makedirs(instance_path)
-    except Exception as ex:  # pragma: no cover
-        app.logger.exception(ex)
+    except Exception:  # pragma: no cover
+        app.logger.exception(
+            "Failed to create instance folder: '{0}'".format(instance_path)
+        )
 
     return app
 

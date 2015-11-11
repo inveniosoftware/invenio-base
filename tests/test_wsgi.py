@@ -45,7 +45,7 @@ def test_create_wsgi_factory():
         return "app"
 
     # Test factory creation
-    factory = create_wsgi_factory({'/api': lambda: api})
+    factory = create_wsgi_factory({'/api': lambda **kwargs: api})
     app.wsgi_app = factory(app)
 
     with app.test_client() as client:
