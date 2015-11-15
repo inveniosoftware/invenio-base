@@ -34,7 +34,7 @@ from invenio_base.cmd import instance
 
 
 def test_instance_create():
-    """Test startproject command."""
+    """Test ``instance create`` command."""
     runner = CliRunner()
 
     # Missing arg
@@ -47,8 +47,8 @@ def test_instance_create():
         assert result.exit_code == 0
 
 
-def test_instance_create_created_project():
-    """Test startproject command checking the result project."""
+def test_instance_create_created_instance():
+    """Test ``instance create`` command checking the resulting instance."""
     runner = CliRunner()
 
     # Missing arg

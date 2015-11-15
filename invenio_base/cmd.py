@@ -38,7 +38,7 @@ def instance():
 @instance.command('create')
 @click.argument('name')
 def create(name):
-    """Create a new project from template."""
+    """Create a new Invenio instance from template."""
     path = resource_filename(__name__, "cookiecutter-invenio-base")
 
     result = cookiecutter(path, no_input=True,
@@ -46,7 +46,7 @@ def create(name):
                               "site_name": name,
                               "secret_key": generate_secret_key()
                               })
-    click.secho("Created project...", fg="green")
+    click.secho("Created instance...", fg="green")
     return result
 
 

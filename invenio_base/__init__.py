@@ -37,14 +37,14 @@ subcommands are available:
      Command Line Interface for Invenio.
 
    Options:
-     -a, --app TEXT        The application to run
+     -a, --app TEXT        The application to run.
      --debug / --no-debug  Enable or disable debug mode.
      --help                Show this message and exit.
 
    Commands:
-     run              Runs a development server.
-     shell            Runs a shell in the app context.
-     instance create  Create a new project from template.
+     run              Run development server.
+     shell            Run shell in the app context.
+     instance create  Create a new Invenio instance from template.
 
 
 The ``run`` and ``shell`` commands only works if you have specified the
@@ -53,8 +53,8 @@ The ``run`` and ``shell`` commands only works if you have specified the
 information.
 
 
-Starting a new project
-~~~~~~~~~~~~~~~~~~~~~~
+Creating a new Invenio instance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``instance create`` subcommand helps you bootstrap a minimal Invenio
 application:
 
