@@ -64,12 +64,20 @@ application:
    $ find mysite
 
 
-You can run the newly created site using the provided ``manage.py`` script:
+You can install the newly created site using the provided ``setup.py`` script:
 
 .. code-block:: console
 
    $ cd mysite
-   $ python manage.py run
+   $ python setup.py install
+
+After installation you can use ``mysite`` command to manage you instance.
+
+.. code-block:: console
+
+   $ mysite --help
+   ...
+
 """
 
 from __future__ import absolute_import, print_function

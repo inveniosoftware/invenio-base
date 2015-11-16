@@ -45,7 +45,7 @@ def create(name):
                           extra_context={
                               "site_name": name,
                               "secret_key": generate_secret_key()
-                              })
+                          })
     click.secho("Created instance...", fg="green")
     return result
 
@@ -59,4 +59,4 @@ def generate_secret_key():
     return ''.join(
         rng.choice(string.ascii_letters + string.digits)
         for dummy in range(0, 256)
-        )
+    )

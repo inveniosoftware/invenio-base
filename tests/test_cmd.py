@@ -25,10 +25,12 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import importlib
 import os
 from subprocess import call
 
 from click.testing import CliRunner
+import pkg_resources
 
 from invenio_base.cmd import instance
 
@@ -60,6 +62,19 @@ def test_instance_create_created_instance():
         site_name = 'mysite2'
         result = runner.invoke(instance, ['create', site_name])
         assert result.exit_code == 0
-        path_to_folder = os.path.join(os.getcwd(), site_name)
-        path_to_manage = os.path.join(path_to_folder, 'manage.py')
-        assert call(['python',  path_to_manage]) == 0
+
+        cwd = os.getcwd()
+        path_to_folder = os.path.join(cwd, site_name)
+        os.chdir(path_to_folder)
+
+        assert call(['pip', 'install', '-e', '.']) == 0
+        assert pkg_resources.get_distribution(site_name)
+
+        app = importlib.import_module(site_name + '.factory').create_app()
+        with app.app_context():
+            assert app.name == site_name
+
+        assert call([site_name, '--help']) == 0
+        assert call(['pip', 'uninstall', site_name, '-y']) == 0
+
+        os.chdir(cwd)

@@ -45,6 +45,7 @@ recursive-include invenio_base *.foo
 recursive-include invenio_base *.gif
 recursive-include invenio_base *.html
 recursive-include invenio_base *.ico
+recursive-include invenio_base *.ini
 recursive-include invenio_base *.js
 recursive-include invenio_base *.json
 recursive-include invenio_base *.less
