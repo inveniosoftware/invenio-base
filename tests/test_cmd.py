@@ -29,8 +29,9 @@ import importlib
 import os
 from subprocess import call
 
-from click.testing import CliRunner
 import pkg_resources
+from click.testing import CliRunner
+from mock import Mock, patch
 
 from invenio_base.cmd import instance
 
@@ -78,3 +79,47 @@ def test_instance_create_created_instance():
         assert call(['pip', 'uninstall', site_name, '-y']) == 0
 
         os.chdir(cwd)
+
+
+def test_list_entry_points():
+    """Test listing of entry points."""
+    mock_working_set = pkg_resources.WorkingSet(entries=[])
+    dist = pkg_resources.get_distribution('invenio-base')
+    mock_working_set.add(dist)
+
+    with patch('invenio_base.cmd.working_set', new=mock_working_set):
+        runner = CliRunner()
+
+        # Test select an existing entry point
+        result = runner.invoke(
+            instance, ['entrypoints', '-e', 'console_scripts'])
+        assert result.exit_code == 0
+        lines = result.output.splitlines()
+        assert lines[0] == 'console_scripts'
+        assert lines[1] == '  inveniomanage = invenio_base.cli:cli'
+
+        # Test no entry point matching
+        result = runner.invoke(
+            instance, ['entrypoints', '-e', 'nothing_here'])
+        assert result.exit_code == 0
+        assert result.output == ""
+
+        # By default we only show entry points groups starting with "invenio"
+        dist.get_entry_map = Mock(return_value={
+            'invenio_base.apps': {
+                'myapp': 'myapp = myapp:MyApp',
+                'app1': 'app1 = app1:MyApp'},
+            'invenio_base.api_apps': {
+                'myapi': 'myapi = myapi:MyApp'},
+            'console_scripts': {
+                'mycli': 'mycli = cli:main'},
+        })
+        result = runner.invoke(instance, ['entrypoints', ])
+        assert result.exit_code == 0
+        print(result.output.splitlines())
+        lines = result.output.splitlines()
+        assert lines[0] == 'invenio_base.api_apps'
+        assert lines[1] == '  myapi = myapi:MyApp'
+        assert lines[2] == 'invenio_base.apps'
+        assert lines[3] == '  app1 = app1:MyApp'
+        assert lines[4] == '  myapp = myapp:MyApp'

@@ -27,7 +27,7 @@ from __future__ import absolute_import, print_function
 
 import click
 from cookiecutter.main import cookiecutter
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename, working_set
 
 
 @click.group()
@@ -48,6 +48,36 @@ def create(name):
                           })
     click.secho("Created instance...", fg="green")
     return result
+
+
+@instance.command('entrypoints')
+@click.option(
+    '-e', '--entry-point', default=None, metavar='ENTRY_POINT',
+    help='Entry point group name (e.g. invenio_base.apps)')
+def list_entrypoints(entry_point):
+    """List defined entry points."""
+    found_entry_points = {}
+    for dist in working_set:
+        entry_map = dist.get_entry_map()
+        for group_name, entry_points in entry_map.items():
+            # Filter entry points
+            if entry_point is None and \
+               not group_name.startswith('invenio'):
+                continue
+            if entry_point is not None and \
+               entry_point != group_name:
+                continue
+
+            # Store entry points.
+            if group_name not in found_entry_points:
+                found_entry_points[group_name] = []
+            for ep in entry_points.values():
+                found_entry_points[group_name].append(str(ep))
+
+    for ep_group in sorted(found_entry_points.keys()):
+        click.secho("{0}".format(ep_group), fg='green')
+        for ep in sorted(found_entry_points[ep_group]):
+            click.echo("  {0}".format(ep))
 
 
 def generate_secret_key():
