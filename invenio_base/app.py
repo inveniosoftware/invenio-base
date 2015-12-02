@@ -88,6 +88,10 @@ def create_app_factory(app_name, config_loader=None,
     def _create_app(**kwargs):
         app = base_app(app_name, **app_kwargs)
 
+        debug = kwargs.get('debug')
+        if debug is not None:
+            app.debug = debug
+
         # Load configuration
         if config_loader:
             config_loader(app, **kwargs)
@@ -105,10 +109,6 @@ def create_app_factory(app_name, config_loader=None,
             entry_points=blueprint_entry_points,
             modules=blueprints,
         )
-
-        debug = kwargs.get('debug')
-        if debug is not None:
-            app.debug = debug
 
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
