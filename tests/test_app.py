@@ -29,6 +29,7 @@ import logging
 import warnings
 from os.path import exists, join
 
+import pytest
 from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
 from mock import patch
@@ -71,6 +72,8 @@ class MockEntryPoint(EntryPoint):
 
     def load(self):
         """Mock load entry point."""
+        if self.name == 'fail':
+            raise Exception("Fail")
         return self.name
 
 
@@ -80,6 +83,7 @@ def _mock_entry_points(name):
                      MockEntryPoint('ep1.e2', 'ep1.e2'), ],
         entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1'),
                      MockEntryPoint('ep2.e2', 'ep2.e2'), ],
+        entrypoint3=[MockEntryPoint('fail', 'ep3.e1',), ],
     )
     names = data.keys() if name is None else [name]
     for key in names:
@@ -126,29 +130,54 @@ def test_configure_warnings():
 @patch('pkg_resources.iter_entry_points', _mock_entry_points)
 def test_loader():
     """Test loader."""
+    app = Flask(__name__)
     found = []
-    _loader(lambda x: found.append(x), entry_points=None, modules=None)
+    _loader(app, lambda x: found.append(x), entry_points=None, modules=None)
     assert found == []
 
     # Modules
     found = []
-    _loader(lambda x: found.append(x), modules=['a', 'b'])
+    _loader(app, lambda x: found.append(x), modules=['a', 'b'])
     assert found == ['a', 'b']
 
     # Entry points
     found = []
     _loader(
+        app,
         lambda x: found.append(x), entry_points=['entrypoint1', 'entrypoint2'])
     assert found == ['ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2']
 
     # Modules and entry points (entry points loaded before modules)
     found = []
     _loader(
+        app,
         lambda x: found.append(x),
         entry_points=['entrypoint1', 'entrypoint2'],
         modules=['a', 'b']
     )
     assert found == ['ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2', 'a', 'b']
+
+
+@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+def test_loader_exceptions():
+    """Test exceptions during loading."""
+    app = Flask(__name__)
+    handler = MockLoggingHandler()
+    app.logger.addHandler(handler)
+
+    def _raise_func():
+        raise Exception()
+
+    assert len(handler.messages['error']) == 0
+    pytest.raises(
+        Exception, _loader, app, lambda x: x(),
+        entry_points=None, modules=[_raise_func])
+    assert len(handler.messages['error']) == 1
+
+    pytest.raises(
+        Exception, _loader, app, lambda x: x(),
+        entry_points=['entrypoint3'], modules=None)
+    assert len(handler.messages['error']) == 2
 
 
 def test_app_loader():

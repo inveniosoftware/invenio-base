@@ -158,7 +158,8 @@ def app_loader(app, entry_points=None, modules=None):
     :param entry_points: List of entry points providing to Flask extensions.
     :param modules: List of Flask extensions.
     """
-    _loader(lambda ext: ext(app), entry_points=entry_points, modules=modules)
+    _loader(app, lambda ext: ext(app), entry_points=entry_points,
+            modules=modules)
 
 
 def blueprint_loader(app, entry_points=None, modules=None):
@@ -167,12 +168,11 @@ def blueprint_loader(app, entry_points=None, modules=None):
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
     """
-    _loader(
-        lambda bp: app.register_blueprint(bp),
-        entry_points=entry_points, modules=modules)
+    _loader(app, lambda bp: app.register_blueprint(bp),
+            entry_points=entry_points, modules=modules)
 
 
-def _loader(init_func, entry_points=None, modules=None):
+def _loader(app, init_func, entry_points=None, modules=None):
     """Generic loader.
 
     Used to load and initialize entry points and modules using an custom
@@ -181,10 +181,19 @@ def _loader(init_func, entry_points=None, modules=None):
     if entry_points:
         for entry_point in entry_points:
             for ep in pkg_resources.iter_entry_points(entry_point):
-                init_func(ep.load())
+                try:
+                    init_func(ep.load())
+                except Exception:
+                    app.logger.error(
+                        "Failed to initialize entry point: {0}".format(ep))
+                    raise
     if modules:
         for m in modules:
-            init_func(m)
+            try:
+                init_func(m)
+            except Exception:
+                app.logger.error("Failed to initialize module: {0}".format(m))
+                raise
 
 
 def base_app(import_name, instance_path=None, static_folder=None,
