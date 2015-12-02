@@ -98,10 +98,6 @@ extras_require['all'] = []
 for reqs in extras_require.values():
     extras_require['all'].extend(reqs)
 
-setup_requires = [
-    'Babel>=1.3',
-]
-
 install_requires = [
     'Flask-CLI>=0.2.1',
     'Flask>=0.10',
@@ -131,7 +127,6 @@ setup(
     },
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
         'Environment :: Web Environment',

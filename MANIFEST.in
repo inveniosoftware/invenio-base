@@ -31,7 +31,6 @@ include .dockerignore
 include .editorconfig
 include .coveragerc
 include LICENSE
-include babel.ini
 include invenio_base/static/img/test
 include invenio_base/static/img/testgif
 include pytest.ini
