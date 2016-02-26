@@ -8,7 +8,8 @@ from setuptools import find_packages, setup
 
 # Get the version string. Cannot be done with import!
 version = {}
-with open(os.path.join('{{ cookiecutter.package_name }}', 'version.py'), 'rt') as fp:
+with open(os.path.join('{{ cookiecutter.package_name }}',
+                       'version.py'), 'rt') as fp:
     exec(fp.read(), version)
 
 setup(
@@ -21,10 +22,25 @@ setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            '{{ cookiecutter.package_name }} = {{ cookiecutter.package_name }}.cli:cli'
+            '{{ cookiecutter.package_name }} = '
+            '{{ cookiecutter.package_name }}.cli:cli',
+        ],
+        'invenio_base.blueprints': [
+            '{{ cookiecutter.package_name }} = '
+            '{{ cookiecutter.package_name }}.views:blueprint',
         ],
     },
     install_requires=[
-        'invenio-base>=1.0.0a3',
+        'invenio-assets>=1.0.0a4',
+        'invenio-db>=1.0.0a9',
+        'invenio-indexer>=1.0.0a1',
+        'invenio-jsonschemas>=1.0.0a2',
+        'invenio-marc21>=1.0.0a1',
+        'invenio-pidstore>=1.0.0a6',
+        'invenio-records-rest>=1.0.0a6',
+        'invenio-records-ui>=1.0.0a4',
+        'invenio-search-ui>=1.0.0a2',
+        'invenio-search>=1.0.0a5',
+        'invenio-theme>=1.0.0a10',
     ],
 )

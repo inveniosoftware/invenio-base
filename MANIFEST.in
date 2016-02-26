@@ -55,6 +55,7 @@ recursive-include invenio_base *.pot
 recursive-include invenio_base *.py
 recursive-include invenio_base *.svg
 recursive-include invenio_base *.tpl
+recursive-include invenio_base *.txt
 recursive-include tests *.html
 recursive-include tests *.js
 recursive-include tests *.py

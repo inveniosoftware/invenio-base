@@ -100,7 +100,7 @@ for reqs in extras_require.values():
 
 install_requires = [
     'Flask-CLI>=0.2.1',
-    'Flask>=0.10',
+    'Flask>=0.10.1',
     'cookiecutter>=1.2.1',
 ]
 
