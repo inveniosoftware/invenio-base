@@ -36,6 +36,7 @@ setup(
         'invenio-indexer>=1.0.0a1',
         'invenio-jsonschemas>=1.0.0a2',
         'invenio-marc21>=1.0.0a1',
+        'invenio-oaiserver>=1.0.0a1',
         'invenio-pidstore>=1.0.0a6',
         'invenio-records-rest>=1.0.0a6',
         'invenio-records-ui>=1.0.0a4',
