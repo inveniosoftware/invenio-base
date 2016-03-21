@@ -15,6 +15,7 @@ BABEL_DEFAULT_TIMEZONE = 'Europe/Zurich'
 I18N_LANGUAGES = [
 ]
 
+HEADER_TEMPLATE = "invenio_theme/header.html"
 BASE_TEMPLATE = "invenio_theme/page.html"
 COVER_TEMPLATE = "invenio_theme/page_cover.html"
 SETTINGS_TEMPLATE = "invenio_theme/settings/content.html"
