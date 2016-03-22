@@ -33,7 +33,7 @@ setup(
     install_requires=[
         'invenio-assets>=1.0.0a4',
         'invenio-db>=1.0.0a9',
-        'invenio-indexer>=1.0.0a1',
+        'invenio-indexer>=1.0.0a2',
         'invenio-jsonschemas>=1.0.0a2',
         'invenio-marc21>=1.0.0a1',
         'invenio-oaiserver>=1.0.0a1',
