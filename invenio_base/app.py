@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -41,6 +41,7 @@ from .cmd import instance
 def create_app_factory(app_name, config_loader=None,
                        extension_entry_points=None, extensions=None,
                        blueprint_entry_points=None, blueprints=None,
+                       converter_entry_points=None, converters=None,
                        wsgi_factory=None, **app_kwargs):
     """Create a Flask application factory.
 
@@ -60,6 +61,11 @@ def create_app_factory(app_name, config_loader=None,
         Blueprints that will be registered on the Flask application.
     :param blueprints: List of Blueprints that will be registered on the
         Flask application.
+    :param converter_entry_points: List of entry points, which specifies
+        Werkzeug URL map converters that will be added to
+        ``app.url_map.converters``.
+    :param converters: Map of Werkzeug URL map converter classes that will
+        be added to ``app.url_map.converters``.
     :param wsgi_factory: A callable that will be passed the Flask application
         object in order to overwrite the default WSGI application (e.g. to
         install ``DispatcherMiddleware``).
@@ -95,6 +101,13 @@ def create_app_factory(app_name, config_loader=None,
         # Load configuration
         if config_loader:
             config_loader(app, **kwargs)
+
+        # Load URL converters.
+        converter_loader(
+            app,
+            entry_points=converter_entry_points,
+            modules=converters,
+        )
 
         # Load application based on entrypoints.
         app_loader(
@@ -170,6 +183,26 @@ def blueprint_loader(app, entry_points=None, modules=None):
     """
     _loader(app, lambda bp: app.register_blueprint(bp),
             entry_points=entry_points, modules=modules)
+
+
+def converter_loader(app, entry_points=None, modules=None):
+    """Default converter loader.
+
+    :param entry_points: List of entry points providing to Blue.
+    :param modules: Map of coverters.
+    """
+    if entry_points:
+        for entry_point in entry_points:
+            for ep in pkg_resources.iter_entry_points(entry_point):
+                try:
+                    app.url_map.converters[ep.name] = ep.load()
+                except Exception:
+                    app.logger.error(
+                        "Failed to initialize entry point: {0}".format(ep))
+                    raise
+
+    if modules:
+        app.url_map.converters.update(**modules)
 
 
 def _loader(app, init_func, entry_points=None, modules=None):

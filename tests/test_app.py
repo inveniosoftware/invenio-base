@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,11 +34,26 @@ from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
 from mock import patch
 from pkg_resources import EntryPoint
+from werkzeug.routing import BaseConverter
 from werkzeug.wsgi import DispatcherMiddleware
+
 
 from invenio_base import __version__
 from invenio_base.app import _loader, app_loader, base_app, blueprint_loader, \
-    configure_warnings, create_app_factory, create_cli
+    converter_loader, configure_warnings, create_app_factory, create_cli
+
+
+class ListConverter(BaseConverter):
+    """Simple list converter."""
+
+    def to_python(self, value):
+        """Return Python object."""
+        return value.split('+')
+
+    def to_url(self, values):
+        """Return string."""
+        return '+'.join(BaseConverter.to_url(value)
+                        for value in values)
 
 
 #
@@ -77,6 +92,14 @@ class MockEntryPoint(EntryPoint):
         return self.name
 
 
+class NoRequireEntryPoint(EntryPoint):
+    """Load without requirements check."""
+
+    def load(self):
+        """Mock load entry point."""
+        return super(NoRequireEntryPoint, self).load(require=False)
+
+
 def _mock_entry_points(name):
     data = dict(
         entrypoint1=[MockEntryPoint('ep1.e1', 'ep1.e1'),
@@ -84,6 +107,8 @@ def _mock_entry_points(name):
         entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1'),
                      MockEntryPoint('ep2.e2', 'ep2.e2'), ],
         entrypoint3=[MockEntryPoint('fail', 'ep3.e1',), ],
+        entrypoint4=[NoRequireEntryPoint.parse(
+            'mylist = test_app:ListConverter'), ],
     )
     names = data.keys() if name is None else [name]
     for key in names:
@@ -203,6 +228,34 @@ def test_blueprint_loader():
     assert len(app.blueprints) == 0
     blueprint_loader(app, modules=[bp])
     assert len(app.blueprints) == 1
+
+
+def test_coverter_loader():
+    """Test converter loader."""
+    app = Flask('testapp')
+
+    assert 'mylist' not in app.url_map.converters
+    converter_loader(app, modules={'mylist': ListConverter})
+    assert 'mylist' in app.url_map.converters
+
+
+@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+def test_coverter_loader_from_entry_points():
+    """Test converter loader."""
+    app = Flask('testapp')
+
+    assert 'mylist' not in app.url_map.converters
+    converter_loader(app, entry_points=['entrypoint4'])
+    assert 'mylist' in app.url_map.converters
+
+
+@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+def test_coverter_loader_fail():
+    """Test converter loader."""
+    app = Flask('testapp')
+
+    with pytest.raises(Exception):
+        converter_loader(app, entry_points=['entrypoint3'])
 
 
 def test_base_app(tmppath):
