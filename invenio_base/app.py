@@ -126,7 +126,7 @@ def create_app_factory(app_name, config_loader=None,
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
-            app.wsgi_app = wsgi_factory(app)
+            app.wsgi_app = wsgi_factory(app, **kwargs)
 
         return app
 

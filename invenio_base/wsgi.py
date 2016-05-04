@@ -41,9 +41,9 @@ def create_wsgi_factory(mounts_factories):
     :param mounts_factories: Dictionary of mount points per application
         factory.
     """
-    def create_wsgi(app):
+    def create_wsgi(app, **kwargs):
         mounts = {
-            mount: factory(debug=app.debug)
+            mount: factory(debug=app.debug, **kwargs)
             for mount, factory in mounts_factories.items()
         }
         return DispatcherMiddleware(app.wsgi_app, mounts)
