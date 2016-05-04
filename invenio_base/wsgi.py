@@ -43,7 +43,7 @@ def create_wsgi_factory(mounts_factories):
     """
     def create_wsgi(app, **kwargs):
         mounts = {
-            mount: factory(debug=app.debug, **kwargs)
+            mount: factory(**kwargs)
             for mount, factory in mounts_factories.items()
         }
         return DispatcherMiddleware(app.wsgi_app, mounts)
