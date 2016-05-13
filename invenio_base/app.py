@@ -181,8 +181,10 @@ def blueprint_loader(app, entry_points=None, modules=None):
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
     """
-    _loader(app, lambda bp: app.register_blueprint(bp),
-            entry_points=entry_points, modules=modules)
+    url_prefixes = app.config.get('BLUEPRINTS_URL_PREFIXES', {})
+    _loader(app, lambda bp: app.register_blueprint(
+        bp, url_prefix=url_prefixes.get(bp.name)
+    ), entry_points=entry_points, modules=modules)
 
 
 def converter_loader(app, entry_points=None, modules=None):
