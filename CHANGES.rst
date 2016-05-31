@@ -24,8 +24,8 @@
 Changes
 =======
 
-Version 1.0.0a10 (released 2016-05-13)
-----------------=---------------------
+Version 1.0.0a11 (released 2016-05-31)
+--------------------------------------
 
 - Initial refactoring for Invenio 3 compatible packages.
 
