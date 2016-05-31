@@ -25,9 +25,9 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from flask import Flask
+from flask import Flask, request
 
-from invenio_base.wsgi import create_wsgi_factory
+from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
 
 
 def test_create_wsgi_factory():
@@ -53,3 +53,21 @@ def test_create_wsgi_factory():
         assert b'app' in client.get('/').data
         assert client.get('/api/').status_code == 200
         assert b'api' in client.get('/api/').data
+
+
+def test_proxyfix():
+    """Test wsgi factory creation."""
+    app = Flask('app')
+    app.config['WSGI_PROXIES'] = 2
+
+    @app.route("/")
+    def appview():
+        return str(request.remote_addr)
+
+    # Test factory creation
+    app.wsgi_app = wsgi_proxyfix()(app, num_proxies=2)
+    e = {'REMOTE_ADDR': '1.2.3.4'}
+
+    with app.test_client() as client:
+        h = {'X-Forwarded-For': '5.6.7.8, 4.3.2.1, 8.7.6.5'}
+        assert client.get('/', headers=h, environ_base=e).data == b'4.3.2.1'

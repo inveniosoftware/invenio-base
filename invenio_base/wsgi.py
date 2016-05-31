@@ -25,6 +25,7 @@
 
 from __future__ import absolute_import, print_function
 
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.wsgi import DispatcherMiddleware
 
 
@@ -47,4 +48,18 @@ def create_wsgi_factory(mounts_factories):
             for mount, factory in mounts_factories.items()
         }
         return DispatcherMiddleware(app.wsgi_app, mounts)
+    return create_wsgi
+
+
+def wsgi_proxyfix(factory=None):
+    """Fix REMOTE_ADDR based on X-Forward-For headers.
+
+    Note you must set ``WSGI_PROXIES`` to the correct number of proxies,
+    otherwise you application is susceptible to malicious attacks.
+    """
+    def create_wsgi(app, **kwargs):
+        wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
+        if app.config.get('WSGI_PROXIES'):
+            return ProxyFix(wsgi_app, num_proxies=app.config['WSGI_PROXIES'])
+        return wsgi_app
     return create_wsgi
