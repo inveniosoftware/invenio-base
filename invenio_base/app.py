@@ -33,7 +33,7 @@ import warnings
 import click
 import pkg_resources
 from flask import Flask
-from flask_cli import FlaskCLI, FlaskGroup
+from flask.cli import FlaskGroup
 
 from .cmd import instance
 
@@ -150,11 +150,10 @@ def create_cli(create_app=None):
             info.create_app = None
             app = info.load_app()
         else:
-            app = create_app(debug=info.debug)
+            app = create_app(debug=getattr(info, 'debug', False))
         return app
 
-    @click.group(cls=FlaskGroup, create_app=create_cli_app,
-                 add_app_option=True)
+    @click.group(cls=FlaskGroup, create_app=create_cli_app)
     def cli(**params):
         """Command Line Interface for Invenio."""
         pass
@@ -255,12 +254,10 @@ def base_app(import_name, instance_path=None, static_folder=None,
         static_url_path=static_url_path,
         template_folder=template_folder,
     )
-    # Ensure we have Click available for Flask <1.0
-    FlaskCLI(app)
 
     # Create instance path if it doesn't exists
     try:
-        if not os.path.exists(instance_path):
+        if instance_path and not os.path.exists(instance_path):
             os.makedirs(instance_path)
     except Exception:  # pragma: no cover
         app.logger.exception(

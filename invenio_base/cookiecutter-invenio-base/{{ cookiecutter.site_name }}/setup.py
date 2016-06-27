@@ -31,6 +31,7 @@ setup(
         ],
     },
     install_requires=[
+        'Flask>=0.11.1',
         'invenio-assets>=1.0.0a4',
         'invenio-db>=1.0.0a9',
         'invenio-indexer>=1.0.0a2',
