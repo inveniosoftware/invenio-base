@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -36,11 +36,12 @@ def create_wsgi_factory(mounts_factories):
 
     .. code-block:: python
 
-       wsgi_factory = create_wsgi_factory(create_app, {'/api': create_api})
+       wsgi_factory = create_wsgi_factory({'/api': create_api})
 
-    :param app_factory: Flask application factory for the default application.
     :param mounts_factories: Dictionary of mount points per application
         factory.
+
+    .. versionadded:: 1.0.0
     """
     def create_wsgi(app, **kwargs):
         mounts = {
@@ -52,10 +53,14 @@ def create_wsgi_factory(mounts_factories):
 
 
 def wsgi_proxyfix(factory=None):
-    """Fix REMOTE_ADDR based on X-Forward-For headers.
+    """Fix ``REMOTE_ADDR`` based on ``X-Forwarded-For`` headers.
 
-    Note you must set ``WSGI_PROXIES`` to the correct number of proxies,
-    otherwise you application is susceptible to malicious attacks.
+    .. note::
+
+       You must set ``WSGI_PROXIES`` to the correct number of proxies,
+       otherwise you application is susceptible to malicious attacks.
+
+    .. versionadded:: 1.0.0
     """
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app

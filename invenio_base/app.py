@@ -70,7 +70,7 @@ def create_app_factory(app_name, config_loader=None,
         object in order to overwrite the default WSGI application (e.g. to
         install ``DispatcherMiddleware``).
     :param app_kwargs: Keyword arguments passed to :py:meth:`base_app`.
-    :return: Flask application factory.
+    :returns: Flask application factory.
 
     Example of a configuration loader:
 
@@ -80,8 +80,12 @@ def create_app_factory(app_name, config_loader=None,
            app.config.from_module('mysite.config')
            app.config.update(**kwargs)
 
-    Note that Invenio-Config provides a default configuration loader which is
-    sufficient for most cases.
+    .. note::
+
+       `Invenio-Config <https://pythonhosted.org/invenio-config>`_ provides a
+       factory creating default configuration loader (see
+       :func:`invenio_config.utils.create_config_loader`) which is sufficient
+       for most cases.
 
     Example of a WSGI factory:
 
@@ -90,6 +94,7 @@ def create_app_factory(app_name, config_loader=None,
        def my_wsgi_factory(app):
            return DispatcherMiddleware(app.wsgi_app, {'/api': api_app})
 
+    .. versionadded: 1.0.0
     """
     def _create_app(**kwargs):
         app = base_app(app_name, **app_kwargs)
@@ -137,7 +142,9 @@ def create_cli(create_app=None):
     """Create CLI for ``inveniomanage`` command.
 
     :param create_app: Flask application factory.
-    :return: Click command group.
+    :returns: Click command group.
+
+    .. versionadded: 1.0.0
     """
     def create_cli_app(info):
         """Application factory for CLI app.
@@ -169,6 +176,8 @@ def app_loader(app, entry_points=None, modules=None):
 
     :param entry_points: List of entry points providing to Flask extensions.
     :param modules: List of Flask extensions.
+
+    .. versionadded: 1.0.0
     """
     _loader(app, lambda ext: ext(app), entry_points=entry_points,
             modules=modules)
@@ -179,6 +188,8 @@ def blueprint_loader(app, entry_points=None, modules=None):
 
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
+
+    .. versionadded: 1.0.0
     """
     url_prefixes = app.config.get('BLUEPRINTS_URL_PREFIXES', {})
     _loader(app, lambda bp: app.register_blueprint(
@@ -191,6 +202,8 @@ def converter_loader(app, entry_points=None, modules=None):
 
     :param entry_points: List of entry points providing to Blue.
     :param modules: Map of coverters.
+
+    .. versionadded: 1.0.0
     """
     if entry_points:
         for entry_point in entry_points:
@@ -199,7 +212,7 @@ def converter_loader(app, entry_points=None, modules=None):
                     app.url_map.converters[ep.name] = ep.load()
                 except Exception:
                     app.logger.error(
-                        "Failed to initialize entry point: {0}".format(ep))
+                        'Failed to initialize entry point: {0}'.format(ep))
                     raise
 
     if modules:
@@ -211,6 +224,8 @@ def _loader(app, init_func, entry_points=None, modules=None):
 
     Used to load and initialize entry points and modules using an custom
     initialization function.
+
+    .. versionadded: 1.0.0
     """
     if entry_points:
         for entry_point in entry_points:
@@ -219,14 +234,14 @@ def _loader(app, init_func, entry_points=None, modules=None):
                     init_func(ep.load())
                 except Exception:
                     app.logger.error(
-                        "Failed to initialize entry point: {0}".format(ep))
+                        'Failed to initialize entry point: {0}'.format(ep))
                     raise
     if modules:
         for m in modules:
             try:
                 init_func(m)
             except Exception:
-                app.logger.error("Failed to initialize module: {0}".format(m))
+                app.logger.error('Failed to initialize module: {0}'.format(m))
                 raise
 
 
@@ -241,7 +256,9 @@ def base_app(import_name, instance_path=None, static_folder=None,
     :param env_prefix: Environment variable prefix.
     :param instance_path: Instance path for Flask application.
     :param static_folder: Static folder path.
-    :return: Flask application instance.
+    :returns: Flask application instance.
+
+    .. versionadded: 1.0.0
     """
     configure_warnings()
 
@@ -261,7 +278,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
             os.makedirs(instance_path)
     except Exception:  # pragma: no cover
         app.logger.exception(
-            "Failed to create instance folder: '{0}'".format(instance_path)
+            'Failed to create instance folder: "{0}"'.format(instance_path)
         )
 
     return app
@@ -271,6 +288,8 @@ def configure_warnings():
     """Configure warnings by routing warnings to the logging system.
 
     It also unhides ``DeprecationWarning``.
+
+    .. versionadded: 1.0.0
     """
     if not sys.warnoptions:
         # Route warnings through python logging
@@ -279,4 +298,4 @@ def configure_warnings():
         # DeprecationWarning is by default hidden, hence we force the
         # "default" behavior on deprecation warnings which is not to hide
         # errors.
-        warnings.simplefilter("default", DeprecationWarning)
+        warnings.simplefilter('default', DeprecationWarning)

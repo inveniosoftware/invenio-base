@@ -49,7 +49,7 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'invenio-config>=1.0.0a1'
+    'invenio-config>=1.0.0b1',
 ]
 
 extras_require = {

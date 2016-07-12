@@ -34,7 +34,7 @@ setup(
         'Flask>=0.11.1',
         'invenio-assets>=1.0.0a4',
         'invenio-base>=1.0.0a11',
-        'invenio-config>=1.0.0a1',
+        'invenio-config>=1.0.0b1',
         'invenio-db>=1.0.0a9',
         'invenio-indexer>=1.0.0a2',
         'invenio-jsonschemas>=1.0.0a2',
