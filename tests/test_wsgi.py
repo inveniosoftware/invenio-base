@@ -25,6 +25,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import pytest
 from flask import Flask, request
 
 from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
@@ -34,15 +35,15 @@ def test_create_wsgi_factory():
     """Test wsgi factory creation."""
     api = Flask('api')
 
-    @api.route("/")
+    @api.route('/')
     def apiview():
-        return "api"
+        return 'api'
 
     app = Flask('app')
 
-    @app.route("/")
+    @app.route('/')
     def appview():
-        return "app"
+        return 'app'
 
     # Test factory creation
     factory = create_wsgi_factory({'/api': lambda **kwargs: api})
@@ -55,19 +56,22 @@ def test_create_wsgi_factory():
         assert b'api' in client.get('/api/').data
 
 
-def test_proxyfix():
+@pytest.mark.parametrize('proxies,data', [
+    (2, b'4.3.2.1'), (None, b'1.2.3.4')
+])
+def test_proxyfix(proxies, data):
     """Test wsgi factory creation."""
     app = Flask('app')
-    app.config['WSGI_PROXIES'] = 2
+    app.config['WSGI_PROXIES'] = proxies
 
-    @app.route("/")
+    @app.route('/')
     def appview():
         return str(request.remote_addr)
 
     # Test factory creation
-    app.wsgi_app = wsgi_proxyfix()(app, num_proxies=2)
+    app.wsgi_app = wsgi_proxyfix()(app)
     e = {'REMOTE_ADDR': '1.2.3.4'}
 
     with app.test_client() as client:
         h = {'X-Forwarded-For': '5.6.7.8, 4.3.2.1, 8.7.6.5'}
-        assert client.get('/', headers=h, environ_base=e).data == b'4.3.2.1'
+        assert client.get('/', headers=h, environ_base=e).data == data
