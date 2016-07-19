@@ -34,6 +34,7 @@ import click
 import pkg_resources
 from flask import Flask
 from flask.cli import FlaskGroup
+from flask.helpers import get_debug_flag
 
 from .cmd import instance
 
@@ -157,7 +158,7 @@ def create_cli(create_app=None):
             info.create_app = None
             app = info.load_app()
         else:
-            app = create_app(debug=getattr(info, 'debug', False))
+            app = create_app(debug=get_debug_flag())
         return app
 
     @click.group(cls=FlaskGroup, create_app=create_cli_app)
@@ -165,7 +166,7 @@ def create_cli(create_app=None):
         """Command Line Interface for Invenio."""
         pass
 
-    # Add command for startin new Invenio instances.
+    # Add command for starting new Invenio instances.
     cli.add_command(instance)
 
     return cli
