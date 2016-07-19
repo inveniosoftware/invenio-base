@@ -24,13 +24,7 @@
 Changes
 =======
 
-Version 1.0.0a12 (released 2016-06-29)
---------------------------------------
-
-- Flask 0.11.1 compatibility fixes.
-
-
-Version 1.0.0a11 (released 2016-05-31)
+Version 1.0.0a13 (released 2016-07-20)
 --------------------------------------
 
 - Initial refactoring for Invenio 3 compatible packages.
