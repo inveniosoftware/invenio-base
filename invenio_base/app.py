@@ -36,8 +36,6 @@ from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
 
-from .cmd import instance
-
 
 def create_app_factory(app_name, config_loader=None,
                        extension_entry_points=None, extensions=None,
@@ -165,9 +163,6 @@ def create_cli(create_app=None):
     def cli(**params):
         """Command Line Interface for Invenio."""
         pass
-
-    # Add command for starting new Invenio instances.
-    cli.add_command(instance)
 
     return cli
 
@@ -297,6 +292,6 @@ def configure_warnings():
         logging.captureWarnings(True)
 
         # DeprecationWarning is by default hidden, hence we force the
-        # "default" behavior on deprecation warnings which is not to hide
+        # 'default' behavior on deprecation warnings which is not to hide
         # errors.
         warnings.simplefilter('default', DeprecationWarning)

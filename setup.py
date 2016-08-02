@@ -90,7 +90,10 @@ setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            'inveniomanage = invenio_base.cli:cli',
+            'inveniomanage = invenio_base.__main__:cli',
+        ],
+        'flask.commands': [
+            'instance = invenio_base.cli:instance',
         ],
     },
     extras_require=extras_require,
@@ -108,9 +111,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Development Status :: 4 - Beta',
     ],
 )

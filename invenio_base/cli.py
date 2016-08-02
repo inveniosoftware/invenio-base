@@ -21,10 +21,72 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-"""Command Line Interface for Invenio."""
+"""Application bootstraping."""
 
 from __future__ import absolute_import, print_function
 
-from .app import create_cli
+import click
+from cookiecutter.main import cookiecutter
+from pkg_resources import resource_filename, working_set
 
-cli = create_cli()
+
+@click.group()
+def instance():
+    """Instance commands."""
+
+
+@instance.command('create')
+@click.argument('name')
+def create(name):
+    """Create a new Invenio instance from template."""
+    path = resource_filename(__name__, 'cookiecutter-invenio-base')
+
+    result = cookiecutter(path, no_input=True,
+                          extra_context={
+                              'site_name': name,
+                              'secret_key': generate_secret_key()
+                          })
+    click.secho('Created instance...', fg='green')
+    return result
+
+
+@instance.command('entrypoints')
+@click.option(
+    '-e', '--entry-point', default=None, metavar='ENTRY_POINT',
+    help='Entry point group name (e.g. invenio_base.apps)')
+def list_entrypoints(entry_point):
+    """List defined entry points."""
+    found_entry_points = {}
+    for dist in working_set:
+        entry_map = dist.get_entry_map()
+        for group_name, entry_points in entry_map.items():
+            # Filter entry points
+            if entry_point is None and \
+               not group_name.startswith('invenio'):
+                continue
+            if entry_point is not None and \
+               entry_point != group_name:
+                continue
+
+            # Store entry points.
+            if group_name not in found_entry_points:
+                found_entry_points[group_name] = []
+            for ep in entry_points.values():
+                found_entry_points[group_name].append(str(ep))
+
+    for ep_group in sorted(found_entry_points.keys()):
+        click.secho('{0}'.format(ep_group), fg='green')
+        for ep in sorted(found_entry_points[ep_group]):
+            click.echo('  {0}'.format(ep))
+
+
+def generate_secret_key():
+    """Generate secret key."""
+    import string
+    import random
+
+    rng = random.SystemRandom()
+    return ''.join(
+        rng.choice(string.ascii_letters + string.digits)
+        for dummy in range(0, 256)
+    )

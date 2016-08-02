@@ -33,7 +33,7 @@ import pkg_resources
 from click.testing import CliRunner
 from mock import Mock, patch
 
-from invenio_base.cmd import instance
+from invenio_base.cli import instance
 
 
 def test_instance_create():
@@ -92,7 +92,7 @@ def test_list_entry_points():
     dist = pkg_resources.get_distribution('invenio-base')
     mock_working_set.add(dist)
 
-    with patch('invenio_base.cmd.working_set', new=mock_working_set):
+    with patch('invenio_base.cli.working_set', new=mock_working_set):
         runner = CliRunner()
 
         # Test select an existing entry point
@@ -101,7 +101,7 @@ def test_list_entry_points():
         assert result.exit_code == 0
         lines = result.output.splitlines()
         assert lines[0] == 'console_scripts'
-        assert lines[1] == '  inveniomanage = invenio_base.cli:cli'
+        assert lines[1] == '  inveniomanage = invenio_base.__main__:cli'
 
         # Test no entry point matching
         result = runner.invoke(

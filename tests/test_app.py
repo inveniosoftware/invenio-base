@@ -370,7 +370,7 @@ def test_create_cli_with_app():
 
 def test_create_cli_without_app():
     """Test create cli."""
-    from invenio_base.cli import cli
+    from invenio_base.__main__ import cli
 
     @cli.command()
     def test_cmd():
