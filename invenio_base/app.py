@@ -243,7 +243,7 @@ def _loader(app, init_func, entry_points=None, modules=None):
 
 def base_app(import_name, instance_path=None, static_folder=None,
              static_url_path='/static', template_folder='templates',
-             instance_relative_config=True):
+             instance_relative_config=True, app_class=Flask):
     """Invenio base application factory.
 
     If the instance folder does not exists, it will be created.
@@ -252,6 +252,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
     :param env_prefix: Environment variable prefix.
     :param instance_path: Instance path for Flask application.
     :param static_folder: Static folder path.
+    :param app_class: Flask application class.
     :returns: Flask application instance.
 
     .. versionadded: 1.0.0
@@ -259,7 +260,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
     configure_warnings()
 
     # Create the Flask application instance
-    app = Flask(
+    app = app_class(
         import_name,
         instance_path=instance_path,
         instance_relative_config=instance_relative_config,

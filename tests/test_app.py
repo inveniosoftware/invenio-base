@@ -302,6 +302,15 @@ def test_base_app(tmppath):
     assert app.jinja_loader.searchpath == [join(app.root_path, 'templates')]
 
 
+def test_base_app_class(tmppath):
+    """Test using custom Flask application class."""
+    class CustomFlask(Flask):
+        pass
+
+    app = base_app('test', app_class=CustomFlask)
+    assert isinstance(app, CustomFlask)
+
+
 def test_create_app_factory():
     """Test app factory factory."""
     class FlaskExt(object):
