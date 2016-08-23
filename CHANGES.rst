@@ -24,7 +24,7 @@
 Changes
 =======
 
-Version 1.0.0a13 (released 2016-07-20)
+Version 1.0.0a14 (released 2016-08-23)
 --------------------------------------
 
 - Initial refactoring for Invenio 3 compatible packages.
