@@ -137,8 +137,8 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'invenio-base@GitHub': 'http://github.com/inveniosoftware/invenio-base/',
-        'invenio-base@PyPI': 'http://pypi.python.org/pypi/invenio-base/',
+        'invenio-base@GitHub': 'https://github.com/inveniosoftware/invenio-base/',
+        'invenio-base@PyPI': 'https://pypi.python.org/pypi/invenio-base/',
     }
 }
 
@@ -322,5 +322,8 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7/', None),
-    'invenio_config': ('http://pythonhosted.org/invenio-config/', None),
+    'invenio_config': ('https://pythonhosted.org/invenio-config/', None),
 }
+
+# Autodoc configuraton.
+autoclass_content = 'both'
