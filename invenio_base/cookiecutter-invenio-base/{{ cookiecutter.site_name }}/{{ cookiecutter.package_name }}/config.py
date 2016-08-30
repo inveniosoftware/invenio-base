@@ -25,4 +25,4 @@ SETTINGS_TEMPLATE = "invenio_theme/settings/content.html"
 SECRET_KEY = "{{ cookiecutter.secret_key }}"
 
 # Theme
-THEME_SITENAME = _("{{ cookiecutter.site_name }}")
+THEME_SITENAME = "{{ cookiecutter.site_name }}"
