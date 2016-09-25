@@ -57,7 +57,7 @@ Tell the application factory how to load configuration by creating
    :literal:
 
 The recommended way is to use `Invenio-Config
-<https://pythonhosted.org/invenio-config/>`_ that provides a default
+<https://invenio-config.readthedocs.io/>`_ that provides a default
 configuration loader :func:`invenio_config.utils.create_config_loader` which is
 sufficient for most cases:
 

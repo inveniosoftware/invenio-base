@@ -24,7 +24,7 @@ Installation
 Documentation
 -------------
 
-   http://pythonhosted.org/invenio-base/
+   https://invenio-base.readthedocs.io/
 
 Happy hacking and thanks for flying Invenio-Base.
 

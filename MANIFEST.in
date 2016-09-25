@@ -30,6 +30,7 @@ include *.yml
 include .dockerignore
 include .editorconfig
 include .coveragerc
+include docs/requirements.txt
 include LICENSE
 include invenio_base/static/img/test
 include invenio_base/static/img/testgif
