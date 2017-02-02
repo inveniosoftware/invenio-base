@@ -37,6 +37,7 @@ include invenio_base/static/img/test
 include invenio_base/static/img/testgif
 include pytest.ini
 include run-tests.sh
+prune docs/_build
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
