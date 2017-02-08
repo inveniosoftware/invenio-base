@@ -18,7 +18,7 @@ I18N_LANGUAGES = [
 HEADER_TEMPLATE = 'invenio_theme/header.html'
 BASE_TEMPLATE = 'invenio_theme/page.html'
 COVER_TEMPLATE = 'invenio_theme/page_cover.html'
-SETTINGS_TEMPLATE = 'invenio_theme/settings/content.html'
+SETTINGS_TEMPLATE = 'invenio_theme/page_settings.html'
 
 # WARNING: Do not share the secret key - especially do not commit it to
 # version control.
