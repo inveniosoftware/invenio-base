@@ -31,8 +31,10 @@ from subprocess import call
 
 import pkg_resources
 from click.testing import CliRunner
-from mock import Mock, patch
+from flask.cli import ScriptInfo
+from mock import MagicMock, Mock, patch
 
+from invenio_base.app import create_app_factory
 from invenio_base.cli import instance
 
 
@@ -128,3 +130,59 @@ def test_list_entry_points():
         assert lines[2] == 'invenio_base.apps'
         assert lines[3] == '  app1 = app1:MyApp'
         assert lines[4] == '  myapp = myapp:MyApp'
+
+
+def test_migrate_secret_key():
+    """Test cli command for SECRET_KEY change."""
+    def _config_loader(app, **kwargs):
+        app.config['CONFIG_LOADER'] = True
+        app.config.update(kwargs)
+
+    create_app = create_app_factory('test', config_loader=_config_loader)
+    app = create_app(KWARGS_TEST=True)
+    script_info = ScriptInfo(create_app=lambda info: app)
+
+    # Check that CLI command fails when the SECRET_KEY is not set.
+    with app.app_context():
+        runner = CliRunner()
+        result = runner.invoke(instance,
+                               ['migrate_secret_key',
+                                '--old-key',
+                                'OLD_SECRET_KEY'],
+                               obj=script_info)
+        assert result.exit_code == 1
+        assert 'Error: SECRET_KEY is not set in the configuration.' in \
+            result.output
+
+    app.secret_key = "SECRET"
+    with patch('pkg_resources.EntryPoint') as MockEntryPoint:
+        # Test that the CLI command succeeds when the entrypoint does
+        # return a function.
+        entrypoint = MockEntryPoint('ep1', 'ep1')
+        entrypoint.load.return_value = MagicMock()
+        with patch('invenio_base.cli.iter_entry_points',
+                   return_value=[entrypoint]):
+            result = runner.invoke(
+                instance, ['migrate_secret_key', '--old-key',
+                           'OLD_SECRET_KEY'],
+                obj=script_info)
+            assert result.exit_code == 0
+            assert entrypoint.load.called
+            entrypoint.load.return_value.assert_called_with(
+                old_key='OLD_SECRET_KEY'
+            )
+            assert 'Successfully changed secret key.' in result.output
+
+        # Test that the CLI command fails correctly when the entrypoint does
+        # not return a function.
+        entrypoint = MockEntryPoint('ep2', 'ep2')
+        entrypoint.load.return_value = 'ep2'
+        with patch('invenio_base.cli.iter_entry_points',
+                   return_value=[entrypoint]):
+            result = runner.invoke(
+                instance, ['migrate_secret_key', '--old-key',
+                           'OLD_SECRET_KEY'],
+                obj=script_info)
+            assert result.exit_code == -1
+            assert entrypoint.load.called
+            assert 'Failed to initialize entry point' in result.output

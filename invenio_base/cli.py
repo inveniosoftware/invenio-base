@@ -27,7 +27,9 @@ from __future__ import absolute_import, print_function
 
 import click
 from cookiecutter.main import cookiecutter
-from pkg_resources import resource_filename, working_set
+from flask import current_app
+from flask.cli import with_appcontext
+from pkg_resources import iter_entry_points, resource_filename, working_set
 
 
 @click.group()
@@ -78,6 +80,26 @@ def list_entrypoints(entry_point):
         click.secho('{0}'.format(ep_group), fg='green')
         for ep in sorted(found_entry_points[ep_group]):
             click.echo('  {0}'.format(ep))
+
+
+@instance.command('migrate_secret_key')
+@click.option('--old-key', required=True)
+@with_appcontext
+def migrate_secret_key(old_key):
+    """Call entry points exposed for the SECRET_KEY change."""
+    if 'SECRET_KEY' not in current_app.config or \
+            current_app.config['SECRET_KEY'] is None:
+        raise click.ClickException(
+            'SECRET_KEY is not set in the configuration.')
+
+    for ep in iter_entry_points('invenio_base.secret_key'):
+        try:
+            ep.load()(old_key=old_key)
+        except Exception:
+            current_app.logger.error(
+                'Failed to initialize entry point: {0}'.format(ep))
+            raise
+    click.secho('Successfully changed secret key.', fg='green')
 
 
 def generate_secret_key():
