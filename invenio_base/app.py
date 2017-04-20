@@ -168,7 +168,7 @@ def create_cli(create_app=None):
 
 
 def app_loader(app, entry_points=None, modules=None):
-    """Default application loader.
+    """Run default application loader.
 
     :param entry_points: List of entry points providing to Flask extensions.
     :param modules: List of Flask extensions.
@@ -180,7 +180,7 @@ def app_loader(app, entry_points=None, modules=None):
 
 
 def blueprint_loader(app, entry_points=None, modules=None):
-    """Default blueprint loader.
+    """Run default blueprint loader.
 
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
@@ -194,7 +194,7 @@ def blueprint_loader(app, entry_points=None, modules=None):
 
 
 def converter_loader(app, entry_points=None, modules=None):
-    """Default converter loader.
+    """Run default converter loader.
 
     :param entry_points: List of entry points providing to Blue.
     :param modules: Map of coverters.
@@ -216,7 +216,7 @@ def converter_loader(app, entry_points=None, modules=None):
 
 
 def _loader(app, init_func, entry_points=None, modules=None):
-    """Generic loader.
+    """Run generic loader.
 
     Used to load and initialize entry points and modules using an custom
     initialization function.
