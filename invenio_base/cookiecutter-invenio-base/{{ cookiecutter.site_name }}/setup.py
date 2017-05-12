@@ -45,6 +45,6 @@ setup(
         'invenio-records-ui>=1.0.0a4',
         'invenio-search-ui>=1.0.0a2',
         'invenio-search>=1.0.0a5',
-        'invenio-theme>=1.0.0a10',
+        'invenio-theme>=1.0.0a17',
     ],
 )
