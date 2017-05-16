@@ -146,7 +146,7 @@ def test_migrate_secret_key():
     with app.app_context():
         runner = CliRunner()
         result = runner.invoke(instance,
-                               ['migrate_secret_key',
+                               ['migrate-secret-key',
                                 '--old-key',
                                 'OLD_SECRET_KEY'],
                                obj=script_info)
@@ -163,7 +163,7 @@ def test_migrate_secret_key():
         with patch('invenio_base.cli.iter_entry_points',
                    return_value=[entrypoint]):
             result = runner.invoke(
-                instance, ['migrate_secret_key', '--old-key',
+                instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],
                 obj=script_info)
             assert result.exit_code == 0
@@ -180,7 +180,7 @@ def test_migrate_secret_key():
         with patch('invenio_base.cli.iter_entry_points',
                    return_value=[entrypoint]):
             result = runner.invoke(
-                instance, ['migrate_secret_key', '--old-key',
+                instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],
                 obj=script_info)
             assert result.exit_code == -1

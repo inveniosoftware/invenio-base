@@ -82,7 +82,7 @@ def list_entrypoints(entry_point):
             click.echo('  {0}'.format(ep))
 
 
-@instance.command('migrate_secret_key')
+@instance.command('migrate-secret-key')
 @click.option('--old-key', required=True)
 @with_appcontext
 def migrate_secret_key(old_key):
