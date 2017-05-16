@@ -78,11 +78,12 @@ def test_instance_create_created_instance():
         assert call(['pip', 'install', '-e', '.']) == 0
         assert pkg_resources.get_distribution(site_name)
 
-        app = importlib.import_module(site_name + '.factory').create_app()
+        from invenio_app.factory import create_app
+        app = create_app()
         with app.app_context():
-            assert app.name == site_name
+            assert app.config.get('THEME_SITENAME') == site_name
 
-        assert call([site_name, '--help']) == 0
+        assert call(['invenio', '--help']) == 0
         assert call(['pip', 'uninstall', site_name, '-y']) == 0
 
         os.chdir(cwd)

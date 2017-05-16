@@ -4,8 +4,36 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_base.app import create_cli
+"""
+Cli commands can be added here, for example:
 
-from .factory import create_app
+.. code:: python
 
-cli = create_cli(create_app=create_app)
+    import click
+
+    @click.group()
+    def avangers():
+        \"\"\"Avengers commands.\"\"\"
+
+    @avengers.command('init')
+    def init():
+        \"\"\"Initialize the Avengers team.\"\"\"
+        click.secho('Calling the team', fg='green')
+
+On the ```setup.py``` the ```entry_points``` should be updated
+
+.. code:: python
+    entry_points={
+        'flask.commands': [
+            'avengers = '
+            '{{ cookiecutter.site_name }}.cli:avengers'
+        ],
+    }
+
+Now on the console
+
+.. code:: console
+
+    $ invenio avangers --help
+    $ invenio avangers init
+"""

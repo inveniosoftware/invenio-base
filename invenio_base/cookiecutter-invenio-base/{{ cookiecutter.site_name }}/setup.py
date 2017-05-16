@@ -21,17 +21,20 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
-        'console_scripts': [
-            '{{ cookiecutter.package_name }} = '
-            '{{ cookiecutter.package_name }}.cli:cli',
+        'flask.commands': [
         ],
         'invenio_base.blueprints': [
             '{{ cookiecutter.package_name }} = '
             '{{ cookiecutter.package_name }}.views:blueprint',
         ],
+        'invenio_config.module': [
+            '{{ cookiecutter.package_name }} = '
+            '{{ cookiecutter.package_name }}.config',
+        ],
     },
     install_requires=[
         'Flask>=0.11.1',
+        'invenio-app>=1.0.0a1',
         'invenio-assets>=1.0.0a4',
         'invenio-base>=1.0.0a11',
         'invenio-config>=1.0.0b1',
