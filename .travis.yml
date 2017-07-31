@@ -59,7 +59,7 @@ install:
   - "travis_retry pip install -e .[all]"
 
 script:
-  - "./run-tests.sh"
+  - "travis_wait 30 ./run-tests.sh"
 
 after_success:
   - coveralls
