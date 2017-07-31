@@ -40,7 +40,7 @@ setup(
         'invenio-config>=1.0.0b1',
         'invenio-db>=1.0.0a9',
         'invenio-indexer>=1.0.0a2',
-        'invenio-jsonschemas>=1.0.0a2',
+        'invenio-jsonschemas>=1.0.0a5',
         'invenio-marc21>=1.0.0a1',
         'invenio-oaiserver>=1.0.0a1',
         'invenio-pidstore>=1.0.0a6',
