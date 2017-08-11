@@ -1,15 +1,13 @@
 ========================
- Invenio-Base v1.0.0a14
+ Invenio-Base v1.0.0a15
 ========================
 
-Invenio-Base v1.0.0a14 was released on August 23, 2016.
+Invenio-Base v1.0.0a15 was released on August 11, 2017.
 
 About
 -----
 
 Base package for building the Invenio application.
-
-*This is an experimental developer preview release.*
 
 What's new
 ----------
@@ -19,7 +17,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-base==1.0.0a14
+   $ pip install invenio-base==1.0.0a15
 
 Documentation
 -------------

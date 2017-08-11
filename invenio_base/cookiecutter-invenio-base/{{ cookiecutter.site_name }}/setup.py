@@ -38,7 +38,7 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
-        'flask.commands': [
+        'console_scripts': [
             '{{ cookiecutter.package_name }} = invenio_app.cli:cli'
         ],
         'invenio_config.module': [
