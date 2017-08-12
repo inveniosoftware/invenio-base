@@ -52,40 +52,6 @@ def test_instance_create():
         assert result.exit_code == 0
 
 
-def test_instance_create_created_instance():
-    """Test ``instance create`` command checking the resulting instance."""
-    runner = CliRunner()
-
-    # Missing arg
-    result = runner.invoke(instance, ['create'])
-    assert result.exit_code != 0
-
-    # With arg
-    with runner.isolated_filesystem():
-        site_name = 'mysite2'
-        result = runner.invoke(instance, ['create', site_name])
-        assert result.exit_code == 0
-
-        cwd = os.getcwd()
-        path_to_folder = os.path.join(cwd, site_name)
-        os.chdir(path_to_folder)
-
-        assert call([
-            'pip', 'install', '-e', '.[mysql,postgresql,elasticsearch2]']) == 0
-        assert pkg_resources.get_distribution(site_name)
-
-        from invenio_app.factory import create_app
-        app = create_app()
-        with app.app_context():
-            assert app.config.get('THEME_SITENAME') == site_name
-
-        assert call(['invenio', '--help']) == 0
-        assert call(['mysite2', '--help']) == 0
-        assert call(['pip', 'uninstall', site_name, '-y']) == 0
-
-        os.chdir(cwd)
-
-
 def test_list_entry_points():
     """Test listing of entry points."""
     mock_working_set = pkg_resources.WorkingSet(entries=[])

@@ -25,8 +25,9 @@
 
 from __future__ import absolute_import, print_function
 
+import warnings
+
 import click
-from cookiecutter.main import cookiecutter
 from flask import current_app
 from flask.cli import with_appcontext
 from pkg_resources import iter_entry_points, resource_filename, working_set
@@ -41,15 +42,16 @@ def instance():
 @click.argument('name')
 def create(name):
     """Create a new Invenio instance from template."""
-    path = resource_filename(__name__, 'cookiecutter-invenio-base')
-
-    result = cookiecutter(path, no_input=True,
-                          extra_context={
-                              'site_name': name,
-                              'secret_key': generate_secret_key()
-                          })
-    click.secho('Created instance...', fg='green')
-    return result
+    warnings.warn('This command have been deprecated.')
+    click.secho(
+        'This command have been deprecated. Please use this instead:\n',
+        fg='yellow',
+    )
+    click.echo(
+        'pip install cookiecutter\n'
+        'cookiecutter '
+        'https://github.com/inveniosoftware/cookiecutter-invenio-instance'
+    )
 
 
 @instance.command('entrypoints')
