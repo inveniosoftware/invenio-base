@@ -70,12 +70,8 @@ def test_instance_create_created_instance():
         path_to_folder = os.path.join(cwd, site_name)
         os.chdir(path_to_folder)
 
-        if os.getenv('REQUIREMENTS') == 'devel':
-            assert call(
-                ['pip', 'install', '-r', 'requirements-devel.txt']
-            ) == 0
-
-        assert call(['pip', 'install', '-e', '.']) == 0
+        assert call([
+            'pip', 'install', '-e', '.[mysql,postgresql,elasticsearch2]']) == 0
         assert pkg_resources.get_distribution(site_name)
 
         from invenio_app.factory import create_app
@@ -84,6 +80,7 @@ def test_instance_create_created_instance():
             assert app.config.get('THEME_SITENAME') == site_name
 
         assert call(['invenio', '--help']) == 0
+        assert call(['mysite2', '--help']) == 0
         assert call(['pip', 'uninstall', site_name, '-y']) == 0
 
         os.chdir(cwd)
