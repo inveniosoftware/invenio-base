@@ -36,6 +36,8 @@ from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
 
+from .signals import app_created, app_loaded
+
 
 def create_app_factory(app_name, config_loader=None,
                        extension_entry_points=None, extensions=None,
@@ -97,6 +99,7 @@ def create_app_factory(app_name, config_loader=None,
     """
     def _create_app(**kwargs):
         app = base_app(app_name, **app_kwargs)
+        app_created.send(_create_app, app=app)
 
         debug = kwargs.get('debug')
         if debug is not None:
@@ -126,6 +129,8 @@ def create_app_factory(app_name, config_loader=None,
             entry_points=blueprint_entry_points,
             modules=blueprints,
         )
+
+        app_loaded.send(_create_app, app=app)
 
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).

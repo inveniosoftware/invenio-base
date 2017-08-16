@@ -12,3 +12,9 @@ WSGI factory
 
 .. automodule:: invenio_base.wsgi
    :members:
+
+Signals
+-------
+
+.. automodule:: invenio_base.signals
+   :members:
