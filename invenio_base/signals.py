@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2017 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,12 +21,38 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-"""Version information for Invenio-Base.
+"""Signals for application creation."""
 
-This file is imported by ``invenio_base.__init__``, and parsed by
-``setup.py`` as well as ``docs/conf.py``.
+from blinker import Namespace
+
+_signals = Namespace()
+
+app_created = _signals.signal('app-created')
+"""Signal sent when the base Flask application have been created.
+
+Parameters:
+- ``sender`` - the application factory function.
+- ``app`` - the Flask application instance.
+
+Example receiver:
+
+.. code-block:: python
+
+   def receiver(sender, app=None, **kwargs):
+       # ...
 """
 
-from __future__ import absolute_import, print_function
+app_loaded = _signals.signal('app-loaded')
+"""Signal sent when the Flask application have been fully loaded.
 
-__version__ = "1.0.0a16"
+Parameters:
+- ``sender`` - the application factory function.
+- ``app`` - the Flask application instance.
+
+Example receiver:
+
+.. code-block:: python
+
+   def receiver(sender, app=None, **kwargs):
+       # ...
+"""

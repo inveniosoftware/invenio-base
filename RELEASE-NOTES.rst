@@ -1,8 +1,8 @@
 ========================
- Invenio-Base v1.0.0a15
+ Invenio-Base v1.0.0a16
 ========================
 
-Invenio-Base v1.0.0a15 was released on August 11, 2017.
+Invenio-Base v1.0.0a16 was released on August 16, 2017.
 
 About
 -----
@@ -17,7 +17,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-base==1.0.0a15
+   $ pip install invenio-base==1.0.0a16
 
 Documentation
 -------------
