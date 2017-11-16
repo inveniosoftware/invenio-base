@@ -40,11 +40,8 @@ env:
 python:
   - "2.7"
   - "3.5"
-  - "pypy"
 
 matrix:
-  allow_failures:
-    - python: pypy
   fast_finish: true
 
 before_install:
