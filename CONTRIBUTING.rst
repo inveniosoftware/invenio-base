@@ -1,4 +1,3 @@
-============
 Contributing
 ============
 
@@ -34,8 +33,8 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-Invenio Base could always use more documentation, whether as part of the
-official Invenio Base docs, in docstrings, or even on the web in blog posts,
+Invenio-Base could always use more documentation, whether as part of the
+official Invenio-Base docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -71,7 +70,7 @@ Ready to contribute? Here's how to set up `invenio-base` for local development.
 
       $ mkvirtualenv invenio-base
       $ cd invenio-base/
-      $ python setup.py develop
+      $ pip install -e .[all]
 
 4. Create a branch for local development:
 
@@ -115,5 +114,5 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring.
 3. The pull request should work for Python 2.7, 3.3, 3.4 and 3.5. Check
-   https://travis-ci.com/inveniosoftware/invenio-base/pull_requests
+   https://travis-ci.org/inveniosoftware/invenio-base/pull_requests
    and make sure that the tests pass for all supported Python versions.
