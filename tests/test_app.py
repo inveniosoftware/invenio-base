@@ -41,6 +41,7 @@ from werkzeug.wsgi import DispatcherMiddleware
 from invenio_base import __version__
 from invenio_base.app import _loader, app_loader, base_app, blueprint_loader, \
     configure_warnings, converter_loader, create_app_factory, create_cli
+from invenio_base.cli import generate_secret_key
 
 
 class ListConverter(BaseConverter):
@@ -331,6 +332,14 @@ def test_create_app_factory():
     assert 'ext' in app.extensions
 
 
+def test_create_app_debug_flag():
+    """Test debug flag propagation (needed by CLI)."""
+    create_app = create_app_factory('test')
+
+    assert create_app().debug is False
+    assert create_app(debug=True).debug is True
+
+
 def test_create_app_factory_config_loader():
     """Test app factory conf loader."""
     def _config_loader(app, **kwargs):
@@ -392,3 +401,11 @@ def test_create_cli_without_app():
     result = runner.invoke(cli, ['test_cmd'])
     assert result.exit_code != 0
     assert 'FLASK_APP' in result.output
+
+
+def test_generate_secret_key():
+    """Test generation of a secret key."""
+    v1 = generate_secret_key()
+    v2 = generate_secret_key()
+    assert len(v1) == len(v2) == 256
+    assert v1 != v2
