@@ -80,7 +80,8 @@ author = u'CERN'
 
 # Get the version string. Cannot be done with import!
 g = {}
-with open(os.path.join('..', 'invenio_base', 'version.py'), 'rt') as fp:
+with open(os.path.join(os.path.dirname(__file__), '..',
+                       'invenio_base', 'version.py'), 'rt') as fp:
     exec(fp.read(), g)
     version = g['__version__']
 
@@ -143,7 +144,7 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'invenio-base@GitHub': 'https://github.com/inveniosoftware/invenio-base/',
+        'invenio-base@GitHub': 'https://github.com/inveniosoftware/invenio-base',
         'invenio-base@PyPI': 'https://pypi.python.org/pypi/invenio-base/',
     }
 }
@@ -194,7 +195,15 @@ html_theme_options = {
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -308,7 +317,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   (master_doc, 'invenio-base', u'Invenio-Base Documentation',
-   author, 'invenio-base', 'Base package for building the Invenio application.',
+   author, 'invenio-base', 'Invenio application loader.',
    'Miscellaneous'),
 ]
 
@@ -328,7 +337,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7/', None),
-    'invenio_config': (
+    'Invenio-Config': (
         'https://invenio-config.readthedocs.io/en/latest/', None
     ),
 }

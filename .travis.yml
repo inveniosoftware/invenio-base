@@ -29,20 +29,21 @@ sudo: false
 
 language: python
 
+matrix:
+  fast_finish: true
+
 cache:
   - pip
 
 env:
   - REQUIREMENTS=lowest
-  - REQUIREMENTS=release
+  - REQUIREMENTS=release DEPLOY=true
   - REQUIREMENTS=devel
 
 python:
   - "2.7"
   - "3.5"
 
-matrix:
-  fast_finish: true
 
 before_install:
   - "travis_retry pip install --upgrade pip setuptools py"
@@ -56,7 +57,7 @@ install:
   - "travis_retry pip install -e .[all]"
 
 script:
-  - "travis_wait 30 ./run-tests.sh"
+  - "./run-tests.sh"
 
 after_success:
   - coveralls
@@ -70,4 +71,5 @@ deploy:
   on:
     tags: true
     python: "2.7"
-    condition: $REQUIREMENTS = release
+    repo: inveniosoftware/invenio-base
+    condition: $DEPLOY = true

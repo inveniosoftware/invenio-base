@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Base package for building the Invenio application."""
+"""Invenio application loader."""
 
 import os
 
@@ -49,7 +49,7 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'invenio-config>=1.0.0b1',
+    'invenio-config>=1.0.0b3',
 ]
 
 extras_require = {
@@ -114,7 +114,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
         'Development Status :: 4 - Beta',
     ],
 )
