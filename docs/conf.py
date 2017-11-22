@@ -27,7 +27,6 @@
 from __future__ import print_function
 
 import os
-import sys
 
 import sphinx.environment
 
@@ -134,7 +133,7 @@ todo_include_todos = False
 html_theme = 'alabaster'
 
 html_theme_options = {
-    'description': 'Invenio application loader.',
+    'description': 'Base package for building Invenio application factories.',
     'github_user': 'inveniosoftware',
     'github_repo': 'invenio-base',
     'github_button': False,
@@ -269,8 +268,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'invenio-base.tex', u'invenio-base Documentation',
-   u'CERN', 'manual'),
+    (master_doc, 'invenio-base.tex', u'invenio-base Documentation',
+     u'CERN', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -313,9 +312,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'invenio-base', u'Invenio-Base Documentation',
-   author, 'invenio-base', 'Invenio application loader.',
-   'Miscellaneous'),
+    (master_doc, 'invenio-base', u'Invenio-Base Documentation',
+     author, 'invenio-base',
+     'Base package for building Invenio application factories.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
