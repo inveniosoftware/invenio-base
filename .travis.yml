@@ -46,6 +46,7 @@ python:
 
 
 before_install:
+  - "nvm install 6; nvm use 6"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"
@@ -67,7 +68,7 @@ deploy:
   user: inveniosoftware
   password:
     secure: "WfmCp0HTnEJo+ch5dHUtayTSde1E4JaaB44/8YdGLqs1Ou64oN7AmM+vxSVgdBXQKswP/aPTgHOgklb8Rc1wBPdY6Zcz53R7pKd+uum1Bz1OLhmSzYa5FfeVqw3iKrn+eRh4tmzZuUMC2lUaBHG5u/mAV7uQm781/SaPEacWlpRe0KM96O8xVu5RJ70ScREAaT9AFbrJVIZS7w3QtBuFbBlH8WUYxVgPlOU/6UMxQcKCzEYdot7jFeedO9xa5nPZDrxCPDqkdp/2zVkspOc/Bd4eFgCYYXuDVGjeTA+01MQ1Gns1S+XPu1hSFlggarTSKJFYrUKqXinUvnWFFnFqCt5FSLg28YCSxCgL3wzhexi/52W1mEjxZlrNmEDU3CYKAU5InEYgFYS+TjBQu905pjWxOmRE5R9Iyg7y8WqhEB2HyRwR8jhZ3FH9CuoRQRkjGAVizZkEoGTLbHEN+bGe3p+7DIYlCfSbl/Jvy4V4iObE9FgO0kCCjHJVaBP0uNle+SfeT3e8ekk+Z60lwn3OTaBMqvqxBrt9rWwwVDaeWTvRVT9agblxJfZ/jDpOAiz8azhFhQzdMytBs83iEFgxQu+5GDbvxrrGQpbfx/NCTPqxwkAjXFkj384ropgYPxzzq5zgp9rnzpeRTNUBBVssGQfhQsPbq/4RlxjbH3VroA8="
-  distributions: "sdist bdist_wheel"
+  distributions: "compile_catalog sdist bdist_wheel"
   on:
     tags: true
     python: "2.7"

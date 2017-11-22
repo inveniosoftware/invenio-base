@@ -24,7 +24,7 @@
 Authors
 =======
 
-Base package for building the Invenio application.
+Base package for building Invenio application factories.
 
 - Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
 - Adrian-Tudor Panescu <adrian.tudor.panescu@cern.ch>
