@@ -168,39 +168,11 @@ subcommands are available:
    Commands:
      run              Run development server.
      shell            Run shell in the app context.
-     instance create  Create a new Invenio instance from template.
-
 
 The ``run`` and ``shell`` commands only works if you have specified the
 ``--app`` option or the ``FLASK_APP`` environment variable. See
 `Flask <http://flask.pocoo.org/docs/dev/cli/>`_ documentation for further
 information.
-
-
-Creating a new Invenio instance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``instance create`` subcommand helps you bootstrap a minimal Invenio
-application:
-
-.. code-block:: console
-
-   $ inveniomanage instance create mysite
-   $ find mysite
-
-
-You can install the newly created site using the provided ``setup.py`` script:
-
-.. code-block:: console
-
-   $ cd mysite
-   $ python setup.py install
-
-After installation you can use ``mysite`` command to manage you instance:
-
-.. code-block:: console
-
-   $ mysite --help
-   ...
 
 """
 

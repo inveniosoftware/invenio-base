@@ -42,9 +42,9 @@ def instance():
 @click.argument('name')
 def create(name):
     """Create a new Invenio instance from template."""
-    warnings.warn('This command have been deprecated.')
+    warnings.warn('This command has been deprecated.')
     click.secho(
-        'This command have been deprecated. Please use this instead:\n',
+        'This command has been deprecated. Please use this instead:\n',
         fg='yellow',
     )
     click.echo(
