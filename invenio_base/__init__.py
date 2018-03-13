@@ -174,6 +174,80 @@ The ``run`` and ``shell`` commands only works if you have specified the
 `Flask <http://flask.pocoo.org/docs/dev/cli/>`_ documentation for further
 information.
 
+
+Listing all entrypoints of an Invenio instance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``instance entrypoints`` subcommand helps you list all entrypoints of your
+Invenio application:
+
+.. code-block:: console
+
+   $ inveniomanage instance entrypoints
+
+The output of the command will be in the below format:
+
+.. code-block:: console
+
+   <entrypoint_group_name>
+     <entrypoint>
+
+
+You can also restrict the output of the command to list all entrypoints for a
+specific entrypoint group by passing the name via the `-e` option:
+
+.. code-block:: console
+
+   $ inveniomanage instance entrypoints -e <entrypoint_group_name>
+
+For further details about the available options run the `help` command:
+
+.. code-block:: console
+
+   $ inveniomanage instance entrypoints --help
+   ...
+
+
+Migrating the application's old secret key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``instance migrate_secret_key`` subcommand helps you migrate your
+application's old secret key:
+
+.. code-block:: console
+
+   $ inveniomanage instance migrate_secret_key --old-key <old_key>
+
+The purpose of this command is to provide the administrator the capability to
+change the Invenio application's secret_key and migrate that change in all
+database's EncryptedType properties through an entrypoint group called
+`invenio_base.secret_key'`. There you can specify your migration function that
+will receive the old secret_key that can be used to decrypt the old properties
+and encrypt them again with the application's new secret_key.
+
+You can register your migration function as shown below in your package's
+entrypoints in the setup.py:
+
+.. code-block:: console
+
+   entrypoints= {
+       'invenio_base.secret_key': [
+           '<entrypoint_name> = <entrypoint_function>'
+       ]
+   }
+
+Also you can see an example of use in `invenio_oauthclient
+<https://github.com/inveniosoftware/invenio-oauthclient>`_
+package's setup.py.
+
+.. note::
+ You should change your application's `secret_key` in the config before calling
+ the migration command.
+
+For further details about the available options run the `help` command:
+
+.. code-block:: console
+
+   $ inveniomanage instance migrate_secret_key --help
+   ...
 """
 
 from __future__ import absolute_import, print_function
