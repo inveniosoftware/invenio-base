@@ -9,6 +9,9 @@
  Invenio-Base
 ==============
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-base.svg
+        :target: https://github.com/inveniosoftware/invenio-base/blob/master/LICENSE
+
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio-base.svg
         :target: https://travis-ci.org/inveniosoftware/invenio-base
 
