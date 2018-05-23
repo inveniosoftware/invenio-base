@@ -209,11 +209,17 @@ def test_app_loader():
 def test_blueprint_loader():
     """Test app loader."""
     bp = Blueprint('test', 'test')
+
+    def create_blueprint_func(app):
+        return Blueprint('test2', 'test2')
+
     app = Flask('testapp')
 
     assert len(app.blueprints) == 0
-    blueprint_loader(app, modules=[bp])
-    assert len(app.blueprints) == 1
+    blueprint_loader(app, modules=[bp, create_blueprint_func])
+    assert len(app.blueprints) == 2
+    assert 'test' in app.blueprints
+    assert 'test2' in app.blueprints
 
 
 def test_coverter_loader():
