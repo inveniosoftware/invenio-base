@@ -172,15 +172,23 @@ def app_loader(app, entry_points=None, modules=None):
 def blueprint_loader(app, entry_points=None, modules=None):
     """Run default blueprint loader.
 
+    The value of any entry_point or module passed can be either an instance of
+    ``flask.Blueprint`` or a callable accepting a ``flask.Flask`` application
+    instance as a single argument and returning an instance of
+    ``flask.Blueprint``.
+
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
 
     .. versionadded: 1.0.0
     """
     url_prefixes = app.config.get('BLUEPRINTS_URL_PREFIXES', {})
-    _loader(app, lambda bp: app.register_blueprint(
-        bp, url_prefix=url_prefixes.get(bp.name)
-    ), entry_points=entry_points, modules=modules)
+
+    def loader_init_func(bp_or_func):
+        bp = bp_or_func(app) if callable(bp_or_func) else bp_or_func
+        app.register_blueprint(bp, url_prefix=url_prefixes.get(bp.name))
+
+    _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
 
 
 def converter_loader(app, entry_points=None, modules=None):
