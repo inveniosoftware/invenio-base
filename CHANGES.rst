@@ -8,6 +8,16 @@
 Changes
 =======
 
+Version 1.0.1 (released 2018-05-25)
+
+- Added support for blueprint factory functions in the
+  ``invenio_base.blueprints`` and the ``invenio_base.api_blueprints`` entry
+  point groups. In addition to specifying an import path to an already created
+  blueprint, you can now specify an import path of a blueprint factory function
+  with the signature create_blueprint(app), that will create and return a
+  blueprint. This allows moving dynamic blueprint creation from the extension
+  initialization phase to the blueprint registration phase.
+
 Version 1.0.0 (released 2018-03-23)
 
 - Initial public release.
