@@ -154,6 +154,6 @@ def test_migrate_secret_key():
                 instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],
                 obj=script_info)
-            assert result.exit_code == -1
+            assert result.exit_code == 1
             assert entrypoint.load.called
             assert 'Failed to initialize entry point' in result.output

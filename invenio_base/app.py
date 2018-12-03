@@ -294,3 +294,4 @@ def configure_warnings():
         # 'default' behavior on deprecation warnings which is not to hide
         # errors.
         warnings.simplefilter('default', DeprecationWarning)
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
