@@ -8,6 +8,8 @@
 Changes
 =======
 
+Version 1.0.2 (released 2018-12-14)
+
 Version 1.0.1 (released 2018-05-25)
 
 - Added support for blueprint factory functions in the
