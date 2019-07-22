@@ -79,13 +79,23 @@ def migrate_secret_key(old_key):
         raise click.ClickException(
             'SECRET_KEY is not set in the configuration.')
 
+    migrators = []
     for ep in iter_entry_points('invenio_base.secret_key'):
         try:
-            ep.load()(old_key=old_key)
+            migrators.append(ep.load())
         except Exception:
-            current_app.logger.error(
-                'Failed to initialize entry point: {0}'.format(ep))
-            raise
+            raise click.ClickException(
+                'Failed to initialize entry point: {0}'.format(ep)
+            )
+
+    for m in migrators:
+        try:
+            m(old_key=old_key)
+        except Exception:
+            raise click.ClickException(
+                'Failed to perform migration of secret key {0}'.format(old_key)
+            )
+
     click.secho('Successfully changed secret key.', fg='green')
 
 

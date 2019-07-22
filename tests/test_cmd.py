@@ -156,4 +156,4 @@ def test_migrate_secret_key():
                 obj=script_info)
             assert result.exit_code == 1
             assert entrypoint.load.called
-            assert 'Failed to initialize entry point' in result.output
+            assert 'Failed to perform migration of secret key' in result.output
