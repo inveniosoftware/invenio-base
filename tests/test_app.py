@@ -331,6 +331,28 @@ def test_create_app_debug_flag():
     assert create_app(debug=True).debug is True
 
 
+def test_callable_instance_path(tmppath):
+    """Test instance path evaluation."""
+
+    def instance_path():
+        return tmppath
+
+    app = create_app_factory('test', instance_path=instance_path)()
+    assert app.instance_path == tmppath
+    assert app.static_folder is None
+
+
+def test_callable_static_path(tmppath):
+    """Test static path evaluation."""
+
+    def static_folder():
+        return join(tmppath, 'teststatic')
+
+    app = create_app_factory('test', static_folder=static_folder)()
+    assert app.static_folder == join(tmppath, 'teststatic')
+    assert app.instance_path is not None
+
+
 def test_create_app_factory_config_loader():
     """Test app factory conf loader."""
     def _config_loader(app, **kwargs):

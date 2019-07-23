@@ -56,6 +56,7 @@ def create_app_factory(app_name, config_loader=None,
         object in order to overwrite the default WSGI application (e.g. to
         install ``DispatcherMiddleware``).
     :param app_kwargs: Keyword arguments passed to :py:meth:`base_app`.
+        `instance_path` and `static_folder` can be passed as callables.
     :returns: Flask application factory.
 
     Example of a configuration loader:
@@ -83,6 +84,14 @@ def create_app_factory(app_name, config_loader=None,
     .. versionadded: 1.0.0
     """
     def _create_app(**kwargs):
+        if 'instance_path' in app_kwargs and \
+                callable(app_kwargs['instance_path']):
+            app_kwargs['instance_path'] = app_kwargs['instance_path']()
+
+        if 'static_folder' in app_kwargs and \
+                callable(app_kwargs['static_folder']):
+            app_kwargs['static_folder'] = app_kwargs['static_folder']()
+
         app = base_app(app_name, **app_kwargs)
         app_created.send(_create_app, app=app)
 

@@ -33,25 +33,32 @@ def config_loader(app, **kwargs):
     app.config.update(**kwargs)
 # sphinxdoc-example-config-end
 
+
 # sphinxdoc-example-paths-begin
 env_prefix = 'APP'
 
-instance_path = os.getenv(env_prefix + '_INSTANCE_PATH') or \
-    os.path.join(sys.prefix, 'var', 'example-instance')
-"""Instance path for Invenio.
 
-Defaults to ``<env_prefix>_INSTANCE_PATH`` or if environment variable is not
-set ``<sys.prefix>/var/<app_name>-instance``.
-"""
+def instance_path():
+    """Instance path for Invenio.
 
-static_folder = os.getenv(env_prefix + '_STATIC_FOLDER') or \
-    os.path.join(instance_path, 'static')
-"""Static folder path.
+    Defaults to ``<env_prefix>_INSTANCE_PATH`` or if environment variable is not
+    set ``<sys.prefix>/var/<app_name>-instance``.
+    """
+    return os.getenv(env_prefix + '_INSTANCE_PATH') or \
+        os.path.join(sys.prefix, 'var', 'example-instance')
 
-Defaults to ``<env_prefix>_STATIC_FOLDER`` or if environment variable is not
-set ``<sys.prefix>/var/<app_name>-instance/static``.
-"""
+
+def static_folder():
+    """Static folder path.
+
+    Defaults to ``<env_prefix>_STATIC_FOLDER`` or if environment variable is not
+    set ``<sys.prefix>/var/<app_name>-instance/static``.
+    """
+    return os.getenv(env_prefix + '_STATIC_FOLDER') or \
+        os.path.join(instance_path(), 'static')
+
 # sphinxdoc-example-paths-end
+
 
 # sphinxdoc-example-factories-begin
 create_api = create_app_factory(
