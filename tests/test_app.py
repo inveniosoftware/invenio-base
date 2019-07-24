@@ -21,12 +21,16 @@ from flask import Blueprint, Flask, current_app
 from mock import patch
 from pkg_resources import EntryPoint
 from werkzeug.routing import BaseConverter
-from werkzeug.wsgi import DispatcherMiddleware
 
 from invenio_base import __version__
 from invenio_base.app import _loader, app_loader, base_app, blueprint_loader, \
     configure_warnings, converter_loader, create_app_factory, create_cli
 from invenio_base.cli import generate_secret_key
+
+try:
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+except ImportError:
+    from werkzeug.wsgi import DispatcherMiddleware
 
 
 class ListConverter(BaseConverter):
@@ -83,7 +87,7 @@ class NoRequireEntryPoint(EntryPoint):
 
     def load(self):
         """Mock load entry point."""
-        return super(NoRequireEntryPoint, self).load(require=False)
+        return super(NoRequireEntryPoint, self).resolve()
 
 
 def _mock_entry_points(name):
