@@ -10,8 +10,13 @@
 
 from __future__ import absolute_import, print_function
 
-from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.wsgi import DispatcherMiddleware
+# They were moved in the same version so they can be in one try/except
+try:
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from werkzeug.middleware.proxy_fix import ProxyFix
+except ImportError:
+    from werkzeug.wsgi import DispatcherMiddleware
+    from werkzeug.contrib.fixers import ProxyFix
 
 
 def create_wsgi_factory(mounts_factories):
