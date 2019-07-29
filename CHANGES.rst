@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version 1.1.0 (released 2019-07-29)
+
+- Add support for allowing instance path and static folder to be callables
+  which are evaluated before being passed to the Flask application class. This
+  fixes an issue in pytest-invenio and Invenio-App in which a global instance
+  path was only evaluated once.
+
+- Fixes deprecation warnings from Werkzeug.
+
 Version 1.0.2 (released 2018-12-14)
 
 Version 1.0.1 (released 2018-05-25)
