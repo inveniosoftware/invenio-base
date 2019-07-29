@@ -14,9 +14,11 @@ from __future__ import absolute_import, print_function
 try:
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from werkzeug.middleware.proxy_fix import ProxyFix
+    WERKZEUG_014 = False
 except ImportError:
     from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.contrib.fixers import ProxyFix
+    WERKZEUG_014 = True
 
 
 def create_wsgi_factory(mounts_factories):
@@ -54,7 +56,11 @@ def wsgi_proxyfix(factory=None):
     """
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
-        if app.config.get('WSGI_PROXIES'):
-            return ProxyFix(wsgi_app, num_proxies=app.config['WSGI_PROXIES'])
+        num_proxies = app.config.get('WSGI_PROXIES')
+        if num_proxies:
+            if WERKZEUG_014:
+                return ProxyFix(wsgi_app, num_proxies=num_proxies)
+            else:
+                return ProxyFix(wsgi_app, x_for=num_proxies)
         return wsgi_app
     return create_wsgi
