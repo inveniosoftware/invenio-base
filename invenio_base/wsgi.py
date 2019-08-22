@@ -10,15 +10,17 @@
 
 from __future__ import absolute_import, print_function
 
+import warnings
+
 # They were moved in the same version so they can be in one try/except
 try:
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from werkzeug.middleware.proxy_fix import ProxyFix
-    WERKZEUG_014 = False
+    WERKZEUG_GTE_014 = False
 except ImportError:
     from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.contrib.fixers import ProxyFix
-    WERKZEUG_014 = True
+    WERKZEUG_GTE_014 = True
 
 
 def create_wsgi_factory(mounts_factories):
@@ -45,7 +47,7 @@ def create_wsgi_factory(mounts_factories):
 
 
 def wsgi_proxyfix(factory=None):
-    """Fix ``REMOTE_ADDR`` based on ``X-Forwarded-For`` headers.
+    """Fix Flask environment according to ``X-Forwarded-_`` headers.
 
     .. note::
 
@@ -53,12 +55,61 @@ def wsgi_proxyfix(factory=None):
        otherwise you application is susceptible to malicious attacks.
 
     .. versionadded:: 1.0.0
+
+    .. note::
+
+       ``PROXY_CONFIG`` lets you specify the number of proxies which a HTTP
+       request is traversing before reaching the Invenio application. Invenio
+       will then be able to trust and therefore pick the correct headers set
+       by your proxy, for example host, protocol or scheme. This is important
+       to avoid any possible malicious attacks which could manipulate/inject
+       headers:
+
+       .. code-block:: python
+
+          PROXYFIX_CONFIG = {
+              x_for: 1,  # Invenio will trust only the first value of
+                         # X-Forwarded-For header and ignore the rest
+              x_proto: 0,  # No X-Forwarded-Proto header will be trusted
+              x_host: 0,  # No X-Forwarded-Host header will be trusted
+              x_port: 0,  # No X-Forwarded-Port header will be trusted
+              x_prefix: 0,  # No X-Forwarded-Prefix header will be trusted
+          }
+
+       This configuration defines which HTTP headers will be taken into
+       account by your application.
+
+       For example, if you have one proxy in front of your application and you
+       want your application to use the original HTTP scheme, you would set
+       the following configuration:
+
+       .. code-block:: python
+
+          PROXYFIX_CONFIG = {
+              x_proto: 1,
+          }
+
+       Which means, that the first ``X-Forwarded-Proto`` header will be taken
+       into account.
+
+    .. versionadded:: 1.2.0
+
+    .. deprecated:: 1.2
+
+       The ``WSGI_PROXIES`` configuration is deprecated and it will be removed,
+       use ``PROXYFIX_CONFIG`` instead.
     """
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
         num_proxies = app.config.get('WSGI_PROXIES')
-        if num_proxies:
-            if WERKZEUG_014:
+        proxy_config = app.config.get('PROXYFIX_CONFIG')
+        if proxy_config and not WERKZEUG_GTE_014:
+            return ProxyFix(wsgi_app, **proxy_config)
+        elif num_proxies:
+            warnings.warn('The WSGI_PROXIES configuration is deprecated and '
+                          'it will be removed, use PROXYFIX_CONFIG instead',
+                          PendingDeprecationWarning)
+            if WERKZEUG_GTE_014:
                 return ProxyFix(wsgi_app, num_proxies=num_proxies)
             else:
                 return ProxyFix(wsgi_app, x_for=num_proxies)
