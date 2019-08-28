@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version 1.2.0 (released 2019-08-28)
+
+- Adds support to trust new proxy headers through the ``PROXYFIX_CONFIG``
+  configuration variable. For more information see the
+  `full documentation <api.html#invenio_base.wsgi.wsgi_proxyfix>`_.
+
+- Deprecates the usage of ``WSGI_PROXIES`` configuration which only supports
+  ``X-Forwarded-For`` headers.
+
 Version 1.1.0 (released 2019-07-29)
 
 - Add support for allowing instance path and static folder to be callables
