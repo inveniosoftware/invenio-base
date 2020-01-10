@@ -41,20 +41,6 @@ def force_logging():
         pass
 
 
-def test_instance_create():
-    """Test ``instance create`` command."""
-    runner = CliRunner()
-
-    # Missing arg
-    result = runner.invoke(instance, ['create'])
-    assert result.exit_code != 0
-
-    # With arg
-    with runner.isolated_filesystem():
-        result = runner.invoke(instance, ['create', 'mysite'])
-        assert result.exit_code == 0
-
-
 def test_list_entry_points():
     """Test listing of entry points."""
     mock_working_set = pkg_resources.WorkingSet(entries=[])
