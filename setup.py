@@ -52,7 +52,6 @@ setup_requires = [
 
 install_requires = [
     'blinker>=1.4',
-    'cookiecutter>=1.2.1',
     'Flask>=0.11.1',
 ]
 
