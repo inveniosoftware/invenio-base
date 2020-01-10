@@ -23,22 +23,6 @@ def instance():
     """Instance commands."""
 
 
-@instance.command('create')
-@click.argument('name')
-def create(name):
-    """Create a new Invenio instance from template."""
-    warnings.warn('This command has been deprecated.')
-    click.secho(
-        'This command has been deprecated. Please use this instead:\n',
-        fg='yellow',
-    )
-    click.echo(
-        'pip install cookiecutter\n'
-        'cookiecutter '
-        'https://github.com/inveniosoftware/cookiecutter-invenio-instance'
-    )
-
-
 @instance.command('entrypoints')
 @click.option(
     '-e', '--entry-point', default=None, metavar='ENTRY_POINT',
