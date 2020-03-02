@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.2.1 (released 2020-03-02)
+
+- Bumps Flask minimum version to v1.0.4.
+- Removes ``invenio instance create`` command and ``cokiecutter`` dependency.
+
 Version 1.2.0 (released 2019-08-28)
 
 - Adds support to trust new proxy headers through the ``PROXYFIX_CONFIG``
