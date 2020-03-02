@@ -52,7 +52,7 @@ setup_requires = [
 
 install_requires = [
     'blinker>=1.4',
-    'Flask>=0.11.1',
+    'Flask>=1.0.4',
 ]
 
 packages = find_packages()
