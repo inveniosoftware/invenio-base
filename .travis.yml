@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2015-2020 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -25,9 +25,8 @@ env:
   - REQUIREMENTS=devel
 
 python:
-  - "2.7"
-  - "3.5"
-
+  - "3.6"
+  - "3.7"
 
 before_install:
   - "nvm install 6; nvm use 6"
@@ -53,8 +52,9 @@ deploy:
   password:
     secure: "k0OsJdCEzkJh3QvKwgS/hLTRcl3IuKaBC9qLVqAC4wWH3lbfZ5g/ePhBYQjA+JewToGQojCq9VHPZEfkMli2MConrg53Glx1yiVQdk5WVVLesqvFZs4v2uFwKkXBQ15Mu1WiQtxEsHUyaYCwVvEcui7q7zpBu4s0U0qgFCWTmAuV3mCLtqdkRwS40rfnho6Co8IzTgsKoySjdkQzme6/1bBWQly3/Myyb2okBNL+fMmyPy6ejH4+EFsE5wZe60ffzI7quEo1OlEmZBHNVISeeoprHzhLPcwUjHPHyHvGq8PCoDRCbtwD7tLSCLnEe5mC55jJ5OVy0kBICsptxYpwaVrgvQWLvN25/ohUHG44rJx0O36zVfU5jwkq1WOrrYHvbQZLojcntIVMqrSajUd1r1SbTlZJwBzuF2aeafUWM9Zz41czuWuaJb0lLnVBz1WxRwzJm+sqsQqGyWuhf1qxAimyAZaZZ2xNaAXNF8CiWW4MXY5cGd+dp3AEVw/Uwla58uhH4XqvOJLrr5cADotFCR7TyU5btj+Ezc6shfAZ6DUDSRkbBGA4BucxggSP1Tat3N5A9at4bczKRWhD4G28rKkBMMNSA5jkDZuDbl5ugXeEgvaQDDkcpqKTKKiZ9AltY+bE3F0uEqBpvqLBjgo8jXyymg6z5NmdO/X1zeX8C+Q="
   distributions: "sdist bdist_wheel"
+  skip_existing: true
   on:
     tags: true
-    python: "2.7"
+    python: "3.6"
     repo: inveniosoftware/invenio-base
     condition: $DEPLOY = true
