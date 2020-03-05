@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 1.2.2 (released 2020-03-05)
+
+- Adds ``six`` dependency.
+- Adds the ``obj_or_import_string`` and ``load_or_import_from_config`` common
+  utility functions for general re-use throughout other Invenio modules.
+
 Version 1.2.1 (released 2020-03-02)
 
 - Bumps Flask minimum version to v1.0.4.
