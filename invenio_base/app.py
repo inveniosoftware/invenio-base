@@ -84,13 +84,9 @@ def create_app_factory(app_name, config_loader=None,
     .. versionadded: 1.0.0
     """
     def _create_app(**kwargs):
-        if 'instance_path' in app_kwargs and \
-                callable(app_kwargs['instance_path']):
-            app_kwargs['instance_path'] = app_kwargs['instance_path']()
-
-        if 'static_folder' in app_kwargs and \
-                callable(app_kwargs['static_folder']):
-            app_kwargs['static_folder'] = app_kwargs['static_folder']()
+        for k in ('instance_path', 'root_path', 'static_folder'):
+            if k in app_kwargs and callable(app_kwargs[k]):
+                app_kwargs[k] = app_kwargs[k]()
 
         app = base_app(app_name, **app_kwargs)
         app_created.send(_create_app, app=app)
@@ -250,7 +246,7 @@ def _loader(app, init_func, entry_points=None, modules=None):
 
 def base_app(import_name, instance_path=None, static_folder=None,
              static_url_path='/static', template_folder='templates',
-             instance_relative_config=True, app_class=Flask):
+             instance_relative_config=True, root_path=None, app_class=Flask):
     """Invenio base application factory.
 
     If the instance folder does not exists, it will be created.
@@ -274,6 +270,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
         static_folder=static_folder,
         static_url_path=static_url_path,
         template_folder=template_folder,
+        root_path=root_path,
     )
 
     # Create instance path if it doesn't exists
