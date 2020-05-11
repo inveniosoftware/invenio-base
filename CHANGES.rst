@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.3 (released 2020-05-11)
+
+- Adds support for passing ``root_path`` to the base Flask application factory.
+
 Version 1.2.2 (released 2020-03-05)
 
 - Adds ``six`` dependency.
