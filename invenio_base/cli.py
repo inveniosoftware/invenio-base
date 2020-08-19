@@ -85,8 +85,8 @@ def migrate_secret_key(old_key):
 
 def generate_secret_key():
     """Generate secret key."""
-    import string
     import random
+    import string
 
     rng = random.SystemRandom()
     return ''.join(
