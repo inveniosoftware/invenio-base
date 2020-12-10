@@ -24,20 +24,14 @@ with open(os.path.join('invenio_base', 'version.py'), 'rt') as fp:
 
 
 tests_require = [
-    'check-manifest>=0.25',
-    'coverage>=4.0',
-    'isort>=4.2.2',
     'mock>=1.3.0',
-    'pydocstyle>=2.0.0',
-    'pytest-cov>=1.8.0',
-    'pytest-pep8>=1.0.6',
-    'pytest>=3.8.0,<5.0.0',
     'invenio-config>=1.0.0',
+    'pytest-invenio>=1.4.0'
 ]
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.4.2',
+        'Sphinx>=3',
     ],
     'tests': tests_require,
 }

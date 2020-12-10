@@ -37,7 +37,7 @@ def force_logging():
         logger = logging.getLogger('flask.app')
         if default_handler not in logger.handlers:
             logger.handlers.append(default_handler)
-    except:
+    except Exception:
         pass
 
 
