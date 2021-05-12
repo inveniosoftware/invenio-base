@@ -46,7 +46,8 @@ setup_requires = [
 
 install_requires = [
     'blinker>=1.4',
-    'Flask>=1.0.4',
+    'Flask>=1.0.4,<2.0',
+    'Werkzeug>=1.0.1,<2.0',
     'six>=1.12.0',
 ]
 
