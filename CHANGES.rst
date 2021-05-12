@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.2.4 (released 2021-05-12)
+
+- Pins Flask <2.0 and Werkzeug <2.0 due to incompatibilities in the newly
+  released versions.
+
 Version 1.2.3 (released 2020-05-11)
 
 - Adds support for passing ``root_path`` to the base Flask application factory.
