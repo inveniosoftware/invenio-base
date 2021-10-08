@@ -25,3 +25,4 @@ Contributors
 - Tibor Simko
 - Yoan Blanc
 - Zacharias Zacharodimos
+- Maximilian Moser
