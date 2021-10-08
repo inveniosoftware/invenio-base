@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2021      TU Wien.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -46,8 +47,8 @@ setup_requires = [
 
 install_requires = [
     'blinker>=1.4',
-    'Flask>=1.0.4,<2.0',
-    'Werkzeug>=1.0.1,<2.0',
+    'Flask>=1.0.4,<3.0',
+    'Werkzeug>=1.0.1,<3.0',
     'six>=1.12.0',
 ]
 
