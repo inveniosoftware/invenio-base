@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.5 (released 2021-10-18)
+
+- Unpin Flask <2.0 and Werkzeug <2.0.
+
 Version 1.2.4 (released 2021-05-12)
 
 - Pins Flask <2.0 and Werkzeug <2.0 due to incompatibilities in the newly
