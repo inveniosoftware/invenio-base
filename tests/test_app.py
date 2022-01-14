@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,8 +19,8 @@ import click
 import pytest
 from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
+from importlib_metadata import EntryPoint
 from mock import patch
-from pkg_resources import EntryPoint
 from werkzeug.routing import BaseConverter
 
 from invenio_base import __version__
@@ -82,28 +83,21 @@ class MockEntryPoint(EntryPoint):
         return self.name
 
 
-class NoRequireEntryPoint(EntryPoint):
-    """Load without requirements check."""
-
-    def load(self):
-        """Mock load entry point."""
-        return super(NoRequireEntryPoint, self).resolve()
-
-
-def _mock_entry_points(name):
-    data = dict(
-        entrypoint1=[MockEntryPoint('ep1.e1', 'ep1.e1'),
-                     MockEntryPoint('ep1.e2', 'ep1.e2'), ],
-        entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1'),
-                     MockEntryPoint('ep2.e2', 'ep2.e2'), ],
-        entrypoint3=[MockEntryPoint('fail', 'ep3.e1',), ],
-        entrypoint4=[NoRequireEntryPoint.parse(
-            'mylist = test_app:ListConverter'), ],
-    )
-    names = data.keys() if name is None else [name]
-    for key in names:
-        for entry_point in data[key]:
-            yield entry_point
+def _mock_entry_points(name=None):
+    def fn():
+        data = dict(
+            entrypoint1=[MockEntryPoint('ep1.e1', 'ep1.e1', 'ep1.e1'),
+                         MockEntryPoint('ep1.e2', 'ep1.e2', 'ep1.e2'), ],
+            entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1', 'ep2.e1'),
+                         MockEntryPoint('ep2.e2', 'ep2.e2', 'ep2.e2'), ],
+            entrypoint3=[MockEntryPoint('fail', 'ep3.e1', 'ep3.e1'), ],
+            entrypoint4=[MockEntryPoint(
+                'mylist', 'test_app:ListConverter', 'mylist'), ],
+        )
+        if name:
+            return {name: data.get(name)}
+        return data
+    return fn
 
 
 #
@@ -142,7 +136,7 @@ def test_configure_warnings():
     warnings.resetwarnings()
 
 
-@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+@patch('importlib_metadata.entry_points', _mock_entry_points())
 def test_loader():
     """Test loader."""
     app = Flask(__name__)
@@ -160,7 +154,7 @@ def test_loader():
     _loader(
         app,
         lambda x: found.append(x), entry_points=['entrypoint1', 'entrypoint2'])
-    assert found == ['ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2']
+    assert sorted(found) == ['ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2']
 
     # Modules and entry points (entry points loaded before modules)
     found = []
@@ -170,10 +164,10 @@ def test_loader():
         entry_points=['entrypoint1', 'entrypoint2'],
         modules=['a', 'b']
     )
-    assert found == ['ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2', 'a', 'b']
+    assert sorted(found) == ['a', 'b', 'ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2']
 
 
-@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+@patch('importlib_metadata.entry_points', _mock_entry_points())
 def test_loader_exceptions():
     """Test exceptions during loading."""
     app = Flask(__name__)
@@ -235,7 +229,7 @@ def test_coverter_loader():
     assert 'mylist' in app.url_map.converters
 
 
-@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+@patch('importlib_metadata.entry_points', _mock_entry_points())
 def test_coverter_loader_from_entry_points():
     """Test converter loader."""
     app = Flask('testapp')
@@ -245,7 +239,7 @@ def test_coverter_loader_from_entry_points():
     assert 'mylist' in app.url_map.converters
 
 
-@patch('pkg_resources.iter_entry_points', _mock_entry_points)
+@patch('importlib_metadata.entry_points', _mock_entry_points())
 def test_coverter_loader_fail():
     """Test converter loader."""
     app = Flask('testapp')

@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2021      TU Wien.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -32,7 +33,7 @@ tests_require = [
 
 extras_require = {
     'docs': [
-        'Sphinx>=3',
+        'Sphinx==4.2.0',
     ],
     'tests': tests_require,
 }
@@ -50,6 +51,8 @@ install_requires = [
     'Flask>=1.0.4,<3.0',
     'Werkzeug>=1.0.1,<3.0',
     'six>=1.12.0',
+    'importlib_metadata>=4.0',
+    'importlib_resources>=4.0'
 ]
 
 packages = find_packages()
