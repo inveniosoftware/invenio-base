@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -13,9 +14,10 @@ from __future__ import absolute_import, print_function
 import warnings
 
 import click
+import importlib_metadata
 from flask import current_app
 from flask.cli import with_appcontext
-from pkg_resources import iter_entry_points, resource_filename, working_set
+from pkg_resources import working_set
 
 
 @click.group()
@@ -31,6 +33,7 @@ def list_entrypoints(entry_point):
     """List defined entry points."""
     found_entry_points = {}
     for dist in working_set:
+        # for dist in importlib_metadata.distributions:
         entry_map = dist.get_entry_map()
         for group_name, entry_points in entry_map.items():
             # Filter entry points
@@ -48,9 +51,9 @@ def list_entrypoints(entry_point):
                 found_entry_points[group_name].append(str(ep))
 
     for ep_group in sorted(found_entry_points.keys()):
-        click.secho('{0}'.format(ep_group), fg='green')
+        click.secho(f'{ep_group}', fg='green')
         for ep in sorted(found_entry_points[ep_group]):
-            click.echo('  {0}'.format(ep))
+            click.echo(f'  {ep}')
 
 
 @instance.command('migrate-secret-key')
@@ -64,23 +67,29 @@ def migrate_secret_key(old_key):
             'SECRET_KEY is not set in the configuration.')
 
     migrators = []
-    for ep in iter_entry_points('invenio_base.secret_key'):
+    for ep in set(
+        importlib_metadata.entry_points().get('invenio_base.secret_key', [])
+    ):
         try:
             migrators.append(ep.load())
         except Exception:
             raise click.ClickException(
-                'Failed to initialize entry point: {0}'.format(ep)
+                f'Failed to initialize entry point: {ep}'
             )
 
-    for m in migrators:
-        try:
-            m(old_key=old_key)
-        except Exception:
-            raise click.ClickException(
-                'Failed to perform migration of secret key {0}'.format(old_key)
-            )
-
-    click.secho('Successfully changed secret key.', fg='green')
+    if migrators:
+        for m in migrators:
+            try:
+                m(old_key=old_key)
+            except Exception:
+                raise click.ClickException(
+                    f'Failed to perform migration of secret key {old_key}'
+                )
+        click.secho('Successfully changed secret key.', fg='green')
+    else:
+        raise click.ClickException(
+            f'Failed to perform migration of secret key {old_key}'
+        )
 
 
 def generate_secret_key():

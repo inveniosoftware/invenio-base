@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,6 +19,7 @@ import pkg_resources
 import pytest
 from click.testing import CliRunner
 from flask.cli import ScriptInfo
+from importlib_metadata import EntryPoint
 from mock import MagicMock, Mock, patch
 
 from invenio_base.app import create_app_factory
@@ -112,17 +114,18 @@ def test_migrate_secret_key():
             result.output
 
     app.secret_key = "SECRET"
-    with patch('pkg_resources.EntryPoint') as MockEntryPoint:
+    with patch('invenio_base.cli.importlib_metadata.entry_points') as MockEP:
         # Test that the CLI command succeeds when the entrypoint does
         # return a function.
-        entrypoint = MockEntryPoint('ep1', 'ep1')
+        entrypoint = MockEP('ep1', 'ep1', 'ep1')
         entrypoint.load.return_value = MagicMock()
-        with patch('invenio_base.cli.iter_entry_points',
-                   return_value=[entrypoint]):
+        with patch('invenio_base.cli.importlib_metadata.entry_points',
+                   return_value={'invenio_base.secret_key': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],
                 obj=script_info)
+            print(app)
             assert result.exit_code == 0
             assert entrypoint.load.called
             entrypoint.load.return_value.assert_called_with(
@@ -132,10 +135,10 @@ def test_migrate_secret_key():
 
         # Test that the CLI command fails correctly when the entrypoint does
         # not return a function.
-        entrypoint = MockEntryPoint('ep2', 'ep2')
+        entrypoint = MockEP('ep2', 'ep2', 'ep2')
         entrypoint.load.return_value = 'ep2'
-        with patch('invenio_base.cli.iter_entry_points',
-                   return_value=[entrypoint]):
+        with patch('invenio_base.cli.importlib_metadata.entry_points',
+                   return_value={'ep2': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],

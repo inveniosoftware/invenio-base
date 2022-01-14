@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -22,7 +23,7 @@ def test_create_app_factory():
     def _receiver(name):
         def _inner(sender, app=None):
             calls[name] += 1
-            calls['{}_app'.format(name)] = app
+            calls[f'{name}_app'] = app
         return _inner
 
     app_created.connect(_receiver('created'), sender=create_app, weak=False)

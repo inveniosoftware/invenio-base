@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -16,7 +17,7 @@ import sys
 import warnings
 
 import click
-import pkg_resources
+import importlib_metadata
 from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
@@ -206,12 +207,14 @@ def converter_loader(app, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in pkg_resources.iter_entry_points(entry_point):
+            for ep in set(
+                importlib_metadata.entry_points().get(entry_point, [])
+            ):
                 try:
                     app.url_map.converters[ep.name] = ep.load()
                 except Exception:
                     app.logger.error(
-                        'Failed to initialize entry point: {0}'.format(ep))
+                        f'Failed to initialize entry point: {ep}')
                     raise
 
     if modules:
@@ -228,19 +231,21 @@ def _loader(app, init_func, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in pkg_resources.iter_entry_points(entry_point):
+            for ep in set(
+                importlib_metadata.entry_points().get(entry_point, [])
+            ):
                 try:
                     init_func(ep.load())
                 except Exception:
                     app.logger.error(
-                        'Failed to initialize entry point: {0}'.format(ep))
+                        f'Failed to initialize entry point: {ep}')
                     raise
     if modules:
         for m in modules:
             try:
                 init_func(m)
             except Exception:
-                app.logger.error('Failed to initialize module: {0}'.format(m))
+                app.logger.error(f'Failed to initialize module: {m}')
                 raise
 
 
@@ -279,7 +284,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
             os.makedirs(instance_path)
     except Exception:  # pragma: no cover
         app.logger.exception(
-            'Failed to create instance folder: "{0}"'.format(instance_path)
+            f'Failed to create instance folder: "{instance_path}"'
         )
 
     return app
