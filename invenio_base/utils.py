@@ -8,7 +8,6 @@
 
 """Base utilities."""
 
-import six
 from flask import current_app
 from werkzeug.utils import import_string
 
@@ -20,7 +19,7 @@ def obj_or_import_string(value, default=None):
     :params default: Default object to return if the import fails.
     :returns: The imported object.
     """
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         return import_string(value)
     elif value:
         return value
