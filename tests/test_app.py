@@ -9,8 +9,6 @@
 
 """Test basic application."""
 
-from __future__ import absolute_import, print_function
-
 import logging
 import warnings
 from os.path import exists, join

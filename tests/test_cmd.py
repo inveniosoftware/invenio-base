@@ -9,11 +9,7 @@
 
 """Test cli application."""
 
-from __future__ import absolute_import, print_function
-
 import logging
-import os
-from subprocess import call
 
 import pkg_resources
 import pytest

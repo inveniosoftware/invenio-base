@@ -49,10 +49,10 @@ setup_requires = [
 install_requires = [
     'blinker>=1.4',
     'Flask>=1.0.4,<3.0',
+    # importlib needed until Python 3.7 end of life.
+    'importlib-metadata>=4.4',
+    'importlib-resources>=5.0',
     'Werkzeug>=1.0.1,<3.0',
-    'six>=1.12.0',
-    'importlib_metadata>=4.0',
-    'importlib_resources>=4.0'
 ]
 
 packages = find_packages()

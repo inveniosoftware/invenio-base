@@ -8,8 +8,6 @@
 
 """Command Line Interface for Invenio."""
 
-from __future__ import absolute_import, print_function
-
 from .app import create_cli
 
 cli = create_cli()
