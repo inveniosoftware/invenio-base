@@ -6,44 +6,27 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+include .dockerignore
+include .editorconfig
 include *.cfg
+include *.py
 include *.py
 include *.rst
 include *.txt
+include *.txt
 include *.yml
-include .coveragerc
-include .dockerignore
-include .editorconfig
-include LICENSE
+include *.toml
 include docs/requirements.txt
-include invenio_base/static/img/test
-include invenio_base/static/img/testgif
+include LICENSE
 include pytest.ini
 include run-tests.sh
 prune docs/_build
+recursive-exclude .github/workflows *.yml
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include examples *.py
-recursive-include invenio_base *.css
-recursive-include invenio_base *.foo
-recursive-include invenio_base *.gif
-recursive-include invenio_base *.html
-recursive-include invenio_base *.ico
-recursive-include invenio_base *.ini
-recursive-include invenio_base *.js
-recursive-include invenio_base *.json
-recursive-include invenio_base *.less
-recursive-include invenio_base *.mo
-recursive-include invenio_base *.png
-recursive-include invenio_base *.po
-recursive-include invenio_base *.pot
-recursive-include invenio_base *.py
-recursive-include invenio_base *.svg
-recursive-include invenio_base *.tpl
-recursive-include invenio_base *.txt
 recursive-include tests *.html
 recursive-include tests *.js
 recursive-include tests *.py
-recursive-include .github/workflows *.yml

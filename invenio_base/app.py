@@ -15,10 +15,10 @@ import sys
 import warnings
 
 import click
-import importlib_metadata
 from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
+from importlib_metadata import entry_points as iter_entry_points
 
 from .signals import app_created, app_loaded
 
@@ -205,9 +205,7 @@ def converter_loader(app, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in set(
-                importlib_metadata.entry_points().get(entry_point, [])
-            ):
+            for ep in iter_entry_points(group=entry_point):
                 try:
                     app.url_map.converters[ep.name] = ep.load()
                 except Exception:
@@ -229,9 +227,7 @@ def _loader(app, init_func, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in set(
-                importlib_metadata.entry_points().get(entry_point, [])
-            ):
+            for ep in iter_entry_points(group=entry_point):
                 try:
                     init_func(ep.load())
                 except Exception:

@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version 1.2.6 (released 2021-10-18)
+
+- Added importlib-resources/importlib-metadata packages to replace usage of
+  pkg_resources.
+
+- Removed __future__ imports and usage of six library.
+
 Version 1.2.5 (released 2021-10-18)
 
 - Unpin Flask <2.0 and Werkzeug <2.0.
