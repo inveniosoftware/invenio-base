@@ -234,8 +234,6 @@ For further details about the available options run the `help` command:
    ...
 """
 
-from __future__ import absolute_import, print_function
-
 from .app import create_app_factory, create_cli
 from .version import __version__
 from .wsgi import create_wsgi_factory

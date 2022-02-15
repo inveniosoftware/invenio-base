@@ -9,10 +9,6 @@
 
 """Application bootstraping."""
 
-from __future__ import absolute_import, print_function
-
-import warnings
-
 import click
 import importlib_metadata
 from flask import current_app

@@ -8,8 +8,6 @@
 
 """Test utilities."""
 
-from __future__ import absolute_import, print_function
-
 from flask import Flask
 
 from invenio_base.utils import load_or_import_from_config, obj_or_import_string

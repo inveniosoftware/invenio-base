@@ -9,8 +9,6 @@
 
 """Test signals."""
 
-from __future__ import absolute_import, print_function
-
 from invenio_base.app import create_app_factory
 from invenio_base.signals import app_created, app_loaded
 

@@ -8,8 +8,6 @@
 
 """WSGI application factory for Invenio."""
 
-from __future__ import absolute_import, print_function
-
 import warnings
 
 # They were moved in the same version so they can be in one try/except
