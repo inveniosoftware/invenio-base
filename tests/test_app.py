@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2015-2022 CERN.
 # Copyright (C) 2022 RERO.
 #
 # Invenio is free software; you can redistribute it and/or modify it
@@ -12,13 +12,13 @@
 import logging
 import warnings
 from os.path import exists, join
+from unittest.mock import patch
 
 import click
 import pytest
 from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
 from importlib_metadata import EntryPoint
-from mock import patch
 from werkzeug.routing import BaseConverter
 
 from invenio_base import __version__
@@ -81,21 +81,20 @@ class MockEntryPoint(EntryPoint):
         return self.name
 
 
-def _mock_entry_points(name=None):
-    def fn():
-        data = dict(
-            entrypoint1=[MockEntryPoint('ep1.e1', 'ep1.e1', 'ep1.e1'),
-                         MockEntryPoint('ep1.e2', 'ep1.e2', 'ep1.e2'), ],
-            entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1', 'ep2.e1'),
-                         MockEntryPoint('ep2.e2', 'ep2.e2', 'ep2.e2'), ],
-            entrypoint3=[MockEntryPoint('fail', 'ep3.e1', 'ep3.e1'), ],
-            entrypoint4=[MockEntryPoint(
-                'mylist', 'test_app:ListConverter', 'mylist'), ],
-        )
-        if name:
-            return {name: data.get(name)}
-        return data
-    return fn
+def _mock_entry_points(group=None):
+    data = dict(
+        entrypoint1=[MockEntryPoint('ep1.e1', 'ep1.e1', 'ep1.e1'),
+                     MockEntryPoint('ep1.e2', 'ep1.e2', 'ep1.e2'), ],
+        entrypoint2=[MockEntryPoint('ep2.e1', 'ep2.e1', 'ep2.e1'),
+                     MockEntryPoint('ep2.e2', 'ep2.e2', 'ep2.e2'), ],
+        entrypoint3=[MockEntryPoint('fail', 'ep3.e1', 'ep3.e1'), ],
+        entrypoint4=[MockEntryPoint(
+            'mylist', 'test_app:ListConverter', 'mylist'), ],
+    )
+    names = data.keys() if group is None else [group]
+    for key in names:
+        for entry_point in data[key]:
+            yield entry_point
 
 
 #
@@ -134,7 +133,7 @@ def test_configure_warnings():
     warnings.resetwarnings()
 
 
-@patch('importlib_metadata.entry_points', _mock_entry_points())
+@patch('invenio_base.app.iter_entry_points', _mock_entry_points)
 def test_loader():
     """Test loader."""
     app = Flask(__name__)
@@ -165,7 +164,7 @@ def test_loader():
     assert sorted(found) == ['a', 'b', 'ep1.e1', 'ep1.e2', 'ep2.e1', 'ep2.e2']
 
 
-@patch('importlib_metadata.entry_points', _mock_entry_points())
+@patch('invenio_base.app.iter_entry_points', _mock_entry_points)
 def test_loader_exceptions():
     """Test exceptions during loading."""
     app = Flask(__name__)
@@ -227,7 +226,7 @@ def test_coverter_loader():
     assert 'mylist' in app.url_map.converters
 
 
-@patch('importlib_metadata.entry_points', _mock_entry_points())
+@patch('invenio_base.app.iter_entry_points', _mock_entry_points)
 def test_coverter_loader_from_entry_points():
     """Test converter loader."""
     app = Flask('testapp')
@@ -237,7 +236,7 @@ def test_coverter_loader_from_entry_points():
     assert 'mylist' in app.url_map.converters
 
 
-@patch('importlib_metadata.entry_points', _mock_entry_points())
+@patch('invenio_base.app.iter_entry_points', _mock_entry_points)
 def test_coverter_loader_fail():
     """Test converter loader."""
     app = Flask('testapp')
@@ -246,43 +245,43 @@ def test_coverter_loader_fail():
         converter_loader(app, entry_points=['entrypoint3'])
 
 
-def test_base_app(tmppath):
+def test_base_app(tmp_path):
     """Test base app creation."""
     # Test default static_url_path and CLI initialization
     app = base_app('test')
     assert app.name == 'test'
     assert app.cli
     assert app.static_url_path == '/static'
-    assert app.instance_path != tmppath
+    assert app.instance_path != tmp_path
 
     # Test specifying instance path
-    app = base_app('test', instance_path=tmppath)
-    assert app.instance_path == tmppath
+    app = base_app('test', instance_path=tmp_path)
+    assert app.instance_path == tmp_path
     assert exists(app.instance_path)
     assert app.static_folder is None
 
     # Test automatic instance path creation
-    newpath = join(tmppath, 'test')
+    newpath = join(tmp_path, 'test')
     assert not exists(newpath)
     app = base_app('test', instance_path=newpath)
     assert exists(newpath)
     assert app.static_folder is None
 
     # Test static folder
-    staticpath = join(tmppath, 'teststatic')
+    staticpath = join(tmp_path, 'teststatic')
     app = base_app('test', static_folder=staticpath)
     assert app.static_folder == staticpath
     assert app.instance_path is not None
 
     # Test static + instance folder
-    staticpath = join(tmppath, 'teststatic')
-    app = base_app('test', instance_path=tmppath,
+    staticpath = join(tmp_path, 'teststatic')
+    app = base_app('test', instance_path=tmp_path,
                    static_folder=staticpath)
     assert app.static_folder == staticpath
-    assert app.instance_path == tmppath
+    assert app.instance_path == tmp_path
 
     # Test choice loader
-    searchpath = join(tmppath, "tpls")
+    searchpath = join(tmp_path, "tpls")
     app = base_app('test', template_folder=searchpath)
     assert app.jinja_loader.searchpath == [searchpath]
 
@@ -290,7 +289,7 @@ def test_base_app(tmppath):
     assert app.jinja_loader.searchpath == [join(app.root_path, 'templates')]
 
 
-def test_base_app_class(tmppath):
+def test_base_app_class(tmp_path):
     """Test using custom Flask application class."""
     class CustomFlask(Flask):
         pass
@@ -327,25 +326,25 @@ def test_create_app_debug_flag():
     assert create_app(debug=True).debug is True
 
 
-def test_callable_instance_path(tmppath):
+def test_callable_instance_path(tmp_path):
     """Test instance path evaluation."""
 
     def instance_path():
-        return tmppath
+        return tmp_path
 
     app = create_app_factory('test', instance_path=instance_path)()
-    assert app.instance_path == tmppath
+    assert app.instance_path == tmp_path
     assert app.static_folder is None
 
 
-def test_callable_static_path(tmppath):
+def test_callable_static_path(tmp_path):
     """Test static path evaluation."""
 
     def static_folder():
-        return join(tmppath, 'teststatic')
+        return join(tmp_path, 'teststatic')
 
     app = create_app_factory('test', static_folder=static_folder)()
-    assert app.static_folder == join(tmppath, 'teststatic')
+    assert app.static_folder == join(tmp_path, 'teststatic')
     assert app.instance_path is not None
 
 
@@ -388,11 +387,6 @@ def test_create_cli_with_app():
     result = runner.invoke(cli, ['test-cmd'])
     assert result.exit_code == 0
     assert u'{0} False\n'.format(app_name) in result.output
-
-    # FIXME wait for fixed support in Flask.
-    # result = runner.invoke(cli, ['--debug', 'test_cmd'])
-    # assert result.exit_code == 0
-    # assert u'{0} True\n'.format(app_name) in result.output
 
 
 def test_create_cli_without_app():

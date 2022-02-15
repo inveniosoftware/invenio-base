@@ -8,19 +8,15 @@
 
 """Pytest configuration."""
 
-import shutil
+
 import tempfile
 
 import pytest
 
 
-@pytest.fixture
-def tmppath(request):
+@pytest.fixture()
+def tmppath():
     """Application fixture."""
     tmppath = tempfile.mkdtemp()
-
-    def teardown():
-        shutil.rmtree(tmppath)
-
-    request.addfinalizer(teardown)
+    yield tmppath
     return tmppath

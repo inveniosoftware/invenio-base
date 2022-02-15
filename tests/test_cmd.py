@@ -10,13 +10,12 @@
 """Test cli application."""
 
 import logging
+from unittest.mock import MagicMock, Mock, patch
 
 import pkg_resources
 import pytest
 from click.testing import CliRunner
 from flask.cli import ScriptInfo
-from importlib_metadata import EntryPoint
-from mock import MagicMock, Mock, patch
 
 from invenio_base.app import create_app_factory
 from invenio_base.cli import instance
@@ -110,18 +109,17 @@ def test_migrate_secret_key():
             result.output
 
     app.secret_key = "SECRET"
-    with patch('invenio_base.cli.importlib_metadata.entry_points') as MockEP:
+    with patch('importlib_metadata.entry_points') as MockEP:
         # Test that the CLI command succeeds when the entrypoint does
         # return a function.
         entrypoint = MockEP('ep1', 'ep1', 'ep1')
         entrypoint.load.return_value = MagicMock()
-        with patch('invenio_base.cli.importlib_metadata.entry_points',
+        with patch('importlib_metadata.entry_points',
                    return_value={'invenio_base.secret_key': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
                            'OLD_SECRET_KEY'],
                 obj=script_info)
-            print(app)
             assert result.exit_code == 0
             assert entrypoint.load.called
             entrypoint.load.return_value.assert_called_with(
@@ -133,7 +131,7 @@ def test_migrate_secret_key():
         # not return a function.
         entrypoint = MockEP('ep2', 'ep2', 'ep2')
         entrypoint.load.return_value = 'ep2'
-        with patch('invenio_base.cli.importlib_metadata.entry_points',
+        with patch('importlib_metadata.entry_points',
                    return_value={'ep2': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
