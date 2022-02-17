@@ -8,10 +8,12 @@
 Changes
 =======
 
-Version 1.2.6 (released 2021-10-18)
+Version 1.2.6 (released 2022-02-18)
 
 - Added importlib-resources/importlib-metadata packages to replace usage of
   pkg_resources.
+
+- Updated package to use a purely declarative package definition.
 
 - Removed __future__ imports and usage of six library.
 
