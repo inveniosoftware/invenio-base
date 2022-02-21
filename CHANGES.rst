@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.7 (released 2022-02-21)
+
+- Fixed minimal test dependencies and limited itsdangerous to <2.1
+
 Version 1.2.6 (released 2022-02-18)
 
 - Added importlib-resources/importlib-metadata packages to replace usage of

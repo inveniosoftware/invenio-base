@@ -237,7 +237,7 @@ For further details about the available options run the `help` command:
 from .app import create_app_factory, create_cli
 from .wsgi import create_wsgi_factory
 
-__version__ = '1.2.6'
+__version__ = '1.2.7'
 
 __all__ = (
     '__version__',
