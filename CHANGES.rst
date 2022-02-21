@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.8 (released 2022-02-21)
+
+- Lowered Python requirement to v3.6 to avoid breaking builds.
+
 Version 1.2.7 (released 2022-02-21)
 
 - Fixed minimal test dependencies and limited itsdangerous to <2.1
