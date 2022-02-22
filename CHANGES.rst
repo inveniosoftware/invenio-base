@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.2.9 (released 2022-02-22)
+
+- Fixes issue with duplicate entry points during tests due to pytest
+  modifying the sys.path.
+
 Version 1.2.8 (released 2022-02-21)
 
 - Lowered Python requirement to v3.6 to avoid breaking builds.
