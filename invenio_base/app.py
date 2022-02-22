@@ -205,7 +205,7 @@ def converter_loader(app, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in iter_entry_points(group=entry_point):
+            for ep in set(iter_entry_points(group=entry_point)):
                 try:
                     app.url_map.converters[ep.name] = ep.load()
                 except Exception:
@@ -227,7 +227,7 @@ def _loader(app, init_func, entry_points=None, modules=None):
     """
     if entry_points:
         for entry_point in entry_points:
-            for ep in iter_entry_points(group=entry_point):
+            for ep in set(iter_entry_points(group=entry_point)):
                 try:
                     init_func(ep.load())
                 except Exception:
