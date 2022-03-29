@@ -8,7 +8,11 @@
 Changes
 =======
 
-Version 1.2.10 (released 2022-02-29)
+Version 1.2.10 (released 2022-03-29)
+
+- Adds a compatibility layer for Werkzeug v2.1.
+
+Version 1.2.10 (released 2022-03-29)
 
 - Adds support for Flask v2.1
 
