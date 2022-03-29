@@ -15,7 +15,6 @@ from unittest.mock import MagicMock, Mock, patch
 import pkg_resources
 import pytest
 from click.testing import CliRunner
-from flask.cli import ScriptInfo
 
 from invenio_base.app import create_app_factory
 from invenio_base.cli import instance
@@ -96,17 +95,13 @@ def test_migrate_secret_key():
     create_app = create_app_factory('test', config_loader=_config_loader)
     app = create_app(KWARGS_TEST=True)
 
-    script_info = ScriptInfo(create_app=lambda info: app)
-
     # Check that CLI command fails when the SECRET_KEY is not set.
-    with app.app_context():
-        runner = CliRunner()
-        result = runner.invoke(
-            instance, ['migrate-secret-key', '--old-key', 'OLD_SECRET_KEY'],
-            obj=script_info)
-        assert result.exit_code == 1
-        assert 'Error: SECRET_KEY is not set in the configuration.' in \
-            result.output
+    runner = app.test_cli_runner()
+    result = runner.invoke(
+        instance, ['migrate-secret-key', '--old-key', 'OLD_SECRET_KEY'])
+    assert result.exit_code == 1
+    assert 'Error: SECRET_KEY is not set in the configuration.' in \
+        result.output
 
     app.secret_key = "SECRET"
     with patch('importlib_metadata.entry_points') as MockEP:
@@ -118,8 +113,7 @@ def test_migrate_secret_key():
                    return_value={'invenio_base.secret_key': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
-                           'OLD_SECRET_KEY'],
-                obj=script_info)
+                           'OLD_SECRET_KEY'])
             assert result.exit_code == 0
             assert entrypoint.load.called
             entrypoint.load.return_value.assert_called_with(
@@ -135,8 +129,7 @@ def test_migrate_secret_key():
                    return_value={'ep2': [entrypoint]}):
             result = runner.invoke(
                 instance, ['migrate-secret-key', '--old-key',
-                           'OLD_SECRET_KEY'],
-                obj=script_info)
+                           'OLD_SECRET_KEY'])
             assert result.exit_code == 1
             assert entrypoint.load.called
             assert 'Failed to perform migration of secret key' in result.output

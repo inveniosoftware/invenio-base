@@ -401,10 +401,6 @@ def test_create_cli_without_app():
     result = runner.invoke(cli)
     assert result.exit_code == 0
 
-    result = runner.invoke(cli, ['test-cmd'])
-    assert result.exit_code != 0
-    assert 'FLASK_APP' in result.output
-
 
 def test_generate_secret_key():
     """Test generation of a secret key."""
