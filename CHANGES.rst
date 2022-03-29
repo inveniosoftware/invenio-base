@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.10 (released 2022-02-29)
+
+- Adds support for Flask v2.1
+
 Version 1.2.9 (released 2022-02-22)
 
 - Fixes issue with duplicate entry points during tests due to pytest
