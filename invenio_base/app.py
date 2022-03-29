@@ -139,16 +139,26 @@ def create_cli(create_app=None):
 
     .. versionadded: 1.0.0
     """
-    def create_cli_app(info):
+    # Flask 2.0 removed support for passing script_info argument. Below
+    # function is thus
+    def create_cli_app(*args):
         """Application factory for CLI app.
 
         Internal function for creating the CLI. When invoked via
         ``inveniomanage`` FLASK_APP must be set.
         """
         if create_app is None:
-            # Fallback to normal Flask behavior
-            info.create_app = None
-            app = info.load_app()
+            # This part is only used for the "inveniomanage" command.
+            if len(args) == 0:
+                # Flask v2
+                # Create a barebones Flask application.
+                app = Flask("inveniomanage")
+            else:
+                # Flask v1
+                # Fallback to normal Flask behavior
+                info = args[0]
+                info.create_app = None
+                app = info.load_app()
         else:
             app = create_app(debug=get_debug_flag())
         return app
