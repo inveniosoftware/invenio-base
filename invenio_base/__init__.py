@@ -237,6 +237,22 @@ For further details about the available options run the `help` command:
 from .app import create_app_factory, create_cli
 from .wsgi import create_wsgi_factory
 
+# Monkey patch Werkzeug 2.1
+# Flask-Login uses the safe_str_cmp method which has been removed in Werkzeug
+# 2.1. Flask-Login v0.6.0 (yet to be released at the time of writing) fixes the
+# issue. Once we depend on Flask-Login v0.6.0 as the minimal version in
+# Flask-Security-Invenio/Invenio-Accounts we can remove this patch again.
+try:
+    # Werkzeug <2.1
+    from werkzeug import security
+    security.safe_str_cmp
+except AttributeError:
+    # Werkzeug >=2.1
+    import hmac
+
+    from werkzeug import security
+    security.safe_str_cmp = hmac.compare_digest
+
 __version__ = '1.2.10'
 
 __all__ = (
