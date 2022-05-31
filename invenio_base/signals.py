@@ -12,7 +12,7 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-app_created = _signals.signal('app-created')
+app_created = _signals.signal("app-created")
 """Signal sent when the base Flask application have been created.
 
 Parameters:
@@ -27,7 +27,7 @@ Example receiver:
        # ...
 """
 
-app_loaded = _signals.signal('app-loaded')
+app_loaded = _signals.signal("app-loaded")
 """Signal sent when the Flask application have been fully loaded.
 
 Parameters:

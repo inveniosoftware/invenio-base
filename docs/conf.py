@@ -48,9 +48,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Invenio-Base"
-copyright = u"2015, CERN"
-author = u"CERN"
+project = "Invenio-Base"
+copyright = "2015, CERN"
+author = "CERN"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -117,10 +117,8 @@ html_theme_options = {
     "github_banner": True,
     "show_powered_by": False,
     "extra_nav_links": {
-        "invenio-base@GitHub":
-        "https://github.com/inveniosoftware/invenio-base",
-        "invenio-base@PyPI":
-        "https://pypi.python.org/pypi/invenio-base/",
+        "invenio-base@GitHub": "https://github.com/inveniosoftware/invenio-base",
+        "invenio-base@PyPI": "https://pypi.python.org/pypi/invenio-base/",
     },
 }
 
@@ -244,11 +242,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc,
-     "invenio-base.tex",
-     u"invenio-base Documentation",
-     u"CERN",
-     "manual"),
+    (master_doc, "invenio-base.tex", "invenio-base Documentation", "CERN", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -276,11 +270,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc,
-              "invenio-base",
-              u"invenio-base Documentation",
-              [author],
-              1)]
+man_pages = [(master_doc, "invenio-base", "invenio-base Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -295,7 +285,7 @@ texinfo_documents = [
     (
         master_doc,
         "invenio-base",
-        u"Invenio-Base Documentation",
+        "Invenio-Base Documentation",
         author,
         "invenio-base",
         "Base package for building Invenio application factories.",
@@ -319,8 +309,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/2.7/", None),
-    "Invenio-Config": ("https://invenio-config.readthedocs.io/en/latest/",
-                       None),
+    "Invenio-Config": ("https://invenio-config.readthedocs.io/en/latest/", None),
 }
 
 # Autodoc configuraton.

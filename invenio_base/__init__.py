@@ -245,19 +245,21 @@ from .wsgi import create_wsgi_factory
 try:
     # Werkzeug <2.1
     from werkzeug import security
+
     security.safe_str_cmp
 except AttributeError:
     # Werkzeug >=2.1
     import hmac
 
     from werkzeug import security
+
     security.safe_str_cmp = hmac.compare_digest
 
-__version__ = '1.2.11'
+__version__ = "1.2.11"
 
 __all__ = (
-    '__version__',
-    'create_app_factory',
-    'create_cli',
-    'create_wsgi_factory',
+    "__version__",
+    "create_app_factory",
+    "create_cli",
+    "create_wsgi_factory",
 )
