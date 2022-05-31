@@ -398,7 +398,7 @@ def test_create_cli_with_app():
 
     @cli.command()
     def test_cmd():
-        click.echo("{0} {1}".format(current_app.name, current_app.debug))
+        click.echo(f"{current_app.name} {current_app.debug}")
 
     runner = CliRunner()
     result = runner.invoke(cli)
@@ -406,7 +406,7 @@ def test_create_cli_with_app():
 
     result = runner.invoke(cli, ["test-cmd"])
     assert result.exit_code == 0
-    assert "{0} False\n".format(app_name) in result.output
+    assert f"{app_name} False\n" in result.output
 
 
 def test_create_cli_without_app():
