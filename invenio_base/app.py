@@ -23,11 +23,18 @@ from importlib_metadata import entry_points as iter_entry_points
 from .signals import app_created, app_loaded
 
 
-def create_app_factory(app_name, config_loader=None,
-                       extension_entry_points=None, extensions=None,
-                       blueprint_entry_points=None, blueprints=None,
-                       converter_entry_points=None, converters=None,
-                       wsgi_factory=None, **app_kwargs):
+def create_app_factory(
+    app_name,
+    config_loader=None,
+    extension_entry_points=None,
+    extensions=None,
+    blueprint_entry_points=None,
+    blueprints=None,
+    converter_entry_points=None,
+    converters=None,
+    wsgi_factory=None,
+    **app_kwargs,
+):
     """Create a Flask application factory.
 
     The application factory will load Flask extensions and blueprints specified
@@ -82,15 +89,16 @@ def create_app_factory(app_name, config_loader=None,
 
     .. versionadded: 1.0.0
     """
+
     def _create_app(**kwargs):
-        for k in ('instance_path', 'root_path', 'static_folder'):
+        for k in ("instance_path", "root_path", "static_folder"):
             if k in app_kwargs and callable(app_kwargs[k]):
                 app_kwargs[k] = app_kwargs[k]()
 
         app = base_app(app_name, **app_kwargs)
         app_created.send(_create_app, app=app)
 
-        debug = kwargs.get('debug')
+        debug = kwargs.get("debug")
         if debug is not None:
             app.debug = debug
 
@@ -179,8 +187,7 @@ def app_loader(app, entry_points=None, modules=None):
 
     .. versionadded: 1.0.0
     """
-    _loader(app, lambda ext: ext(app), entry_points=entry_points,
-            modules=modules)
+    _loader(app, lambda ext: ext(app), entry_points=entry_points, modules=modules)
 
 
 def blueprint_loader(app, entry_points=None, modules=None):
@@ -196,7 +203,7 @@ def blueprint_loader(app, entry_points=None, modules=None):
 
     .. versionadded: 1.0.0
     """
-    url_prefixes = app.config.get('BLUEPRINTS_URL_PREFIXES', {})
+    url_prefixes = app.config.get("BLUEPRINTS_URL_PREFIXES", {})
 
     def loader_init_func(bp_or_func):
         bp = bp_or_func(app) if callable(bp_or_func) else bp_or_func
@@ -219,8 +226,7 @@ def converter_loader(app, entry_points=None, modules=None):
                 try:
                     app.url_map.converters[ep.name] = ep.load()
                 except Exception:
-                    app.logger.error(
-                        f'Failed to initialize entry point: {ep}')
+                    app.logger.error(f"Failed to initialize entry point: {ep}")
                     raise
 
     if modules:
@@ -241,21 +247,27 @@ def _loader(app, init_func, entry_points=None, modules=None):
                 try:
                     init_func(ep.load())
                 except Exception:
-                    app.logger.error(
-                        f'Failed to initialize entry point: {ep}')
+                    app.logger.error(f"Failed to initialize entry point: {ep}")
                     raise
     if modules:
         for m in modules:
             try:
                 init_func(m)
             except Exception:
-                app.logger.error(f'Failed to initialize module: {m}')
+                app.logger.error(f"Failed to initialize module: {m}")
                 raise
 
 
-def base_app(import_name, instance_path=None, static_folder=None,
-             static_url_path='/static', template_folder='templates',
-             instance_relative_config=True, root_path=None, app_class=Flask):
+def base_app(
+    import_name,
+    instance_path=None,
+    static_folder=None,
+    static_url_path="/static",
+    template_folder="templates",
+    instance_relative_config=True,
+    root_path=None,
+    app_class=Flask,
+):
     """Invenio base application factory.
 
     If the instance folder does not exists, it will be created.
@@ -287,9 +299,7 @@ def base_app(import_name, instance_path=None, static_folder=None,
         if instance_path and not os.path.exists(instance_path):
             os.makedirs(instance_path)
     except Exception:  # pragma: no cover
-        app.logger.exception(
-            f'Failed to create instance folder: "{instance_path}"'
-        )
+        app.logger.exception(f'Failed to create instance folder: "{instance_path}"')
 
     return app
 
@@ -308,5 +318,5 @@ def configure_warnings():
         # DeprecationWarning is by default hidden, hence we force the
         # 'default' behavior on deprecation warnings which is not to hide
         # errors.
-        warnings.simplefilter('default', DeprecationWarning)
-        warnings.simplefilter('ignore', PendingDeprecationWarning)
+        warnings.simplefilter("default", DeprecationWarning)
+        warnings.simplefilter("ignore", PendingDeprecationWarning)

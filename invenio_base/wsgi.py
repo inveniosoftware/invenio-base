@@ -14,10 +14,12 @@ import warnings
 try:
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from werkzeug.middleware.proxy_fix import ProxyFix
+
     WERKZEUG_GTE_014 = False
 except ImportError:
     from werkzeug.contrib.fixers import ProxyFix
     from werkzeug.wsgi import DispatcherMiddleware
+
     WERKZEUG_GTE_014 = True
 
 
@@ -35,12 +37,13 @@ def create_wsgi_factory(mounts_factories):
 
     .. versionadded:: 1.0.0
     """
+
     def create_wsgi(app, **kwargs):
         mounts = {
-            mount: factory(**kwargs)
-            for mount, factory in mounts_factories.items()
+            mount: factory(**kwargs) for mount, factory in mounts_factories.items()
         }
         return DispatcherMiddleware(app.wsgi_app, mounts)
+
     return create_wsgi
 
 
@@ -97,19 +100,23 @@ def wsgi_proxyfix(factory=None):
        The ``WSGI_PROXIES`` configuration is deprecated and it will be removed,
        use ``PROXYFIX_CONFIG`` instead.
     """
+
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
-        num_proxies = app.config.get('WSGI_PROXIES')
-        proxy_config = app.config.get('PROXYFIX_CONFIG')
+        num_proxies = app.config.get("WSGI_PROXIES")
+        proxy_config = app.config.get("PROXYFIX_CONFIG")
         if proxy_config and not WERKZEUG_GTE_014:
             return ProxyFix(wsgi_app, **proxy_config)
         elif num_proxies:
-            warnings.warn('The WSGI_PROXIES configuration is deprecated and '
-                          'it will be removed, use PROXYFIX_CONFIG instead',
-                          PendingDeprecationWarning)
+            warnings.warn(
+                "The WSGI_PROXIES configuration is deprecated and "
+                "it will be removed, use PROXYFIX_CONFIG instead",
+                PendingDeprecationWarning,
+            )
             if WERKZEUG_GTE_014:
                 return ProxyFix(wsgi_app, num_proxies=num_proxies)
             else:
                 return ProxyFix(wsgi_app, x_for=num_proxies)
         return wsgi_app
+
     return create_wsgi
