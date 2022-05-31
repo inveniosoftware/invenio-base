@@ -8,10 +8,6 @@
 
 """Sphinx configuration."""
 
-import os
-
-import sphinx.environment
-
 from invenio_base import __version__
 
 # -- General configuration ------------------------------------------------
@@ -66,7 +62,7 @@ release = __version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
