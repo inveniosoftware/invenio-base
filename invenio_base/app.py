@@ -31,6 +31,7 @@ def create_app_factory(
     blueprints=None,
     converter_entry_points=None,
     converters=None,
+    init_functions_entry_points=None,
     wsgi_factory=None,
     **app_kwargs,
 ):
@@ -125,6 +126,13 @@ def create_app_factory(
             entry_points=blueprint_entry_points,
             modules=blueprints,
         )
+        
+        # Load init functions
+        init_functions_loader(
+            app,
+            entry_points=init_functions_entry_points,
+        )
+
 
         app_loaded.send(_create_app, app=app)
 
@@ -176,6 +184,20 @@ def create_cli(create_app=None):
         pass
 
     return cli
+
+
+def init_functions_loader(app, entry_points=None):
+    """Run functions that should be executed after the application is instantiated.
+
+    :param entry_points: List of entry points providing to Flask extensions.
+
+    .. versionadded: 2.0.0
+    """
+    def loader_init_func(func):
+        with app.app_context():
+            func(app)
+
+    _loader(app, loader_init_func, entry_points=entry_points)
 
 
 def app_loader(app, entry_points=None, modules=None):
