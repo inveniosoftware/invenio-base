@@ -8,7 +8,12 @@
 Changes
 =======
 
-Version 1.2.10 (released 2022-03-29)
+Version 1.2.14 (released 2023-04-26)
+
+- Pins Flask<2.3.0 due to removed deprecations (for example
+  `before_(app_)first_request`).
+
+Version 1.2.11 (released 2022-03-29)
 
 - Adds a compatibility layer for Werkzeug v2.1.
 
