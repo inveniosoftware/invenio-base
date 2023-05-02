@@ -1,12 +1,17 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2015-2023 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 1.2.15 (released 2023-05-02)
+
+- Pins Werkzeug<2.3.0 due to removed deprecations (for example ``Authoriation`` headers
+  parsing issues).
 
 Version 1.2.14 (released 2023-04-26)
 
