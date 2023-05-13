@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2023 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -31,7 +32,7 @@ def create_app_factory(
     blueprints=None,
     converter_entry_points=None,
     converters=None,
-    init_functions_entry_points=None,
+    finalize_app_entry_points=None,
     wsgi_factory=None,
     **app_kwargs,
 ):
@@ -58,6 +59,8 @@ def create_app_factory(
         ``app.url_map.converters``.
     :param converters: Map of Werkzeug URL map converter classes that will
         be added to ``app.url_map.converters``.
+    :param finalize_app_entry_points: List of entry points, which specifies
+        the functions to finalize the app.
     :param wsgi_factory: A callable that will be passed the Flask application
         object in order to overwrite the default WSGI application (e.g. to
         install ``DispatcherMiddleware``).
@@ -126,13 +129,11 @@ def create_app_factory(
             entry_points=blueprint_entry_points,
             modules=blueprints,
         )
-        
-        # Load init functions
-        init_functions_loader(
-            app,
-            entry_points=init_functions_entry_points,
-        )
 
+        finalize_app_loader(
+            app,
+            entry_points=finalize_app_entry_points,
+        )
 
         app_loaded.send(_create_app, app=app)
 
@@ -186,13 +187,18 @@ def create_cli(create_app=None):
     return cli
 
 
-def init_functions_loader(app, entry_points=None):
-    """Run functions that should be executed after the application is instantiated.
+def finalize_app_loader(app, entry_points=None):
+    """Run functions before of the first request.
+
+    This loader is the last possible position where it is possible to configure the app.
+
+    NOTE: it replaces the before_first_request decorator of flask <2.3.0
 
     :param entry_points: List of entry points providing to Flask extensions.
 
     .. versionadded: 2.0.0
     """
+
     def loader_init_func(func):
         with app.app_context():
             func(app)
