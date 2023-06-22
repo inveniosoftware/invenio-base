@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.0 (released 2023-06-23)
+
+- Adds finalize_app_entry_points to overcome ``before_(app_)_first_request``
+  deprecation in Flask>=2.3.0
+
 Version 1.2.15 (released 2023-05-02)
 
 - Pins Werkzeug<2.3.0 due to removed deprecations (for example ``Authoriation`` headers
