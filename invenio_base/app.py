@@ -155,6 +155,7 @@ def create_cli(create_app=None):
 
     .. versionadded: 1.0.0
     """
+
     # Flask 2.0 removed support for passing script_info argument. Below
     # function is thus
     def create_cli_app(*args):
