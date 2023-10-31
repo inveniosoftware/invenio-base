@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.16 (released 2023-10-31)
+
+- Pins watchdog due to Werkzeug version incompatibility
+
 Version 1.2.15 (released 2023-05-02)
 
 - Pins Werkzeug<2.3.0 due to removed deprecations (for example ``Authoriation`` headers

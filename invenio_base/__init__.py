@@ -255,7 +255,7 @@ except AttributeError:
 
     security.safe_str_cmp = hmac.compare_digest
 
-__version__ = "1.2.15"
+__version__ = "1.2.16"
 
 __all__ = (
     "__version__",
