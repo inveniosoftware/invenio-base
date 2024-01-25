@@ -1,12 +1,18 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2023 CERN.
+    Copyright (C) 2015-2024 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 1.2.16 (released 2024-01-25)
+
+- Add configurable gc.freeze() call via ``APP_GC_FREEZE`` config variable.
+  As described in https://bugs.python.org/issue31558, this improves memory
+  usage in prefork-style runtime, like uWSGI and Celery.
 
 Version 1.2.16 (released 2023-10-31)
 
