@@ -9,6 +9,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Invenio application factory."""
+import gc
 import logging
 import os.path
 import sys
@@ -142,6 +143,9 @@ def create_app_factory(
         if wsgi_factory:
             app.wsgi_app = wsgi_factory(app, **kwargs)
 
+        # See https://bugs.python.org/issue31558 for how this helps with memory use
+        if app.config.get("APP_GC_FREEZE", False):
+            gc.freeze()
         return app
 
     return _create_app
