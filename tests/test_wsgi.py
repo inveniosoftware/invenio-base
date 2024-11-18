@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -12,8 +13,6 @@ import json
 
 import pytest
 from flask import Flask, jsonify, request
-from packaging import version
-from werkzeug import __version__ as werkzeug_version
 
 from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
 
@@ -71,9 +70,6 @@ def test_proxyfix_wsgi_proxies(proxies, data):
 )
 def test_proxyfix_wsgi_config(num_proxies, proxy_config):
     """Test wsgi factory creation with APP_WSGI_CONFIG set."""
-    if version.parse(werkzeug_version) < version.parse("0.15.0"):
-        pytest.skip("Unsupported configuration for Werkzeug<0.15.0")
-
     app = Flask("app")
     app.config["PROXYFIX_CONFIG"] = proxy_config
 
