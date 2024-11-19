@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 2.0.0 (released 2024-11-19)
+
+- setup: set flask,werkzeug min version
+- jws: move functionality from itsdangerous
+- setup: remove upper pins
+
 Version 1.4.0 (released 2024-01-29)
 
 - app: add configurable gc.freeze() call
