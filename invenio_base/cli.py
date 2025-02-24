@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -96,3 +97,65 @@ def generate_secret_key():
     return "".join(
         rng.choice(string.ascii_letters + string.digits) for dummy in range(0, 256)
     )
+
+
+def create_args(subcommand, subcommand_args):
+    """Create args"""
+    click_params = {param.name: param for param in subcommand.params}
+
+    args = []
+    kwargs = {}
+
+    for param_name, param_type in click_params.items():
+        if isinstance(param_type, click.Option):
+            print(f"create_args is option")
+        elif isinstance(param_type, click.Argument):
+            print(f"create_args is argument")
+            kwargs[param_name] = subcommand_args[0]
+        print(
+            f"create_args param_type: {param_type}, param_name: {param_name}, subcommand_args: {subcommand_args}"
+        )
+
+    print(f"create_args kwargs: {kwargs}, positional_args: {args}")
+    return args, kwargs
+
+
+@click.command()
+@click.argument("commands", type=str, required=True)
+@click.pass_context
+@with_appcontext
+def apply(ctx, commands):
+    """Apply group."""
+    parsed_commands = [cmd.strip() for cmd in commands.split("&&") if cmd.strip()]
+
+    for cmd in parsed_commands:
+        parts = cmd.split()
+        group_name = parts[0]
+        args = parts[1:]
+
+        try:
+            group_cmd = ctx.parent.command.commands[group_name]
+        except KeyError:
+            click.echo(f"Unknown group: {group_name}", err=True)
+            continue
+
+        if not isinstance(group_cmd, click.Group):
+            click.echo(f"Group cmd: {group_cmd} is not of type click.Group", err=True)
+            continue
+
+        if len(args) == 0:
+            click.echo("Args must be greater then 0", err=True)
+            continue
+
+        try:
+            subcommand_name = args[0]
+            subcommand_args = args[1:]
+
+            subcommand = group_cmd.commands[subcommand_name]
+
+            args, kwargs = create_args(subcommand, subcommand_args)
+            ctx.invoke(subcommand, *args, **kwargs)
+        except KeyError:
+            click.echo(
+                f"Unknown subcommand: {subcommand_name} for {group_name}", err=True
+            )
