@@ -17,8 +17,8 @@ try:
 
     WERKZEUG_GTE_014 = False
 except ImportError:
-    from werkzeug.contrib.fixers import ProxyFix
-    from werkzeug.wsgi import DispatcherMiddleware
+    from werkzeug.contrib.fixers import ProxyFix  # type: ignore
+    from werkzeug.wsgi import DispatcherMiddleware  # type: ignore
 
     WERKZEUG_GTE_014 = True
 
