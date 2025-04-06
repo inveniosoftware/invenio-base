@@ -9,6 +9,7 @@
 """WSGI application factory for Invenio."""
 
 import warnings
+from typing import Any, Callable, Dict, Optional
 
 # They were moved in the same version so they can be in one try/except
 try:
@@ -17,13 +18,15 @@ try:
 
     WERKZEUG_GTE_014 = False
 except ImportError:
-    from werkzeug.contrib.fixers import ProxyFix  # type: ignore
-    from werkzeug.wsgi import DispatcherMiddleware  # type: ignore
+    from werkzeug.contrib.fixers import ProxyFix
+    from werkzeug.wsgi import DispatcherMiddleware
 
     WERKZEUG_GTE_014 = True
 
 
-def create_wsgi_factory(mounts_factories):
+def create_wsgi_factory(
+    mounts_factories: Dict[str, Callable[..., Any]],
+) -> Callable[..., Any]:
     """Create a WSGI application factory.
 
     Usage example:
@@ -38,7 +41,7 @@ def create_wsgi_factory(mounts_factories):
     .. versionadded:: 1.0.0
     """
 
-    def create_wsgi(app, **kwargs):
+    def create_wsgi(app: Any, **kwargs: Any) -> Any:
         mounts = {
             mount: factory(**kwargs) for mount, factory in mounts_factories.items()
         }
@@ -47,7 +50,7 @@ def create_wsgi_factory(mounts_factories):
     return create_wsgi
 
 
-def wsgi_proxyfix(factory=None):
+def wsgi_proxyfix(factory: Optional[Callable[..., Any]] = None) -> Callable[..., Any]:
     """Fix Flask environment according to ``X-Forwarded-_`` headers.
 
     .. note::
@@ -101,7 +104,7 @@ def wsgi_proxyfix(factory=None):
        use ``PROXYFIX_CONFIG`` instead.
     """
 
-    def create_wsgi(app, **kwargs):
+    def create_wsgi(app: Any, **kwargs: Any) -> Any:
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
         num_proxies = app.config.get("WSGI_PROXIES")
         proxy_config = app.config.get("PROXYFIX_CONFIG")
