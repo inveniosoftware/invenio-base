@@ -30,15 +30,15 @@ from .signals import app_created, app_loaded
 
 def create_app_factory(
     app_name: str,
-    config_loader: Callable | None = None,
+    config_loader: Callable[..., None] | None = None,
     extension_entry_points: list[str] | None = None,
     extensions: list[object] | None = None,
-    blueprint_entry_points: list[str] | None =None,
+    blueprint_entry_points: list[str] | None = None,
     blueprints: list[object] | None = None,
     converter_entry_points: list[str] | None = None,
-    converters: dict | None = None,
+    converters: dict[str, Any] | None = None,
     finalize_app_entry_points: list[str] | None = None,
-    wsgi_factory: Callable | None = None,
+    wsgi_factory: Callable[..., Any] | None = None,
     **app_kwargs: Any,
 ) -> Callable[..., Flask]:
     """Create a Flask application factory.
@@ -155,7 +155,7 @@ def create_app_factory(
     return _create_app
 
 
-def create_cli(create_app: Callable[..., Flask] | None = None):
+def create_cli(create_app: Callable[..., Flask] | None = None) -> Callable[..., None]:
     """Create CLI for ``inveniomanage`` command.
 
     :param create_app: Flask application factory.
@@ -189,14 +189,14 @@ def create_cli(create_app: Callable[..., Flask] | None = None):
         return app
 
     @click.group(cls=FlaskGroup, create_app=create_cli_app)
-    def cli(**params):
+    def cli(**params: Any) -> None:
         """Command Line Interface for Invenio."""
         pass
 
     return cli
 
 
-def finalize_app_loader(app: Flask, entry_points: list[str] | None =None):
+def finalize_app_loader(app: Flask, entry_points: list[str] | None =None) -> None:
     """Run functions before of the first request.
 
     This loader is the last possible position where it is possible to configure the app.
@@ -216,7 +216,7 @@ def finalize_app_loader(app: Flask, entry_points: list[str] | None =None):
     _loader(app, loader_init_func, entry_points=entry_points)
 
 
-def app_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None =None):
+def app_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
     """Run default application loader.
 
     :param app: The Flask application.
@@ -228,7 +228,7 @@ def app_loader(app: Flask, entry_points: list[str] | None = None, modules: list[
     _loader(app, lambda ext: ext(app), entry_points=entry_points, modules=modules)
 
 
-def blueprint_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None = None):
+def blueprint_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
     """Run default blueprint loader.
 
     The value of any entry_point or module passed can be either an instance of
@@ -251,7 +251,7 @@ def blueprint_loader(app: Flask, entry_points: list[str] | None = None, modules:
     _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
 
 
-def converter_loader(app: Flask, entry_points: list[str] | None = None, modules: dict | None = None):
+def converter_loader(app: Flask, entry_points: list[str] | None = None, modules: dict[str, Any] | None = None) -> None:
     """Run default converter loader.
 
     :param app: The Flask application.
@@ -273,7 +273,7 @@ def converter_loader(app: Flask, entry_points: list[str] | None = None, modules:
         app.url_map.converters.update(**modules)
 
 
-def _loader(app: Flask, init_func: Callable, entry_points: list[str] | None = None, modules: list[object] | None = None):
+def _loader(app: Flask, init_func: Callable[[Any], None], entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
     """Run generic loader.
 
     Used to load and initialize entry points and modules using a custom
