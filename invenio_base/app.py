@@ -33,15 +33,15 @@ from .urls.helpers import invenio_url_for
 
 def create_app_factory(
     app_name: str,
-    config_loader: Callable | None = None,
+    config_loader: Callable[..., None] | None = None,
     extension_entry_points: list[str] | None = None,
     extensions: list[object] | None = None,
     blueprint_entry_points: list[str] | None = None,
     blueprints: list[object] | None = None,
     converter_entry_points: list[str] | None = None,
-    converters: dict | None = None,
+    converters: dict[str, Any] | None = None,
     finalize_app_entry_points: list[str] | None = None,
-    wsgi_factory: Callable | None = None,
+    wsgi_factory: Callable[..., Any] | None = None,
     urls_builder_factory: Callable | None = None,
     **app_kwargs: Any,
 ) -> Callable[..., Flask]:
@@ -158,7 +158,7 @@ def create_app_factory(
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
-            app.wsgi_app = wsgi_factory(app, **kwargs)  # type: ignore
+            app.wsgi_app = wsgi_factory(app, **kwargs)
 
         # See https://bugs.python.org/issue31558 for how this helps with memory use
         if app.config.get("APP_GC_FREEZE", False):
@@ -168,7 +168,7 @@ def create_app_factory(
     return _create_app
 
 
-def create_cli(create_app: Callable[..., Flask] | None = None):
+def create_cli(create_app: Callable[..., Flask] | None = None) -> Callable[..., None]:
     """Create CLI for ``inveniomanage`` command.
 
     :param create_app: Flask application factory.
@@ -202,14 +202,14 @@ def create_cli(create_app: Callable[..., Flask] | None = None):
         return app
 
     @click.group(cls=FlaskGroup, create_app=create_cli_app)
-    def cli(**params):
+    def cli(**params: Any) -> None:
         """Command Line Interface for Invenio."""
         pass
 
     return cli
 
 
-def finalize_app_loader(app: Flask, entry_points: list[str] | None = None):
+def finalize_app_loader(app: Flask, entry_points: list[str] | None = None) -> None:
     """Run functions before of the first request.
 
     This loader is the last possible position where it is possible to configure the app.
@@ -233,7 +233,7 @@ def app_loader(
     app: Flask,
     entry_points: list[str] | None = None,
     modules: list[object] | None = None,
-):
+) -> None:
     """Run default application loader.
 
     :param app: The Flask application.
@@ -249,7 +249,7 @@ def blueprint_loader(
     app: Flask,
     entry_points: list[str] | None = None,
     modules: list[object] | None = None,
-):
+) -> None:
     """Run default blueprint loader.
 
     The value of any entry_point or module passed can be either an instance of
