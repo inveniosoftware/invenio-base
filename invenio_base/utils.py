@@ -2,17 +2,24 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2017-2020 CERN.
+
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Base utilities."""
 
-from flask import current_app
+from typing import Optional, TypeVar, Union, cast
+
+from flask import Flask, current_app
 from werkzeug.utils import import_string
 
+T = TypeVar("T")
 
-def obj_or_import_string(value, default=None):
+
+def obj_or_import_string(
+    value: Optional[Union[str, T]], default: Optional[T] = None
+) -> Optional[T]:
     """Import string or return object.
 
     :params value: Import path or class object to instantiate.
@@ -20,13 +27,15 @@ def obj_or_import_string(value, default=None):
     :returns: The imported object.
     """
     if isinstance(value, str):
-        return import_string(value)
+        return cast(T, import_string(value))
     elif value:
         return value
     return default
 
 
-def load_or_import_from_config(key, app=None, default=None):
+def load_or_import_from_config(
+    key: str, app: Optional[Flask] = None, default: Optional[T] = None
+) -> Optional[T]:
     """Load or import value from the application config.
 
     :params key: Configuration key.
