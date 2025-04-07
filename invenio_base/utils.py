@@ -8,14 +8,17 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Base utilities."""
-
-from typing import Optional, TypeVar, Union, cast
+from fractions import Fraction
+from typing import Optional, TypeVar, Union, cast, TypeAlias
 
 from flask import Flask, current_app
 from werkzeug.utils import import_string
 
 T = TypeVar("T")
 
+# The classes from the standard library `numbers` module are not suitable for
+# type checking (https://github.com/python/mypy/issues/3186).
+Real: TypeAlias = int | float | Fraction
 
 def obj_or_import_string(
     value: Optional[Union[str, T]], default: Optional[T] = None

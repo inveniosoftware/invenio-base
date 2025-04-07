@@ -3,7 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C) 2022 RERO.
-# Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2023-2025 Graz University of Technology.
 # Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
@@ -16,10 +16,9 @@ import os.path
 import sys
 import warnings
 from os import PathLike
-from typing import Callable, Any, ClassVar, Type
+from typing import Callable, Any, Type
 
 import click
-import flask.app
 from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
