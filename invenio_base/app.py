@@ -15,7 +15,7 @@ import os.path
 import sys
 import warnings
 from os import PathLike
-from typing import Callable, Any, Type
+from typing import Any, Callable, Type
 
 import click
 from flask import Flask
@@ -144,7 +144,7 @@ def create_app_factory(
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
-            app.wsgi_app = wsgi_factory(app, **kwargs) # type: ignore
+            app.wsgi_app = wsgi_factory(app, **kwargs)  # type: ignore
 
         # See https://bugs.python.org/issue31558 for how this helps with memory use
         if app.config.get("APP_GC_FREEZE", False):
@@ -195,7 +195,7 @@ def create_cli(create_app: Callable[..., Flask] | None = None) -> Callable[..., 
     return cli
 
 
-def finalize_app_loader(app: Flask, entry_points: list[str] | None =None) -> None:
+def finalize_app_loader(app: Flask, entry_points: list[str] | None = None) -> None:
     """Run functions before of the first request.
 
     This loader is the last possible position where it is possible to configure the app.
@@ -215,7 +215,11 @@ def finalize_app_loader(app: Flask, entry_points: list[str] | None =None) -> Non
     _loader(app, loader_init_func, entry_points=entry_points)
 
 
-def app_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
+def app_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run default application loader.
 
     :param app: The Flask application.
@@ -227,7 +231,11 @@ def app_loader(app: Flask, entry_points: list[str] | None = None, modules: list[
     _loader(app, lambda ext: ext(app), entry_points=entry_points, modules=modules)
 
 
-def blueprint_loader(app: Flask, entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
+def blueprint_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run default blueprint loader.
 
     The value of any entry_point or module passed can be either an instance of
@@ -250,7 +258,11 @@ def blueprint_loader(app: Flask, entry_points: list[str] | None = None, modules:
     _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
 
 
-def converter_loader(app: Flask, entry_points: list[str] | None = None, modules: dict[str, Any] | None = None) -> None:
+def converter_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: dict[str, Any] | None = None,
+) -> None:
     """Run default converter loader.
 
     :param app: The Flask application.
@@ -272,7 +284,12 @@ def converter_loader(app: Flask, entry_points: list[str] | None = None, modules:
         app.url_map.converters.update(**modules)
 
 
-def _loader(app: Flask, init_func: Callable[[Any], None], entry_points: list[str] | None = None, modules: list[object] | None = None) -> None:
+def _loader(
+    app: Flask,
+    init_func: Callable[[Any], None],
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run generic loader.
 
     Used to load and initialize entry points and modules using a custom
@@ -300,7 +317,7 @@ def _loader(app: Flask, init_func: Callable[[Any], None], entry_points: list[str
 def base_app(
     import_name: str,
     instance_path: str | None = None,
-    static_folder:  str | PathLike[str] | None = None,
+    static_folder: str | PathLike[str] | None = None,
     static_url_path: str | None = "/static",
     template_folder: str | PathLike[str] | None = "templates",
     instance_relative_config: bool = True,

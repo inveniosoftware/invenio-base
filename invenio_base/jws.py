@@ -39,8 +39,7 @@ import hashlib
 import time
 from datetime import datetime, timezone
 from decimal import Decimal
-from .utils import Real
-from typing import Iterable, Any, Type
+from typing import Any, Iterable, Type
 
 from itsdangerous._json import _CompactJSON
 from itsdangerous.encoding import base64_decode, base64_encode, want_bytes
@@ -53,6 +52,8 @@ from itsdangerous.exc import (
 )
 from itsdangerous.serializer import Serializer, _PDataSerializer
 from itsdangerous.signer import HMACAlgorithm, NoneAlgorithm, Signer, SigningAlgorithm
+
+from .utils import Real
 
 
 class JSONWebSignatureSerializer(Serializer):
@@ -76,7 +77,7 @@ class JSONWebSignatureSerializer(Serializer):
 
     def __init__(
         self,
-        secret_key:  str | bytes | Iterable[str] | Iterable[bytes],
+        secret_key: str | bytes | Iterable[str] | Iterable[bytes],
         salt: str | bytes | None = None,
         serializer: Any | None = None,
         serializer_kwargs: dict[str, Any] | None = None,
@@ -100,10 +101,12 @@ class JSONWebSignatureSerializer(Serializer):
         self.algorithm_name = algorithm_name
         self.algorithm = self.make_algorithm(algorithm_name)
 
-    def load_payload(self,
-                     payload: str | bytes,
-                     serializer: _PDataSerializer | None = None,
-                     return_header: bool = False) -> Any:
+    def load_payload(
+        self,
+        payload: str | bytes,
+        serializer: _PDataSerializer | None = None,
+        return_header: bool = False,
+    ) -> Any:
         """Load payload."""
         payload = want_bytes(payload)
 
@@ -146,11 +149,7 @@ class JSONWebSignatureSerializer(Serializer):
 
         return payload
 
-<<<<<<< Updated upstream
-    def dump_payload(self, header: dict[str, Any], obj: Any) -> bytes: # type: ignore
-=======
     def dump_payload(self, header: dict[str, Any], obj: Any) -> bytes:  # type: ignore[override]
->>>>>>> Stashed changes
         """Dump payload."""
         base64d_header = base64_encode(
             self.serializer.dumps(header, **self.serializer_kwargs)
@@ -167,7 +166,9 @@ class JSONWebSignatureSerializer(Serializer):
         except KeyError:
             raise NotImplementedError("Algorithm not supported")
 
-    def make_signer(self, salt: str | bytes | None = None, algorithm: SigningAlgorithm | None = None) -> Signer:
+    def make_signer(
+        self, salt: str | bytes | None = None, algorithm: SigningAlgorithm | None = None
+    ) -> Signer:
         """Make signer."""
         if salt is None:
             salt = self.salt
@@ -191,7 +192,12 @@ class JSONWebSignatureSerializer(Serializer):
         header["alg"] = self.algorithm_name
         return header
 
-    def dumps(self, obj: Any, salt: str | bytes | None = None, header_fields: dict[str, Any] | None = None) -> bytes:
+    def dumps(
+        self,
+        obj: Any,
+        salt: str | bytes | None = None,
+        header_fields: dict[str, Any] | None = None,
+    ) -> bytes:
         """Dumps.
 
         Like :meth:`.Serializer.dumps` but creates a JSON Web
@@ -202,7 +208,7 @@ class JSONWebSignatureSerializer(Serializer):
         signer = self.make_signer(salt, self.algorithm)
         return signer.sign(self.dump_payload(header, obj))
 
-    def loads(self, s: str | bytes, salt: str | bytes | None = None, return_header: bool = False) -> Any: # type: ignore[override]
+    def loads(self, s: str | bytes, salt: str | bytes | None = None, return_header: bool = False) -> Any:  # type: ignore[override]
         """Loads.
 
         Reverse of :meth:`dumps`. If requested via ``return_header``
@@ -221,7 +227,12 @@ class JSONWebSignatureSerializer(Serializer):
 
         return payload
 
-    def loads_unsafe(self, s: str | bytes, salt: str | bytes | None = None, return_header: bool = False) -> tuple[bool, Any]:
+    def loads_unsafe(
+        self,
+        s: str | bytes,
+        salt: str | bytes | None = None,
+        return_header: bool = False,
+    ) -> tuple[bool, Any]:
         """Loads unsafe."""
         kwargs = {"return_header": return_header}
         return self._loads_unsafe_impl(s, salt, kwargs, kwargs)
@@ -243,10 +254,12 @@ class TimedJSONWebSignatureSerializer(JSONWebSignatureSerializer):
 
     DEFAULT_EXPIRES_IN = 3600
 
-    def __init__(self,
-                 secret_key: str | bytes | Iterable[str] | Iterable[bytes],
-                 expires_in: int | None = None,
-                 **kwargs: Any) -> None:
+    def __init__(
+        self,
+        secret_key: str | bytes | Iterable[str] | Iterable[bytes],
+        expires_in: int | None = None,
+        **kwargs: Any
+    ) -> None:
         """Construct."""
         super().__init__(secret_key, **kwargs)
 
@@ -264,7 +277,7 @@ class TimedJSONWebSignatureSerializer(JSONWebSignatureSerializer):
         header["exp"] = exp
         return header
 
-    def loads(self, s: str | bytes, salt: str | bytes | None = None, return_header: bool = False) -> Any: # type: ignore[override]
+    def loads(self, s: str | bytes, salt: str | bytes | None = None, return_header: bool = False) -> Any:  # type: ignore[override]
         """Loads."""
         payload, header = super().loads(s, salt, return_header=True)
 
@@ -308,6 +321,8 @@ class TimedJSONWebSignatureSerializer(JSONWebSignatureSerializer):
 
         if isinstance(rv, (Real, Decimal)):
             return datetime.fromtimestamp(int(rv), tz=timezone.utc)
+
+        return None
 
     def now(self) -> int:
         """Get now."""
