@@ -16,7 +16,7 @@ import os.path
 import sys
 import warnings
 from os import PathLike
-from typing import Callable, Any, Type
+from typing import Any, Callable, Type
 
 import click
 from flask import Flask
@@ -157,7 +157,8 @@ def create_app_factory(
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
-            app.wsgi_app = wsgi_factory(app, **kwargs)
+            # here mypy doesn't like runtime reassignment of a method
+            app.wsgi_app = wsgi_factory(app, **kwargs)  # type: ignore[method-assign]
 
         # See https://bugs.python.org/issue31558 for how this helps with memory use
         if app.config.get("APP_GC_FREEZE", False):
@@ -308,10 +309,10 @@ def converter_loader(app, entry_points=None, modules=None):
 
 def _loader(
     app: Flask,
-    init_func: Callable,
+    init_func: Callable[[Any], None],
     entry_points: list[str] | None = None,
     modules: list[object] | None = None,
-):
+) -> None:
     """Run generic loader.
 
     Used to load and initialize entry points and modules using a custom

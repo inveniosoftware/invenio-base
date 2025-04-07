@@ -9,13 +9,6 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Application bootstraping."""
-
-import click
-import importlib_metadata
-from flask import current_app
-from flask.cli import with_appcontext
-from pkg_resources import working_set
-
 from typing import (
     Any,
     Collection,
@@ -25,7 +18,13 @@ from typing import (
     Sequence,
     cast,
 )
+
+import click
+import importlib_metadata
+from flask import current_app
+from flask.cli import with_appcontext
 from importlib_metadata import EntryPoint
+from pkg_resources import working_set
 from typing_extensions import Protocol
 
 
