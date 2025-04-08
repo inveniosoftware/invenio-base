@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -9,24 +10,45 @@
 """WSGI application factory for Invenio."""
 
 import warnings
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Protocol, TypeVar, cast, ParamSpec
 
-# They were moved in the same version so they can be in one try/except
 try:
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from werkzeug.middleware.proxy_fix import ProxyFix
 
-    WERKZEUG_GTE_014 = False
+    WERKZEUG_GTE_014 = True
 except ImportError:
     from werkzeug.contrib.fixers import ProxyFix
     from werkzeug.wsgi import DispatcherMiddleware
 
-    WERKZEUG_GTE_014 = True
+    WERKZEUG_GTE_014 = False
+
+from invenio_base.utils import obj_or_import_string
+
+# Define type parameters
+P = ParamSpec("P")  # For function parameters
+T = TypeVar("T", bound="WSGIApplication")  # For WSGI applications
+
+# Define types for WSGI applications
+Environ = Dict[str, Any]
+StartResponse = Callable[[str, list[tuple[str, str]]], Callable[[], bytes]]
+WSGICallable = Callable[[Environ, StartResponse], list[bytes]]
+
+
+class WSGIApplication(Protocol):
+    """Protocol for WSGI applications."""
+
+    def __call__(
+        self, environ: Environ, start_response: StartResponse
+    ) -> list[bytes]: ...
+
+    wsgi_app: WSGICallable
+    config: Dict[str, Any]
 
 
 def create_wsgi_factory(
-    mounts_factories: Dict[str, Callable[..., Any]],
-) -> Callable[..., Any]:
+    mounts_factories: Dict[str, Callable[P, WSGIApplication]],
+) -> Callable[[WSGIApplication, P], WSGICallable]:
     """Create a WSGI application factory.
 
     Usage example:
@@ -41,16 +63,18 @@ def create_wsgi_factory(
     .. versionadded:: 1.0.0
     """
 
-    def create_wsgi(app: Any, **kwargs: Any) -> Any:
+    def create_wsgi(app: WSGIApplication, **kwargs: Any) -> WSGICallable:
         mounts = {
             mount: factory(**kwargs) for mount, factory in mounts_factories.items()
         }
-        return DispatcherMiddleware(app.wsgi_app, mounts)
+        return cast(WSGICallable, DispatcherMiddleware(app.wsgi_app, mounts))
 
     return create_wsgi
 
 
-def wsgi_proxyfix(factory: Optional[Callable[..., Any]] = None) -> Callable[..., Any]:
+def wsgi_proxyfix(
+    factory: Optional[Callable[P, T]] = None,
+) -> Callable[[T, P], WSGICallable]:
     """Fix Flask environment according to ``X-Forwarded-_`` headers.
 
     .. note::
@@ -104,12 +128,12 @@ def wsgi_proxyfix(factory: Optional[Callable[..., Any]] = None) -> Callable[...,
        use ``PROXYFIX_CONFIG`` instead.
     """
 
-    def create_wsgi(app: Any, **kwargs: Any) -> Any:
-        wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
+    def create_wsgi(app: T, **kwargs: Any) -> WSGICallable:
+        wsgi_app = factory(**kwargs) if factory else app.wsgi_app
         num_proxies = app.config.get("WSGI_PROXIES")
         proxy_config = app.config.get("PROXYFIX_CONFIG")
-        if proxy_config and not WERKZEUG_GTE_014:
-            return ProxyFix(wsgi_app, **proxy_config)
+        if proxy_config and WERKZEUG_GTE_014:
+            return cast(WSGICallable, ProxyFix(wsgi_app, **proxy_config))
         elif num_proxies:
             warnings.warn(
                 "The WSGI_PROXIES configuration is deprecated and "
@@ -117,9 +141,17 @@ def wsgi_proxyfix(factory: Optional[Callable[..., Any]] = None) -> Callable[...,
                 PendingDeprecationWarning,
             )
             if WERKZEUG_GTE_014:
-                return ProxyFix(wsgi_app, num_proxies=num_proxies)
+                return cast(WSGICallable, ProxyFix(wsgi_app, x_for=num_proxies))
             else:
-                return ProxyFix(wsgi_app, x_for=num_proxies)
-        return wsgi_app
+                return cast(WSGICallable, ProxyFix(wsgi_app, num_proxies=num_proxies))
+        return cast(WSGICallable, wsgi_app)
 
     return create_wsgi
+
+
+__all__ = (
+    "create_wsgi_factory",
+    "wsgi_proxyfix",
+    "WSGIApplication",
+    "WSGICallable",
+)
