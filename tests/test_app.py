@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2022 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -31,6 +32,7 @@ from invenio_base.app import (
     converter_loader,
     create_app_factory,
     create_cli,
+    finalize_app_loader,
 )
 from invenio_base.cli import generate_secret_key
 
@@ -428,3 +430,37 @@ def test_generate_secret_key():
     v2 = generate_secret_key()
     assert len(v1) == len(v2) == 256
     assert v1 != v2
+
+
+def test_app_type_annotations():
+    """Test type annotations for app module."""
+    from os import PathLike
+    from typing import Any, Callable, Type, get_type_hints
+
+    from flask import Flask
+
+    from invenio_base.app import base_app, create_app_factory
+
+    factory_hints = get_type_hints(create_app_factory)
+    assert factory_hints["app_name"] == str
+    assert factory_hints["config_loader"] == Callable[..., None] | None
+    assert factory_hints["extension_entry_points"] == list[str] | None
+    assert factory_hints["extensions"] == list[object] | None
+    assert factory_hints["blueprint_entry_points"] == list[str] | None
+    assert factory_hints["blueprints"] == list[object] | None
+    assert factory_hints["converter_entry_points"] == list[str] | None
+    assert factory_hints["converters"] == dict[str, Any] | None
+    assert factory_hints["finalize_app_entry_points"] == list[str] | None
+    assert factory_hints["wsgi_factory"] == Callable[..., Any] | None
+    assert factory_hints["return"] == Callable[..., Flask]
+
+    base_hints = get_type_hints(base_app)
+    assert base_hints["import_name"] == str
+    assert base_hints["instance_path"] == str | None
+    assert base_hints["static_folder"] == str | PathLike[str] | None
+    assert base_hints["static_url_path"] == str | None
+    assert base_hints["template_folder"] == str | PathLike[str] | None
+    assert base_hints["instance_relative_config"] == bool
+    assert base_hints["root_path"] == str | None
+    assert base_hints["app_class"] == Type[Flask]
+    assert base_hints["return"] == Flask
