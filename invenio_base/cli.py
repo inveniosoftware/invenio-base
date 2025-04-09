@@ -9,15 +9,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Application bootstraping."""
-from typing import (
-    Any,
-    Collection,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    cast,
-)
+from typing import Any, cast
 
 import click
 import importlib_metadata
@@ -49,9 +41,9 @@ def instance() -> None:
     metavar="ENTRY_POINT",
     help="Entry point group name (e.g. invenio_base.apps)",
 )
-def list_entrypoints(entry_point: Optional[str]) -> None:
+def list_entrypoints(entry_point: str | None = None) -> None:
     """List defined entry points."""
-    found_entry_points: Dict[str, List[str]] = {}
+    found_entry_points: dict[str, list[str]] = {}
     for dist in working_set:
         # for dist in importlib_metadata.distributions:
         entry_map = dist.get_entry_map()
@@ -86,40 +78,21 @@ def migrate_secret_key(old_key: str) -> None:
     ):
         raise click.ClickException("SECRET_KEY is not set in the configuration.")
 
-    migrators: List[SecretKeyMigrator] = []
-    entry_points_data = importlib_metadata.entry_points()
-    # Handle both importlib_metadata v3.x and v4.x+ APIs
-    available_migrators: Sequence[EntryPoint] = []
-
-    if hasattr(entry_points_data, "select"):
-        # Modern API (importlib_metadata >= 3.6)
-        available_migrators = entry_points_data.select(group="invenio_base.secret_key")
-    else:
-        # Legacy API (importlib_metadata < 3.6)
-        entry_points_dict = cast(Dict[str, List[EntryPoint]], entry_points_data)
-        available_migrators = entry_points_dict.get("invenio_base.secret_key", [])
-
-    # Ensure unique entry points
-    for ep in set(cast(Collection[EntryPoint], available_migrators)):
+    migrators: list[SecretKeyMigrator] = []
+    for ep in set(importlib_metadata.entry_points().get("invenio_base.secret_key", [])):  # type: ignore[attr-defined]
         try:
-            # Cast the loaded entry point
             migrators.append(cast(SecretKeyMigrator, ep.load()))
         except Exception:
             raise click.ClickException(f"Failed to initialize entry point: {ep}")
 
     if migrators:
-        failed_handlers = []
         for m in migrators:
             try:
                 m(old_key=old_key)
             except Exception:
-                failed_handlers.append(str(m))
-
-        if failed_handlers:
-            handler_list = ", ".join(failed_handlers)
-            raise click.ClickException(
-                f"Failed to perform migration of secret key {old_key}"
-            )
+                raise click.ClickException(
+                    f"Failed to perform migration of secret key {old_key}"
+                )
         click.secho("Successfully changed secret key.", fg="green")
     else:
         raise click.ClickException(

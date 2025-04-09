@@ -13,14 +13,12 @@ no_implicit_optional = true
 
 # third party imports
 [[tool.mypy.overrides]]
+# Ignore missing imports for the entire module.
+# Note: it doesn't ignore specific attribute access or method calls.
 module = [
-    "werkzeug.*",
     "flask.*",
     "click.*",
-    "blinker.*",
-    "itsdangerous.*",
-    "jinja2.*",
-    "markupsafe.*"
+    "werkzeug.*"
 ]
 ignore_missing_imports = true
 

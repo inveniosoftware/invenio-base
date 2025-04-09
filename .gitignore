@@ -2,31 +2,45 @@
 __pycache__/
 *.py[cod]
 
+# Idea software family
+.idea/
+
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
+
+
 # C extensions
 *.so
 
 # Distribution / packaging
+.Python
+env/
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
-env/
-.installed.cfg
+uv.lock
+.venv/
+.venv-*/
 lib/
 lib64/
 parts/
-.Python
 sdist/
 var/
-*.egg
 *.egg-info/
-uv.lock
+.installed.cfg
+*.egg
 
-# Environments
-.venv/
-.venv-*/
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
 
 # Installer logs
 pip-log.txt
@@ -54,14 +68,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# Text-Editor swapfiles
+# Vim swapfiles
 .*.sw?
-
-# Idea software family
-.idea/
-
-# VSCode
-.vscode/
-
-# MacOS
-.DS_Store
