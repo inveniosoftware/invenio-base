@@ -10,21 +10,19 @@
 
 """Base utilities."""
 from fractions import Fraction
-from typing import Optional, TypeAlias, TypeVar, Union, cast
+from typing import TypeAlias, TypeVar, cast
 
 from flask import Flask, current_app
 from werkzeug.utils import import_string
-
-T = TypeVar("T")
 
 # The classes from the standard library `numbers` module are not suitable for
 # type checking (https://github.com/python/mypy/issues/3186).
 Real: TypeAlias = int | float | Fraction
 
 
-def obj_or_import_string(
-    value: Optional[Union[str, T]], default: Optional[T] = None
-) -> Optional[T]:
+def obj_or_import_string[T](
+    value: str | T | None, default: T | None = None
+) -> T | None:
     """Import string or return object.
 
     :params value: Import path or class object to instantiate.
@@ -38,9 +36,9 @@ def obj_or_import_string(
     return default
 
 
-def load_or_import_from_config(
-    key: str, app: Optional[Flask] = None, default: Optional[T] = None
-) -> Optional[T]:
+def load_or_import_from_config[T](
+    key: str, app: Flask | None = None, default: T | None = None
+) -> T | None:
     """Load or import value from the application config.
 
     :params key: Configuration key.
