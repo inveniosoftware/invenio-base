@@ -51,4 +51,3 @@ jobs:
           mypy invenio_base
           deactivate
           rm -rf .venv
-
