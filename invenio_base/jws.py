@@ -1,5 +1,5 @@
 # Copyright (c) pallets/itsdangerous
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 # copy pasted over to invenio-base because of removable from itsdangerous with version 2.1.0
 # https://github.com/pallets/itsdangerous/blob/2.0.1/src/itsdangerous/jws.py
 
