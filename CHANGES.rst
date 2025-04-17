@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.1.0 (released 2025-04-17)
+
+- Add invenio_url_for (and related mechanisms) to generate cross-app URLs
+
 Version 2.0.0 (released 2024-11-19)
 
 - setup: set flask,werkzeug min version
