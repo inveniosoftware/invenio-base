@@ -4,6 +4,7 @@
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C) 2022 RERO.
 # Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -22,6 +23,8 @@ from flask.helpers import get_debug_flag
 from importlib_metadata import entry_points as iter_entry_points
 
 from .signals import app_created, app_loaded
+from .urls.builders import NoOpInvenioUrlsBuilder
+from .urls.helpers import invenio_url_for
 
 
 def create_app_factory(
@@ -35,6 +38,7 @@ def create_app_factory(
     converters=None,
     finalize_app_entry_points=None,
     wsgi_factory=None,
+    urls_builder_factory=None,
     **app_kwargs,
 ):
     """Create a Flask application factory.
@@ -65,6 +69,8 @@ def create_app_factory(
     :param wsgi_factory: A callable that will be passed the Flask application
         object in order to overwrite the default WSGI application (e.g. to
         install ``DispatcherMiddleware``).
+    :param urls_builder_factory: A callable (Flask.App, dict) -> InvenioUrlsBuilder
+        that builds instance of object that builds the URLs.
     :param app_kwargs: Keyword arguments passed to :py:meth:`base_app`.
         `instance_path` and `static_folder` can be passed as callables.
     :returns: Flask application factory.
@@ -129,6 +135,13 @@ def create_app_factory(
             app,
             entry_points=blueprint_entry_points,
             modules=blueprints,
+        )
+
+        # Load urls builder (follows naming convention although should be a verb)
+        urls_builder_loader(
+            app,
+            urls_builder_factory,
+            **kwargs,
         )
 
         finalize_app_loader(
@@ -242,6 +255,19 @@ def blueprint_loader(app, entry_points=None, modules=None):
         app.register_blueprint(bp, url_prefix=url_prefixes.get(bp.name))
 
     _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
+
+
+def urls_builder_loader(app, factory, **kwargs):
+    """Loads the urls builder.
+
+    :param app: current Flask App
+    :param factory: callable ``(Flask.App, **kwargs) -> InvenioURLsBuilder``
+    """
+    app.add_template_global(invenio_url_for)
+    if factory:
+        app._urls_builder = factory(app, **kwargs)
+    else:
+        app._urls_builder = NoOpInvenioUrlsBuilder()
 
 
 def converter_loader(app, entry_points=None, modules=None):
