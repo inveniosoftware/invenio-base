@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from flask import Blueprint, url_for
 from importlib_metadata import EntryPoint
-from werkzeug.routing import BuildError, Map, Rule
+from werkzeug.routing import BaseConverter, BuildError, Map, Rule
 
 from invenio_base import invenio_url_for
 from invenio_base.app import create_app_factory
@@ -86,16 +86,6 @@ def test_generic_setup_of_invenio_url_for():
 # InvenioAppsUrlsBuilder tests
 
 
-class MockEntryPoint(EntryPoint):
-    """Mocking of entrypoint."""
-
-    def load(self):
-        """Mock load entry point."""
-        if self.name == "fail":
-            raise Exception("Fail")
-        return self.name
-
-
 class MockBlueprintEntryPoint:  # EntryPoint by any other name
     """Mocking of entrypoint for blueprints.
 
@@ -115,22 +105,62 @@ class MockBlueprintEntryPoint:  # EntryPoint by any other name
         return bp
 
 
+class MockConverterEntryPoint:  # EntryPoint by any other name
+    """Mocking of entrypoint for converters.
+
+    Not inheriting from Entrypoint because they are immutable.
+    """
+
+    def __init__(self, name, converter):
+        """Constructor."""
+        self.name = name
+        self.converter = converter
+
+    def load(self):
+        """Mock load entry point."""
+        return self.converter
+
+
+class YesNoConverter(BaseConverter):
+    """Converts yes to True and no to False (and vice versa).
+
+    Adapted from
+    https://werkzeug.palletsprojects.com/en/stable/routing/#custom-converters
+    """
+
+    regex = r"(?:yes|no)"
+
+    def to_python(self, value):
+        return value == "yes"
+
+    def to_url(self, value):
+        return "yes" if value else "no"
+
+
 def _mock_iter_entry_points(group=None):
-    data = {
+    eps_by_group = {
+        "invenio_base.converters": [MockConverterEntryPoint("yesno", YesNoConverter)],
         "invenio_base.blueprints": [
             MockBlueprintEntryPoint(
                 "ui_blueprint", [("/foo", "endpoint_foo_of_ui_app")]
             ),
         ],
+        "invenio_base.api_converters": [
+            MockConverterEntryPoint("yesno", YesNoConverter)
+        ],
         "invenio_base.api_blueprints": [
             MockBlueprintEntryPoint(
-                "api_blueprint", [("/foo", "endpoint_foo_of_api_app")]
+                "api_blueprint",
+                [
+                    ("/foo", "endpoint_foo_of_api_app"),
+                    ("/bar/<yesno:bar>", "endpoint_bar_of_api_app"),
+                ],
             ),
         ],
     }
-    names = data.keys() if group is None else [group]
-    for key in names:
-        for entry_point in data[key]:
+    groups_selected = eps_by_group.keys() if group is None else [group]
+    for group in groups_selected:
+        for entry_point in eps_by_group[group]:
             yield entry_point
 
 
@@ -146,6 +176,7 @@ def test_invenio_apps_urls_builder_w_ui_as_this_app():
     create_app = create_app_factory(
         "test",
         blueprint_entry_points=["invenio_base.blueprints"],
+        converter_entry_points=["invenio_base.converters"],
         config_loader=_config_loader,
         urls_builder_factory=create_invenio_apps_urls_builder_factory(
             "SITE_UI_URL", "SITE_API_URL", ["invenio_base.api_blueprints"]
@@ -161,4 +192,30 @@ def test_invenio_apps_urls_builder_w_ui_as_this_app():
         # test for endpoint of other app
         assert "https://example.org/api/foo" == invenio_url_for(
             "api_blueprint.endpoint_foo_of_api_app"
+        )
+
+
+@patch("invenio_base.app.iter_entry_points", _mock_iter_entry_points)
+@patch("invenio_base.urls.builders.iter_entry_points", _mock_iter_entry_points)
+def test_invenio_apps_urls_builder_w_converters():
+
+    create_app = create_app_factory(
+        "test",
+        blueprint_entry_points=["invenio_base.blueprints"],
+        config_loader=_config_loader,
+        urls_builder_factory=create_invenio_apps_urls_builder_factory(
+            "SITE_UI_URL",
+            "SITE_API_URL",
+            groups_of_other_app_entrypoints={
+                "blueprints": ["invenio_base.api_blueprints"],
+                "converters": ["invenio_base.api_converters"],
+            },
+        ),
+    )
+    app = create_app()
+
+    with app.app_context():
+        # test for endpoint containing converter of other app
+        assert "https://example.org/api/bar/yes" == invenio_url_for(
+            "api_blueprint.endpoint_bar_of_api_app", bar=True
         )
