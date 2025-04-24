@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.2.0 (released 2025-04-25)
+
+- urls: support converters in create_invenio_apps_urls_builder_factory
+
 Version 2.1.0 (released 2025-04-17)
 
 - Add invenio_url_for (and related mechanisms) to generate cross-app URLs
