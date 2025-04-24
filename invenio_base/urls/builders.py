@@ -54,21 +54,51 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         self.cfg_of_other_app_prefix = cfg_of_other_app_prefix
         self.groups_of_other_app_entrypoints = groups_of_other_app_entrypoints
 
+    def _load_converters(self, app_tmp, defaults=None):
+        """Load converters in temporary app `app_tmp`.
+
+        Prerequisite to loading blueprints.
+        This doesn't use app.py's `converter_loader` to sidestep circular dependency.
+        """
+        # Gracefully take into account converters by supporting:
+        # 1) previous interface: list of blueprints only
+        if isinstance(self.groups_of_other_app_entrypoints, list):
+            app_tmp.url_map.converters = defaults or {}
+        # 2) new interface: dict of blueprints and converters
+        else:  # assume dict and let it raise if not
+            groups = self.groups_of_other_app_entrypoints.get("converters", [])
+            for group in groups:
+                for ep in set(iter_entry_points(group=group)):
+                    try:
+                        app_tmp.url_map.converters[ep.name] = ep.load()
+                    except Exception:
+                        app_tmp.logger.error(f"Failed to initialize entry point: {ep}")
+                        raise
+
     def _load_blueprints(self, app_tmp):
         """Load blueprints in temporary app `app_tmp`.
 
+        Part of loading blueprints is loading converters.
         This doesn't use app.py's `blueprint_loader` to sidestep circular dependency.
         """
+        # Gracefully take into account converters by supporting:
+        # 1) previous interface: list of blueprints only
+        if isinstance(self.groups_of_other_app_entrypoints, list):
+            groups = self.groups_of_other_app_entrypoints
+        # 2) new interface: dict of blueprints and converters
+        else:  # assume dict and let it raise if not
+            groups = self.groups_of_other_app_entrypoints.get("blueprints", [])
+
         url_prefixes = app_tmp.config.get("BLUEPRINTS_URL_PREFIXES", {})
 
-        def loader_init_func(bp_or_func):
+        def register_blueprint(bp_or_func):
             bp = bp_or_func(app_tmp) if callable(bp_or_func) else bp_or_func
             app_tmp.register_blueprint(bp, url_prefix=url_prefixes.get(bp.name))
 
-        for group in self.groups_of_other_app_entrypoints:
+        for group in groups:
             for ep in set(iter_entry_points(group=group)):
                 try:
-                    loader_init_func(ep.load())
+                    register_blueprint(ep.load())
                 except Exception:
                     app_tmp.logger.error(f"Failed to initialize entry point: {ep}")
                     raise
@@ -93,12 +123,14 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         app_tmp.config = app.config
         app_tmp.extensions = app.extensions
 
-        # Load blueprints
+        self._load_converters(app_tmp, defaults=app.url_map.converters)
+
         self._load_blueprints(app_tmp)
 
         # End goal: copy the Rules minus the view_functions (don't need them)
         self.url_map = Map(
-            [Rule(r.rule, endpoint=r.endpoint) for r in app_tmp.url_map.iter_rules()]
+            [Rule(r.rule, endpoint=r.endpoint) for r in app_tmp.url_map.iter_rules()],
+            converters=app_tmp.url_map.converters,
         )
 
     def prefix(self, site_cfg):
