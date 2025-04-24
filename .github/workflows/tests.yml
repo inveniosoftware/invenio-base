@@ -12,9 +12,11 @@ name: CI
 
 on:
   push:
-    branches: master
+    branches:
+      - master
   pull_request:
-    branches: master
+    branches:
+      - master
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  "0 3 * * 6"
@@ -28,3 +30,6 @@ on:
 jobs:
   Tests:
     uses: inveniosoftware/workflows/.github/workflows/tests-python.yml@master
+    with:
+      db-service: '[""]'
+      search-service: '[""]'
