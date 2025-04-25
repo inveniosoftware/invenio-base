@@ -49,7 +49,18 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         cfg_of_other_app_prefix,
         groups_of_other_app_entrypoints,
     ):
-        """Constructor."""
+        """Constructor.
+
+        The ``cfg_of_app_prefix`` and ``cfg_of_other_app_prefix`` are the names of
+        config items containing the URL prefixes for both apps (e.g. ``SITE_UI_URL``
+        and ``SITE_API_URL``).
+
+        ``groups_of_other_app_entrypoints`` is expected to be either a dictionary of
+        the shape ``{"blueprints": [...], "converters": [...]}``, containing the names
+        of entrypoint groups.
+        Alternatively the value can be a list, which will be used equivalent to
+        ``{"blueprints": [...]}``.
+        """
         self.cfg_of_app_prefix = cfg_of_app_prefix
         self.cfg_of_other_app_prefix = cfg_of_other_app_prefix
         self.groups_of_other_app_entrypoints = groups_of_other_app_entrypoints
