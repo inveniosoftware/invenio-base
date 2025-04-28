@@ -41,7 +41,9 @@ class WSGIApplication(Protocol):
 
     def __call__(
         self, environ: Environ, start_response: StartResponse
-    ) -> Iterable[bytes]: ...
+    ) -> Iterable[bytes]:
+        """Handle WSGI call."""
+        ...
 
     wsgi_app: WSGICallable
     config: dict[str, Any]
@@ -78,6 +80,8 @@ def wsgi_proxyfix[T: WSGIApplication](
     factory: Callable[..., T] | None = None,
 ) -> Callable[[T], WSGICallable]:
     """Fix Flask environment according to ``X-Forwarded-_`` headers.
+
+    Detailed explanation follows in the rest of the docstring.
 
     .. note::
 

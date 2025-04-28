@@ -28,13 +28,13 @@ class SecretKeyMigrator(Protocol):
         ...
 
 
-@click.group()  # type: ignore[misc]
+@click.group()
 def instance() -> None:
     """Instance commands."""
 
 
-@instance.command("entrypoints")  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
+@instance.command("entrypoints")
+@click.option(
     "-e",
     "--entry-point",
     default=None,
@@ -67,9 +67,9 @@ def list_entrypoints(entry_point: str | None = None) -> None:
             click.echo(f"  {ep}")
 
 
-@instance.command("migrate-secret-key")  # type: ignore[misc]
-@click.option("--old-key", required=True)  # type: ignore[misc]
-@with_appcontext  # type: ignore[misc]
+@instance.command("migrate-secret-key")
+@click.option("--old-key", required=True)
+@with_appcontext
 def migrate_secret_key(old_key: str) -> None:
     """Call entry points exposed for the SECRET_KEY change."""
     if (
