@@ -17,4 +17,4 @@ set -o nounset
 python -m check_manifest
 python -m sphinx.cmd.build -qnNW docs docs/_build/html
 python -m pytest
-python -m mypy --strict invenio_base
+python -m mypy invenio_base

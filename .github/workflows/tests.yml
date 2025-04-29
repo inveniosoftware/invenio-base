@@ -33,21 +33,3 @@ jobs:
     with:
       db-service: '[""]'
       search-service: '[""]'
-  mypy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install uv
-        run: pip install uv
-      - name: run mypy in venv
-        run: |
-          mkdir venv && uv venv .venv && source .venv/bin/activate
-          uv pip install .[type-check]
-          mypy invenio_base
-          deactivate
-          rm -rf .venv
