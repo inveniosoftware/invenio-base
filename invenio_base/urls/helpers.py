@@ -12,17 +12,18 @@
 Really just there to put invenio_url_for definition in a way that circumvents
 circular import.
 """
+from typing import Any
 
 from flask import current_app
 
 
 def invenio_url_for(
-    endpoint,
+    endpoint: str,
     *,
     # _anchor = None,  # TODO
-    _method=None,
-    **values,
-):
+    _method: str | None = None,
+    **values: Any,
+) -> str:
     """A URL generator for the Invenio reality.
 
     This function can build full (external) URLs for the current app and for setup
@@ -37,7 +38,7 @@ def invenio_url_for(
     than `url_for`'s.
     """
 
-    return current_app._urls_builder.build(
+    return current_app._urls_builder.build(  # type: ignore
         endpoint,
         values,
         method=_method,

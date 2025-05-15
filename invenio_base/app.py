@@ -19,10 +19,9 @@ from os import PathLike
 from typing import Any, Callable, Type
 
 import click
-from flask import Flask
+from flask import Flask, Blueprint
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
-from flask.sansio.blueprints import Blueprint
 from importlib_metadata import entry_points as iter_entry_points
 
 from .signals import app_created, app_loaded
