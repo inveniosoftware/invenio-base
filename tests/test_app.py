@@ -3,12 +3,14 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2022 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Test basic application."""
 
+import importlib.metadata
 import logging
 import warnings
 from os.path import exists, join
@@ -402,11 +404,18 @@ def test_create_cli_with_app():
 
     runner = CliRunner()
     result = runner.invoke(cli)
-    assert result.exit_code == 0
+    if importlib.metadata.version("click") < "8.2.0":
+        assert result.exit_code == 0
+    else:
+        assert result.exit_code == 2
 
     result = runner.invoke(cli, ["test-cmd"])
-    assert result.exit_code == 0
-    assert f"{app_name} False\n" in result.output
+    if importlib.metadata.version("click") < "8.2.0":
+        assert result.exit_code == 0
+        assert f"{app_name} False\n" in result.output
+    else:
+        assert result.exit_code == 2
+        assert "No such command 'test-cmd'" in result.output
 
 
 def test_create_cli_without_app():
@@ -419,7 +428,10 @@ def test_create_cli_without_app():
 
     runner = CliRunner()
     result = runner.invoke(cli)
-    assert result.exit_code == 0
+    if importlib.metadata.version("click") < "8.2.0":
+        assert result.exit_code == 0
+    else:
+        assert result.exit_code == 2
 
 
 def test_generate_secret_key():
