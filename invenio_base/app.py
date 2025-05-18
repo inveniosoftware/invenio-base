@@ -19,7 +19,7 @@ from os import PathLike
 from typing import Any, Callable, Type
 
 import click
-from flask import Flask, Blueprint
+from flask import Blueprint, Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
 from importlib_metadata import entry_points as iter_entry_points

@@ -16,11 +16,11 @@ in another Flask application. Other developer niceties are included.
 """
 
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Any, Callable
 
-from flask import Flask, current_app, Blueprint
+from flask import Blueprint, Flask, current_app
 from importlib_metadata import entry_points as iter_entry_points
-from werkzeug.routing import BuildError, Map, Rule, BaseConverter
+from werkzeug.routing import BaseConverter, BuildError, Map, Rule
 
 from .proxies import current_app_map_adapter, other_app_map_adapter
 

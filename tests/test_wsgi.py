@@ -21,6 +21,9 @@ from invenio_base.wsgi import (
     wsgi_proxyfix,
 )
 
+# inndicating collection of factories for different mount points
+MountsFactories = Dict[str, Callable[..., WSGIApplication]]
+
 
 def test_create_wsgi_factory():
     """Test wsgi factory creation."""
@@ -152,7 +155,7 @@ def test_wsgi_with_type_annotations():
     def create_api(**kwargs: Any) -> WSGIApplication:
         return TestWSGIApp()
 
-    mounts_factories: Dict[str, Callable[..., WSGIApplication]] = {"/api": create_api}
+    mounts_factories: MountsFactories = {"/api": create_api}
     factory = create_wsgi_factory(mounts_factories)
     assert callable(factory)
 

@@ -24,7 +24,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-uv.lock
 .venv/
 .venv-*/
 lib/
