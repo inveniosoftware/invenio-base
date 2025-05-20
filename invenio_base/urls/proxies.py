@@ -11,6 +11,7 @@
 
 from flask import current_app, g
 from werkzeug.local import LocalProxy
+from werkzeug.routing import MapAdapter
 
 # The following 2 proxies were created to mimic how Flask caches the MapAdapter object
 # on the application or request.
@@ -19,25 +20,25 @@ from werkzeug.local import LocalProxy
 # each link (especially for search API responses)
 
 
-def other_bind():
+def other_bind() -> MapAdapter:
     """Cache MapAdapter for non-current app's url_map.
 
     Usage of this proxy can only be done after `current_app._urls_builder.url_map`
     has been set.
     """
     if "other_app_map_adapter" not in g:
-        g.other_app_map_adapter = current_app._urls_builder.url_map.bind("")
-    return g.other_app_map_adapter
+        g.other_app_map_adapter = current_app._urls_builder.url_map.bind("")  # type: ignore[attr-defined]
+    return g.other_app_map_adapter  # type: ignore[no-any-return]
 
 
 other_app_map_adapter = LocalProxy(other_bind)
 
 
-def current_bind():
+def current_bind() -> MapAdapter:
     """Cache MapAdapter for current app's url_map."""
     if "current_app_map_adapter" not in g:
         g.current_app_map_adapter = current_app.url_map.bind("")
-    return g.current_app_map_adapter
+    return g.current_app_map_adapter  # type: ignore[no-any-return]
 
 
 current_app_map_adapter = LocalProxy(current_bind)

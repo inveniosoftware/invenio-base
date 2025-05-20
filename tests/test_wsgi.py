@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,11 +10,19 @@
 """Test wsgi application."""
 
 import json
+from typing import Any, Callable, Dict
 
 import pytest
 from flask import Flask, jsonify, request
 
-from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
+from invenio_base.wsgi import (
+    WSGIApplication,
+    create_wsgi_factory,
+    wsgi_proxyfix,
+)
+
+# inndicating collection of factories for different mount points
+MountsFactories = Dict[str, Callable[..., WSGIApplication]]
 
 
 def test_create_wsgi_factory():
@@ -123,3 +131,40 @@ def test_proxyfix_wsgi_config(num_proxies, proxy_config):
         }
         res = client.get("/", headers=h, environ_base=e)
         assert json.loads(res.get_data(as_text=True)) == data[num_proxies]
+
+
+# Test with type annotations
+def test_wsgi_with_type_annotations():
+    """Test wsgi functions with proper type annotations."""
+    from flask import Flask
+
+    from invenio_base.wsgi import (
+        WSGIApplication,
+        create_wsgi_factory,
+        wsgi_proxyfix,
+    )
+
+    class TestWSGIApp(WSGIApplication):
+        def __init__(self):
+            self.wsgi_app = lambda environ, start_response: []
+            self.config = {}
+
+        def __call__(self, environ, start_response):
+            return self.wsgi_app(environ, start_response)
+
+    def create_api(**kwargs: Any) -> WSGIApplication:
+        return TestWSGIApp()
+
+    mounts_factories: MountsFactories = {"/api": create_api}
+    factory = create_wsgi_factory(mounts_factories)
+    assert callable(factory)
+
+    proxyfix = wsgi_proxyfix(create_api)
+    assert callable(proxyfix)
+
+    app = TestWSGIApp()
+    wsgi_app = factory(app)
+    assert callable(wsgi_app)
+
+    proxy_app = proxyfix(app)
+    assert callable(proxy_app)

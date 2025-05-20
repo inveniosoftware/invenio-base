@@ -310,3 +310,36 @@ intersphinx_mapping = {
 
 # Autodoc configuraton.
 autoclass_content = "both"
+
+# To address <unknown>:1:py:class reference target not found
+# (better ideas welcomed)
+nitpick_ignore = [
+    (
+        "py:class",
+        "flask.app.Flask",
+    ),  # noqa
+    (
+        "py:class",
+        "collections.abc.Callable",
+    ),  # noqa
+    (
+        "py:class",
+        "collections.abc.Iterable",
+    ),  # noqa
+    (
+        "py:class",
+        "T",
+    ),  # noqa
+    (
+        "py:class",
+        "blinker.base.Signal",
+    ),  # noqa
+    (
+        "py:class",
+        "werkzeug.routing.converters.BaseConverter",
+    ),  # noqa
+    (
+        "py:class",
+        "invenio_base.urls.builders.InvenioUrlsBuilder",
+    ),  # noqa
+]

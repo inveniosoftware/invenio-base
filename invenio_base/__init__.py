@@ -249,14 +249,14 @@ try:
     # Werkzeug <2.1
     from werkzeug import security
 
-    security.safe_str_cmp
+    security.safe_str_cmp  # type: ignore
 except AttributeError:
     # Werkzeug >=2.1
     import hmac
 
     from werkzeug import security
 
-    security.safe_str_cmp = hmac.compare_digest
+    security.safe_str_cmp = hmac.compare_digest  # type: ignore
 
 __version__ = "2.2.0"
 

@@ -5,6 +5,13 @@ __pycache__/
 # Idea software family
 .idea/
 
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
+
+
 # C extensions
 *.so
 
@@ -17,6 +24,8 @@ dist/
 downloads/
 eggs/
 .eggs/
+.venv/
+.venv-*/
 lib/
 lib64/
 parts/
