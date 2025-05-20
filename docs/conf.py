@@ -334,4 +334,12 @@ nitpick_ignore = [
         "py:class",
         "blinker.base.Signal",
     ),  # noqa
+    (
+        "py:class",
+        "werkzeug.routing.converters.BaseConverter",
+    ),  # noqa
+    (
+        "py:class",
+        "invenio_base.urls.builders.InvenioUrlsBuilder",
+    ),  # noqa
 ]

@@ -23,9 +23,10 @@ from flask import Blueprint, Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
 from importlib_metadata import entry_points as iter_entry_points
+from werkzeug.routing import BaseConverter
 
 from .signals import app_created, app_loaded
-from .urls.builders import NoOpInvenioUrlsBuilder
+from .urls.builders import InvenioUrlsBuilder, NoOpInvenioUrlsBuilder
 from .urls.helpers import invenio_url_for
 
 
@@ -40,7 +41,7 @@ def create_app_factory(
     converters: dict[str, Any] | None = None,
     finalize_app_entry_points: list[str] | None = None,
     wsgi_factory: Callable[..., Any] | None = None,
-    urls_builder_factory: Callable | None = None,
+    urls_builder_factory: Callable[..., InvenioUrlsBuilder] | None = None,
     **app_kwargs: Any,
 ) -> Callable[..., Flask]:
     """Create a Flask application factory.
@@ -271,25 +272,23 @@ def blueprint_loader(
     _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
 
 
-def urls_builder_loader(app, factory, **kwargs):
-    """Loads the urls builder.
-
-    :param app: current Flask App
-    :param factory: callable ``(Flask.App, **kwargs) -> InvenioURLsBuilder``
-    """
+def urls_builder_loader(
+    app: Flask, factory: Callable[..., InvenioUrlsBuilder] | None, **kwargs: Any
+) -> None:
+    """Loads the urls builder."""
     app.add_template_global(invenio_url_for)
     if factory:
-        app._urls_builder = factory(app, **kwargs)
+        app._urls_builder = factory(app, **kwargs)  # type: ignore[attr-defined]
     else:
-        app._urls_builder = NoOpInvenioUrlsBuilder()
+        app._urls_builder = NoOpInvenioUrlsBuilder()  # type: ignore[attr-defined]
 
 
-def converter_loader(app, entry_points=None, modules=None):
+def converter_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: dict[str, type[BaseConverter]] | None = None,
+) -> None:
     """Run default converter loader.
-
-    :param app: The Flask application.
-    :param entry_points: List of entry points providing to Blue.
-    :param modules: Map of converters.
 
     .. versionadded: 1.0.0
     """
