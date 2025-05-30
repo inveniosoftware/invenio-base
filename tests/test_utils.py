@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2017-2020 CERN.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -34,3 +35,29 @@ def test_load_or_import_from_config():
             load_or_import_from_config("MISSING_KEY", default=wsgi_proxyfix)
             == wsgi_proxyfix
         )
+
+
+def test_utils_type_annotations():
+    """Test type annotations for utility functions."""
+    from fractions import Fraction
+    from typing import Optional, get_type_hints
+
+    from invenio_base.utils import (
+        Real,
+        load_or_import_from_config,
+        obj_or_import_string,
+    )
+
+    hints = get_type_hints(obj_or_import_string)
+    assert "value" in hints
+    assert "default" in hints
+    assert "return" in hints
+
+    hints = get_type_hints(load_or_import_from_config)
+    assert hints["key"] == str
+    assert hints["app"] == Optional[Flask]
+
+    assert isinstance(1, Real)
+    assert isinstance(1.0, Real)
+    assert isinstance(Fraction(1, 2), Real)
+    assert not isinstance("1", Real)

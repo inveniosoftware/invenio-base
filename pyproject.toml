@@ -1,3 +1,28 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=68.0.0", "wheel>=0.40.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+python_version = "3.12"
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_calls = true
+no_implicit_optional = true
+
+# third party imports
+[[tool.mypy.overrides]]
+# Ignore missing imports for the entire module.
+# Note: it doesn't ignore specific attribute access or method calls.
+module = [
+    "flask.*",
+    "click.*",
+    "werkzeug.*"
+]
+ignore_missing_imports = true
+
+# test files
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+ignore_errors = true

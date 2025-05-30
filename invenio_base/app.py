@@ -3,7 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C) 2022 RERO.
-# Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2023-2025 Graz University of Technology.
 # Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
@@ -15,32 +15,35 @@ import logging
 import os.path
 import sys
 import warnings
+from os import PathLike
+from typing import Any, Callable, Type
 
 import click
-from flask import Flask
+from flask import Blueprint, Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
 from importlib_metadata import entry_points as iter_entry_points
+from werkzeug.routing import BaseConverter
 
 from .signals import app_created, app_loaded
-from .urls.builders import NoOpInvenioUrlsBuilder
+from .urls.builders import InvenioUrlsBuilder, NoOpInvenioUrlsBuilder
 from .urls.helpers import invenio_url_for
 
 
 def create_app_factory(
-    app_name,
-    config_loader=None,
-    extension_entry_points=None,
-    extensions=None,
-    blueprint_entry_points=None,
-    blueprints=None,
-    converter_entry_points=None,
-    converters=None,
-    finalize_app_entry_points=None,
-    wsgi_factory=None,
-    urls_builder_factory=None,
-    **app_kwargs,
-):
+    app_name: str,
+    config_loader: Callable[..., None] | None = None,
+    extension_entry_points: list[str] | None = None,
+    extensions: list[object] | None = None,
+    blueprint_entry_points: list[str] | None = None,
+    blueprints: list[object] | None = None,
+    converter_entry_points: list[str] | None = None,
+    converters: dict[str, Any] | None = None,
+    finalize_app_entry_points: list[str] | None = None,
+    wsgi_factory: Callable[..., Any] | None = None,
+    urls_builder_factory: Callable[..., InvenioUrlsBuilder] | None = None,
+    **app_kwargs: Any,
+) -> Callable[..., Flask]:
     """Create a Flask application factory.
 
     The application factory will load Flask extensions and blueprints specified
@@ -100,7 +103,7 @@ def create_app_factory(
     .. versionadded: 1.0.0
     """
 
-    def _create_app(**kwargs):
+    def _create_app(**kwargs: Any) -> Flask:
         for k in ("instance_path", "root_path", "static_folder"):
             if k in app_kwargs and callable(app_kwargs[k]):
                 app_kwargs[k] = app_kwargs[k]()
@@ -154,7 +157,8 @@ def create_app_factory(
         # Replace WSGI application using factory if provided (e.g. to install
         # WSGI middleware).
         if wsgi_factory:
-            app.wsgi_app = wsgi_factory(app, **kwargs)
+            # here mypy doesn't like runtime reassignment of a method
+            app.wsgi_app = wsgi_factory(app, **kwargs)  # type: ignore[method-assign]
 
         # See https://bugs.python.org/issue31558 for how this helps with memory use
         if app.config.get("APP_GC_FREEZE", False):
@@ -164,7 +168,7 @@ def create_app_factory(
     return _create_app
 
 
-def create_cli(create_app=None):
+def create_cli(create_app: Callable[..., Flask] | None = None) -> Callable[..., None]:
     """Create CLI for ``inveniomanage`` command.
 
     :param create_app: Flask application factory.
@@ -175,7 +179,7 @@ def create_cli(create_app=None):
 
     # Flask 2.0 removed support for passing script_info argument. Below
     # function is thus
-    def create_cli_app(*args):
+    def create_cli_app(*args: Any) -> Flask:
         """Application factory for CLI app.
 
         Internal function for creating the CLI. When invoked via
@@ -198,35 +202,41 @@ def create_cli(create_app=None):
         return app
 
     @click.group(cls=FlaskGroup, create_app=create_cli_app)
-    def cli(**params):
+    def cli(**params: Any) -> None:
         """Command Line Interface for Invenio."""
         pass
 
     return cli
 
 
-def finalize_app_loader(app, entry_points=None):
+def finalize_app_loader(app: Flask, entry_points: list[str] | None = None) -> None:
     """Run functions before of the first request.
 
     This loader is the last possible position where it is possible to configure the app.
 
     NOTE: it replaces the before_first_request decorator of flask <2.3.0
 
+    :param app: The Flask application.
     :param entry_points: List of entry points providing to Flask extensions.
 
     .. versionadded: 2.0.0
     """
 
-    def loader_init_func(func):
+    def loader_init_func(func: Callable[[Flask], None]) -> None:
         with app.app_context():
             func(app)
 
     _loader(app, loader_init_func, entry_points=entry_points)
 
 
-def app_loader(app, entry_points=None, modules=None):
+def app_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run default application loader.
 
+    :param app: The Flask application.
     :param entry_points: List of entry points providing to Flask extensions.
     :param modules: List of Flask extensions.
 
@@ -235,7 +245,11 @@ def app_loader(app, entry_points=None, modules=None):
     _loader(app, lambda ext: ext(app), entry_points=entry_points, modules=modules)
 
 
-def blueprint_loader(app, entry_points=None, modules=None):
+def blueprint_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run default blueprint loader.
 
     The value of any entry_point or module passed can be either an instance of
@@ -243,6 +257,7 @@ def blueprint_loader(app, entry_points=None, modules=None):
     instance as a single argument and returning an instance of
     ``flask.Blueprint``.
 
+    :param app: The Flask application.
     :param entry_points: List of entry points providing to Blueprints.
     :param modules: List of Blueprints.
 
@@ -250,31 +265,30 @@ def blueprint_loader(app, entry_points=None, modules=None):
     """
     url_prefixes = app.config.get("BLUEPRINTS_URL_PREFIXES", {})
 
-    def loader_init_func(bp_or_func):
+    def loader_init_func(bp_or_func: Blueprint | Callable[[Flask], Blueprint]) -> None:
         bp = bp_or_func(app) if callable(bp_or_func) else bp_or_func
         app.register_blueprint(bp, url_prefix=url_prefixes.get(bp.name))
 
     _loader(app, loader_init_func, entry_points=entry_points, modules=modules)
 
 
-def urls_builder_loader(app, factory, **kwargs):
-    """Loads the urls builder.
-
-    :param app: current Flask App
-    :param factory: callable ``(Flask.App, **kwargs) -> InvenioURLsBuilder``
-    """
+def urls_builder_loader(
+    app: Flask, factory: Callable[..., InvenioUrlsBuilder] | None, **kwargs: Any
+) -> None:
+    """Loads the urls builder."""
     app.add_template_global(invenio_url_for)
     if factory:
-        app._urls_builder = factory(app, **kwargs)
+        app._urls_builder = factory(app, **kwargs)  # type: ignore[attr-defined]
     else:
-        app._urls_builder = NoOpInvenioUrlsBuilder()
+        app._urls_builder = NoOpInvenioUrlsBuilder()  # type: ignore[attr-defined]
 
 
-def converter_loader(app, entry_points=None, modules=None):
+def converter_loader(
+    app: Flask,
+    entry_points: list[str] | None = None,
+    modules: dict[str, type[BaseConverter]] | None = None,
+) -> None:
     """Run default converter loader.
-
-    :param entry_points: List of entry points providing to Blue.
-    :param modules: Map of coverters.
 
     .. versionadded: 1.0.0
     """
@@ -291,10 +305,15 @@ def converter_loader(app, entry_points=None, modules=None):
         app.url_map.converters.update(**modules)
 
 
-def _loader(app, init_func, entry_points=None, modules=None):
+def _loader(
+    app: Flask,
+    init_func: Callable[[Any], None],
+    entry_points: list[str] | None = None,
+    modules: list[object] | None = None,
+) -> None:
     """Run generic loader.
 
-    Used to load and initialize entry points and modules using an custom
+    Used to load and initialize entry points and modules using a custom
     initialization function.
 
     .. versionadded: 1.0.0
@@ -317,21 +336,20 @@ def _loader(app, init_func, entry_points=None, modules=None):
 
 
 def base_app(
-    import_name,
-    instance_path=None,
-    static_folder=None,
-    static_url_path="/static",
-    template_folder="templates",
-    instance_relative_config=True,
-    root_path=None,
-    app_class=Flask,
-):
+    import_name: str,
+    instance_path: str | None = None,
+    static_folder: str | PathLike[str] | None = None,
+    static_url_path: str | None = "/static",
+    template_folder: str | PathLike[str] | None = "templates",
+    instance_relative_config: bool = True,
+    root_path: str | None = None,
+    app_class: Type[Flask] = Flask,
+) -> Flask:
     """Invenio base application factory.
 
-    If the instance folder does not exists, it will be created.
+    If the instance folder does not exist, it will be created.
 
     :param import_name: The name of the application package.
-    :param env_prefix: Environment variable prefix.
     :param instance_path: Instance path for Flask application.
     :param static_folder: Static folder path.
     :param app_class: Flask application class.
@@ -362,7 +380,7 @@ def base_app(
     return app
 
 
-def configure_warnings():
+def configure_warnings() -> None:
     """Configure warnings by routing warnings to the logging system.
 
     It also unhides ``DeprecationWarning``.

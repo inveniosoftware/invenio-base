@@ -2,28 +2,56 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """WSGI application factory for Invenio."""
 
+from __future__ import annotations
+
 import warnings
+from collections.abc import Callable, Iterable
+from typing import Any, NotRequired, Protocol, TypeAlias, TypedDict, TypeVar
 
-# They were moved in the same version so they can be in one try/except
-try:
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-    WERKZEUG_GTE_014 = False
-except ImportError:
-    from werkzeug.contrib.fixers import ProxyFix
-    from werkzeug.wsgi import DispatcherMiddleware
-
-    WERKZEUG_GTE_014 = True
+# Define basic WSGI types
+Environ: TypeAlias = dict[str, Any]
+Headers: TypeAlias = list[tuple[str, str]]
+ExcInfo: TypeAlias = list[Any]
+StartResponse: TypeAlias = Callable[[str, Headers, ExcInfo], Iterable[bytes]]
+WSGICallable: TypeAlias = Callable[[Environ, StartResponse], Iterable[bytes]]
 
 
-def create_wsgi_factory(mounts_factories):
+class ProxyConfig(TypedDict, total=False):
+    """Configuration for ProxyFix middleware."""
+
+    x_for: NotRequired[int]
+    x_proto: NotRequired[int]
+    x_host: NotRequired[int]
+    x_port: NotRequired[int]
+    x_prefix: NotRequired[int]
+
+
+class WSGIApplication(Protocol):
+    """Protocol for WSGI applications."""
+
+    def __call__(
+        self, environ: Environ, start_response: StartResponse
+    ) -> Iterable[bytes]:
+        """Handle WSGI call."""
+        ...
+
+    wsgi_app: WSGICallable
+    config: dict[str, Any]
+
+
+def create_wsgi_factory(
+    mounts_factories: dict[str, Callable[..., WSGIApplication]],
+) -> Callable[[WSGIApplication], WSGICallable]:
     """Create a WSGI application factory.
 
     Usage example:
@@ -38,17 +66,22 @@ def create_wsgi_factory(mounts_factories):
     .. versionadded:: 1.0.0
     """
 
-    def create_wsgi(app, **kwargs):
+    def create_wsgi(app: WSGIApplication, **kwargs: Any) -> WSGICallable:
         mounts = {
-            mount: factory(**kwargs) for mount, factory in mounts_factories.items()
+            mount: factory(**kwargs).wsgi_app
+            for mount, factory in mounts_factories.items()
         }
-        return DispatcherMiddleware(app.wsgi_app, mounts)
+        return DispatcherMiddleware(app.wsgi_app, mounts)  # type: ignore
 
     return create_wsgi
 
 
-def wsgi_proxyfix(factory=None):
+def wsgi_proxyfix[T: WSGIApplication](
+    factory: Callable[..., T] | None = None,
+) -> Callable[[T], WSGICallable]:
     """Fix Flask environment according to ``X-Forwarded-_`` headers.
+
+    Detailed explanation follows in the rest of the docstring.
 
     .. note::
 
@@ -101,22 +134,31 @@ def wsgi_proxyfix(factory=None):
        use ``PROXYFIX_CONFIG`` instead.
     """
 
-    def create_wsgi(app, **kwargs):
-        wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
+    def create_wsgi(app: T) -> WSGICallable:
+        wsgi_app = factory().wsgi_app if factory else app.wsgi_app
         num_proxies = app.config.get("WSGI_PROXIES")
-        proxy_config = app.config.get("PROXYFIX_CONFIG")
-        if proxy_config and not WERKZEUG_GTE_014:
-            return ProxyFix(wsgi_app, **proxy_config)
-        elif num_proxies:
-            warnings.warn(
-                "The WSGI_PROXIES configuration is deprecated and "
-                "it will be removed, use PROXYFIX_CONFIG instead",
-                PendingDeprecationWarning,
-            )
-            if WERKZEUG_GTE_014:
-                return ProxyFix(wsgi_app, num_proxies=num_proxies)
-            else:
-                return ProxyFix(wsgi_app, x_for=num_proxies)
-        return wsgi_app
+        proxy_config: ProxyConfig | None = app.config.get("PROXYFIX_CONFIG")
+
+        match (proxy_config, num_proxies):
+            case (dict(), _):
+                return ProxyFix(wsgi_app, **proxy_config)  # type: ignore
+            case (None, int()):
+                warnings.warn(
+                    "The WSGI_PROXIES configuration is deprecated and "
+                    "it will be removed, use PROXYFIX_CONFIG instead",
+                    PendingDeprecationWarning,
+                )
+                return ProxyFix(wsgi_app, x_for=num_proxies)  # type: ignore
+            case _:
+                return wsgi_app
 
     return create_wsgi
+
+
+__all__ = (
+    "create_wsgi_factory",
+    "wsgi_proxyfix",
+    "WSGIApplication",
+    "WSGICallable",
+    "ProxyConfig",
+)

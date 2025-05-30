@@ -3,14 +3,18 @@
 # This file is part of Invenio.
 # Copyright (C) 2017-2018 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Test signals."""
 
+from blinker import Namespace
+from blinker.base import Signal
+
 from invenio_base.app import create_app_factory
-from invenio_base.signals import app_created, app_loaded
+from invenio_base.signals import _signals, app_created, app_loaded
 
 
 def test_create_app_factory():
@@ -35,3 +39,11 @@ def test_create_app_factory():
     assert calls["loaded"] == 1
     assert calls["created_app"] is app
     assert calls["loaded_app"] is app
+
+
+def test_signals_type_annotations():
+    """Test type annotations for signals."""
+    assert isinstance(_signals, Namespace)
+
+    assert isinstance(app_created, Signal)
+    assert isinstance(app_loaded, Signal)

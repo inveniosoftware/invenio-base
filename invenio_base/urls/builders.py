@@ -16,10 +16,11 @@ in another Flask application. Other developer niceties are included.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any, Callable
 
-from flask import Flask, current_app
+from flask import Blueprint, Flask, current_app
 from importlib_metadata import entry_points as iter_entry_points
-from werkzeug.routing import BuildError, Map, Rule
+from werkzeug.routing import BaseConverter, BuildError, Map, Rule
 
 from .proxies import current_app_map_adapter, other_app_map_adapter
 
@@ -28,14 +29,14 @@ class InvenioUrlsBuilder(ABC):
     """Interface of class in charge of producing urls."""
 
     @abstractmethod
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint: str, values: dict, method: str | None = None) -> str:
         """Build current or other app url."""
 
 
 class NoOpInvenioUrlsBuilder(InvenioUrlsBuilder):
     """Doesn't do anything."""
 
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint: str, values: dict, method: str | None = None) -> str:
         """Instead of building returns empty string."""
         return ""
 
@@ -45,10 +46,10 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
 
     def __init__(
         self,
-        cfg_of_app_prefix,
-        cfg_of_other_app_prefix,
-        groups_of_other_app_entrypoints,
-    ):
+        cfg_of_app_prefix: str,
+        cfg_of_other_app_prefix: str,
+        groups_of_other_app_entrypoints: dict[str, list] | list,
+    ) -> None:
         """Constructor.
 
         The ``cfg_of_app_prefix`` and ``cfg_of_other_app_prefix`` are the names of
@@ -65,7 +66,9 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         self.cfg_of_other_app_prefix = cfg_of_other_app_prefix
         self.groups_of_other_app_entrypoints = groups_of_other_app_entrypoints
 
-    def _load_converters(self, app_tmp, defaults=None):
+    def _load_converters(
+        self, app_tmp: Flask, defaults: dict[str, type[BaseConverter]] | None = None
+    ) -> None:
         """Load converters in temporary app `app_tmp`.
 
         Prerequisite to loading blueprints.
@@ -86,7 +89,7 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
                         app_tmp.logger.error(f"Failed to initialize entry point: {ep}")
                         raise
 
-    def _load_blueprints(self, app_tmp):
+    def _load_blueprints(self, app_tmp: Flask) -> None:
         """Load blueprints in temporary app `app_tmp`.
 
         Part of loading blueprints is loading converters.
@@ -100,9 +103,13 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         else:  # assume dict and let it raise if not
             groups = self.groups_of_other_app_entrypoints.get("blueprints", [])
 
-        url_prefixes = app_tmp.config.get("BLUEPRINTS_URL_PREFIXES", {})
+        url_prefixes: dict[str, Blueprint] = app_tmp.config.get(
+            "BLUEPRINTS_URL_PREFIXES", {}
+        )
 
-        def register_blueprint(bp_or_func):
+        def register_blueprint(
+            bp_or_func: Blueprint | Callable[[Flask], Blueprint],
+        ) -> None:
             bp = bp_or_func(app_tmp) if callable(bp_or_func) else bp_or_func
             app_tmp.register_blueprint(bp, url_prefix=url_prefixes.get(bp.name))
 
@@ -114,7 +121,7 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
                     app_tmp.logger.error(f"Failed to initialize entry point: {ep}")
                     raise
 
-    def setup(self, app, **kwargs):
+    def setup(self, app: Flask, **kwargs: Any) -> None:
         """Sets up the object for url generation.
 
         It does so by building an internal url_map that it will reuse.
@@ -144,11 +151,11 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
             converters=app_tmp.url_map.converters,
         )
 
-    def prefix(self, site_cfg):
+    def prefix(self, site_cfg: str) -> str:
         """Return site prefix."""
-        return current_app.config[site_cfg].rstrip("/")
+        return current_app.config[site_cfg].rstrip("/")  # type: ignore[no-any-return]
 
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint: str, values: dict, method: str | None = None) -> str:
         """Build full url of any registered endpoint with appropriate prefix.
 
         This is called within an application context.
@@ -156,28 +163,30 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         # 1- Try to build url from current app
         try:
             url_adapter = current_app_map_adapter
-            url_relative = url_adapter.build(
+            url_relative = url_adapter.build(  # type: ignore[attr-defined]
                 endpoint, values, method=method, force_external=False
             )
-            return self.prefix(self.cfg_of_app_prefix) + url_relative
+            return self.prefix(self.cfg_of_app_prefix) + url_relative  # type: ignore[no-any-return]
         except BuildError:
             # The endpoint may be from the complementary blueprints
             pass
 
         # 2- Try to build url from complementary url_map
         url_adapter = other_app_map_adapter
-        url_relative = url_adapter.build(
+        url_relative = url_adapter.build(  # type: ignore[attr-defined]
             endpoint,
             values,
             method=method,
             force_external=False,
         )
-        return self.prefix(self.cfg_of_other_app_prefix) + url_relative
+        return self.prefix(self.cfg_of_other_app_prefix) + url_relative  # type: ignore[no-any-return]
 
 
 def create_invenio_apps_urls_builder_factory(
-    cfg_of_app_prefix, cfg_of_other_app_prefix, groups_of_other_app_entrypoints
-):
+    cfg_of_app_prefix: str,
+    cfg_of_other_app_prefix: str,
+    groups_of_other_app_entrypoints: dict[str, list] | list[str],
+) -> Callable[..., InvenioAppsUrlsBuilder]:
     """Create the factory for invenio_urls_builder that knows about dual app setup.
 
     This function is made with knowledge of invenio-app mechanisms as a
@@ -186,13 +195,13 @@ def create_invenio_apps_urls_builder_factory(
     can swap it out easily for a different URL generator - just need to
     produce a builder that implements InvenioUrlsBuilder's interface.
 
-    :param cfg_of_site_prefix: str. config for current app prefix
-    :param cfg_of_other_site_prefix: str. config for other app prefix
-    :param groups_of_other_site_entrypoints: entrypoints groups to load
+    :param cfg_of_app_prefix: config for current app prefix
+    :param cfg_of_other_app_prefix: config for other app prefix
+    :param groups_of_other_app_entrypoints: entrypoints groups to load
                                              blueprints of other app
     """
 
-    def _factory(app, **kwargs):
+    def _factory(app: Flask, **kwargs: Any) -> InvenioAppsUrlsBuilder:
         builder = InvenioAppsUrlsBuilder(
             cfg_of_app_prefix,
             cfg_of_other_app_prefix,
