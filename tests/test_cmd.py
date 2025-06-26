@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,14 +11,36 @@
 """Test cli application."""
 
 import logging
+from importlib.metadata import distribution
 from unittest.mock import MagicMock, Mock, patch
 
-import pkg_resources
 import pytest
 from click.testing import CliRunner
 
 from invenio_base.app import create_app_factory
 from invenio_base.cli import instance
+
+
+class ComparableMock(Mock):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    def __lt__(self, other):
+        return str(self._name) < str(other._name)
+
+    def __le__(self, other):
+        return str(self._name) <= str(other._name)
+
+    def __gt__(self, other):
+        return str(self._name) > str(other._name)
+
+    def __ge__(self, other):
+        return str(self._name) >= str(other._name)
 
 
 @pytest.fixture(autouse=True)
@@ -40,36 +63,35 @@ def force_logging():
 
 def test_list_entry_points():
     """Test listing of entry points."""
-    mock_working_set = pkg_resources.WorkingSet(entries=[])
-    dist = pkg_resources.get_distribution("invenio-base")
-    mock_working_set.add(dist)
 
-    with patch("invenio_base.cli.working_set", new=mock_working_set):
-        runner = CliRunner()
+    runner = CliRunner()
 
-        # Test select an existing entry point
-        result = runner.invoke(instance, ["entrypoints", "-e", "console_scripts"])
-        assert result.exit_code == 0
-        lines = result.output.splitlines()
-        assert lines[0] == "console_scripts"
-        assert lines[1] == "  inveniomanage = invenio_base.__main__:cli"
+    # Test select an existing entry point
+    result = runner.invoke(instance, ["entrypoints", "-e", "console_scripts"])
+    assert result.exit_code == 0
+    lines = result.output.splitlines()
 
-        # Test no entry point matching
-        result = runner.invoke(instance, ["entrypoints", "-e", "nothing_here"])
-        assert result.exit_code == 0
-        assert result.output == ""
+    assert lines[0] == "console_scripts"
+    assert "  inveniomanage = invenio_base.__main__:cli" in lines
 
-        # By default we only show entry points groups starting with "invenio"
-        dist.get_entry_map = Mock(
-            return_value={
-                "invenio_base.apps": {
-                    "myapp": "myapp = myapp:MyApp",
-                    "app1": "app1 = app1:MyApp",
-                },
-                "invenio_base.api_apps": {"myapi": "myapi = myapi:MyApp"},
-                "console_scripts": {"mycli": "mycli = cli:main"},
-            }
-        )
+    # Test no entry point matching
+    result = runner.invoke(instance, ["entrypoints", "-e", "nothing_here"])
+    assert result.exit_code == 0
+    assert result.output == ""
+
+    # By default we only show entry points groups starting with "invenio"
+    mock_dist = Mock()
+    mock_dist.name = "invenio-base"
+    mock_dist.version = distribution("invenio-base").version
+    mock_dist.entry_points = [
+        ComparableMock(name="myapp", value="myapp:MyApp", group="invenio_base.apps"),
+        ComparableMock(name="app1", value="app1:MyApp", group="invenio_base.apps"),
+        ComparableMock(
+            name="myapi", value="myapi:MyApp", group="invenio_base.api_apps"
+        ),
+        ComparableMock(name="mycli", value="cli:main", group="console_scripts"),
+    ]
+    with patch("invenio_base.cli.distributions", return_value=[mock_dist]):
         result = runner.invoke(
             instance,
             [
@@ -77,7 +99,7 @@ def test_list_entry_points():
             ],
         )
         assert result.exit_code == 0
-        print(result.output.splitlines())
+
         lines = result.output.splitlines()
         assert lines[0] == "invenio_base.api_apps"
         assert lines[1] == "  myapi = myapi:MyApp"
@@ -105,18 +127,20 @@ def test_migrate_secret_key():
     assert "Error: SECRET_KEY is not set in the configuration." in result.output
 
     app.secret_key = "SECRET"
-    with patch("importlib_metadata.entry_points") as MockEP:
+
+    with patch("importlib.metadata.entry_points") as MockEP:
         # Test that the CLI command succeeds when the entrypoint does
         # return a function.
         entrypoint = MockEP("ep1", "ep1", "ep1")
         entrypoint.load.return_value = MagicMock()
         with patch(
-            "importlib_metadata.entry_points",
-            return_value={"invenio_base.secret_key": [entrypoint]},
+            "importlib.metadata.entry_points",
+            return_value=[entrypoint],
         ):
             result = runner.invoke(
                 instance, ["migrate-secret-key", "--old-key", "OLD_SECRET_KEY"]
             )
+
             assert result.exit_code == 0
             assert entrypoint.load.called
             entrypoint.load.return_value.assert_called_with(old_key="OLD_SECRET_KEY")
@@ -127,7 +151,8 @@ def test_migrate_secret_key():
         entrypoint = MockEP("ep2", "ep2", "ep2")
         entrypoint.load.return_value = "ep2"
         with patch(
-            "importlib_metadata.entry_points", return_value={"ep2": [entrypoint]}
+            "importlib.metadata.entry_points",
+            return_value=[entrypoint],
         ):
             result = runner.invoke(
                 instance, ["migrate-secret-key", "--old-key", "OLD_SECRET_KEY"]

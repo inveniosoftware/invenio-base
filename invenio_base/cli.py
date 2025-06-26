@@ -3,17 +3,20 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2022 RERO.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Application bootstraping."""
 
+from importlib.metadata import distributions
+
 import click
-import importlib_metadata
 from flask import current_app
 from flask.cli import with_appcontext
-from pkg_resources import working_set
+
+from .utils import entry_points
 
 
 @click.group()
@@ -32,10 +35,11 @@ def instance():
 def list_entrypoints(entry_point):
     """List defined entry points."""
     found_entry_points = {}
-    for dist in working_set:
-        # for dist in importlib_metadata.distributions:
-        entry_map = dist.get_entry_map()
-        for group_name, entry_points in entry_map.items():
+
+    for dist in distributions():
+        for ep in dist.entry_points:
+            group_name = ep.group
+
             # Filter entry points
             if entry_point is None and not group_name.startswith("invenio"):
                 continue
@@ -45,13 +49,13 @@ def list_entrypoints(entry_point):
             # Store entry points.
             if group_name not in found_entry_points:
                 found_entry_points[group_name] = []
-            for ep in entry_points.values():
-                found_entry_points[group_name].append(str(ep))
+
+            found_entry_points[group_name].append(ep)
 
     for ep_group in sorted(found_entry_points.keys()):
         click.secho(f"{ep_group}", fg="green")
         for ep in sorted(found_entry_points[ep_group]):
-            click.echo(f"  {ep}")
+            click.echo(f"  {ep.name} = {ep.value}")
 
 
 @instance.command("migrate-secret-key")
@@ -66,7 +70,7 @@ def migrate_secret_key(old_key):
         raise click.ClickException("SECRET_KEY is not set in the configuration.")
 
     migrators = []
-    for ep in set(importlib_metadata.entry_points().get("invenio_base.secret_key", [])):
+    for ep in set(entry_points("invenio_base.secret_key")):
         try:
             migrators.append(ep.load())
         except Exception:

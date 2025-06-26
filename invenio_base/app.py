@@ -3,7 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C) 2022 RERO.
-# Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2023-2025 Graz University of Technology.
 # Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
@@ -20,11 +20,11 @@ import click
 from flask import Flask
 from flask.cli import FlaskGroup
 from flask.helpers import get_debug_flag
-from importlib_metadata import entry_points as iter_entry_points
 
 from .signals import app_created, app_loaded
 from .urls.builders import NoOpInvenioUrlsBuilder
 from .urls.helpers import invenio_url_for
+from .utils import entry_points as iter_entry_points
 
 
 def create_app_factory(
@@ -307,6 +307,7 @@ def _loader(app, init_func, entry_points=None, modules=None):
                 except Exception:
                     app.logger.error(f"Failed to initialize entry point: {ep}")
                     raise
+
     if modules:
         for m in modules:
             try:
