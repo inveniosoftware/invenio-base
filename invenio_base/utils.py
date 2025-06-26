@@ -19,7 +19,15 @@ from werkzeug.utils import import_string
 def entry_points(group):
     """Entry points."""
     if version_info < (3, 10):
-        eps = m.entry_points().get(group, [])
+        eps = m.entry_points()
+        # the only reason to add this check is to simplify the tests! the tests
+        # are implemented against python >=3.10 which uses the group keyword.
+        # since we drop python3.9 soon, this should work!
+        # in the tests there is a line which patches the return value of
+        # importlib.metadata.entry_points with a list. this works for
+        # python>=3.10 but not for 3.9
+        if isinstance(eps, dict):
+            eps = eps.get(group, [])
     else:
         eps = m.entry_points(group=group)
 
