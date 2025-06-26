@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2025 CERN.
 # Copyright (C) 2025 Northwestern University.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,7 +11,6 @@
 from unittest.mock import patch
 
 from flask import Blueprint, url_for
-from importlib_metadata import EntryPoint
 from werkzeug.routing import BaseConverter, BuildError, Map, Rule
 
 from invenio_base import invenio_url_for
