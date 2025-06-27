@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 # Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
@@ -258,7 +258,7 @@ except AttributeError:
 
     security.safe_str_cmp = hmac.compare_digest
 
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 
 __all__ = (
     "__version__",
