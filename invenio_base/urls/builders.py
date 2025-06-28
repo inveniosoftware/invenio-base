@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2025 CERN.
 # Copyright (C) 2025 Northwestern University.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,9 +19,9 @@ in another Flask application. Other developer niceties are included.
 from abc import ABC, abstractmethod
 
 from flask import Flask, current_app
-from importlib_metadata import entry_points as iter_entry_points
 from werkzeug.routing import BuildError, Map, Rule
 
+from ..utils import entry_points as iter_entry_points
 from .proxies import current_app_map_adapter, other_app_map_adapter
 
 
