@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 2.3.1 (released 2025-06-28)
+
+- fix: use standard importlib.metadata
+
 Version 2.3.0 (released 2025-06-27)
 
 - fix: pkg_resources DeprecationWarning
