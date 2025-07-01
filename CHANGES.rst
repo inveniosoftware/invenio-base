@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 2.3.2 (released 2025-07-01)
+
+- fix: python3.9 can contain duplicates
+
 Version 2.3.1 (released 2025-06-28)
 
 - fix: use standard importlib.metadata
