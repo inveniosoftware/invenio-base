@@ -26,8 +26,11 @@ def entry_points(group):
         # in the tests there is a line which patches the return value of
         # importlib.metadata.entry_points with a list. this works for
         # python>=3.10 but not for 3.9
+        # the return value of .get can contain duplicates. the simplest way to
+        # remove is the set() call, to still return a list, list() is called on
+        # set()
         if isinstance(eps, dict):
-            eps = eps.get(group, [])
+            eps = list(set(eps.get(group, [])))
     else:
         eps = m.entry_points(group=group)
 

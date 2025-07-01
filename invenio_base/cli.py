@@ -70,7 +70,7 @@ def migrate_secret_key(old_key):
         raise click.ClickException("SECRET_KEY is not set in the configuration.")
 
     migrators = []
-    for ep in set(entry_points("invenio_base.secret_key")):
+    for ep in entry_points("invenio_base.secret_key"):
         try:
             migrators.append(ep.load())
         except Exception:
