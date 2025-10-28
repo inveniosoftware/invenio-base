@@ -258,6 +258,7 @@ except AttributeError:
 
     security.safe_str_cmp = hmac.compare_digest
 
+# change to 2.4.0 or 2.3.3 when 3.9 stops being minimum
 __version__ = "2.3.2"
 
 __all__ = (

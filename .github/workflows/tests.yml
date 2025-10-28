@@ -33,3 +33,4 @@ jobs:
     with:
       db-service: '[""]'
       search-service: '[""]'
+      python-version: '["3.9", "3.10", "3.14"]'
