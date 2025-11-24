@@ -33,10 +33,16 @@ class UrlsBuilderForTest(InvenioUrlsBuilder):
         )
         self.url_adapter = self.url_map.bind("")
 
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint, values, method=None, anchor=None):
         """Build url for any registered blueprints."""
         try:
-            return url_for(endpoint, **values, _method=method, _external=True)
+            return url_for(
+                endpoint,
+                **values,
+                _method=method,
+                _anchor=anchor,
+                _external=True,
+            )
         except BuildError:
             url_relative = self.url_adapter.build(
                 endpoint,
@@ -192,6 +198,11 @@ def test_invenio_apps_urls_builder_w_ui_as_this_app():
         # test for endpoint of other app
         assert "https://example.org/api/foo" == invenio_url_for(
             "api_blueprint.endpoint_foo_of_api_app"
+        )
+        # test anchor
+        assert "https://example.org/foo#my-anchor!" == invenio_url_for(
+            "ui_blueprint.endpoint_foo_of_ui_app",
+            _anchor="my-anchor!",
         )
 
 
