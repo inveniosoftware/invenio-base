@@ -19,27 +19,28 @@ from flask import current_app
 def invenio_url_for(
     endpoint,
     *,
-    # _anchor = None,  # TODO
     _method=None,
+    _anchor=None,
     **values,
 ):
     """A URL generator for the Invenio reality.
 
     This function can build full (external) URLs for the current app and for setup
-    endpoints. For maximum flexibility it leaves most of the work to `invenio_urls`
-    and instance of `InvenioUrlsBuilder` setup and assigned at Flask app creation.
+    endpoints. For maximum flexibility it leaves most of the work to the instance of
+    `InvenioUrlsBuilder` (`current_app._urls_builder`) created at Flask app creation.
     This solves the problem of generating URLs for a Flask app when inside
     another Flask app.
 
     Because of this and to simplify things, `invenio_url_for` only generates
     external URLs (with scheme and server name configured by the instance of
     `InvenioUrlsBuilder`). This makes its interface slightly different
-    than `url_for`'s.
+    than `url_for`'s. However, invenio_url_for strives to be compatible with `url_for`'s
+    interface in all other ways (e.g., _anchor, _method ...).
     """
 
     return current_app._urls_builder.build(
         endpoint,
         values,
         method=_method,
-        # _anchor=_anchor,  # TODO
+        anchor=_anchor,
     )

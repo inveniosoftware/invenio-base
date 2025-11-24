@@ -16,6 +16,7 @@ sense of the term) to generate URLs even if those URLs are for views registered
 in another Flask application. Other developer niceties are included.
 """
 
+import urllib.parse
 from abc import ABC, abstractmethod
 
 from flask import Flask, current_app
@@ -29,14 +30,14 @@ class InvenioUrlsBuilder(ABC):
     """Interface of class in charge of producing urls."""
 
     @abstractmethod
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint, values, method=None, anchor=None):
         """Build current or other app url."""
 
 
 class NoOpInvenioUrlsBuilder(InvenioUrlsBuilder):
     """Doesn't do anything."""
 
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint, values, method=None, anchor=None):
         """Instead of building returns empty string."""
         return ""
 
@@ -149,18 +150,29 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
         """Return site prefix."""
         return current_app.config[site_cfg].rstrip("/")
 
-    def build(self, endpoint, values, method=None):
+    def build(self, endpoint, values, method=None, anchor=None):
         """Build full url of any registered endpoint with appropriate prefix.
 
         This is called within an application context.
+
+        :params endpoint: string. Name of endpoint.
+        :params values: dict. Route variable to value mapping.
+        :params anchor: string. Anchor part of URL *without* starting '#'
+        :params method: string. HTTP verb.
         """
+
+        anchor_str = ""
+        if anchor is not None:
+            anchor = urllib.parse.quote(anchor, safe="%!#$&'()*+,/:;=?@")
+            anchor_str = f"#{anchor}"
+
         # 1- Try to build url from current app
         try:
             url_adapter = current_app_map_adapter
             url_relative = url_adapter.build(
                 endpoint, values, method=method, force_external=False
             )
-            return self.prefix(self.cfg_of_app_prefix) + url_relative
+            return self.prefix(self.cfg_of_app_prefix) + url_relative + anchor_str
         except BuildError:
             # The endpoint may be from the complementary blueprints
             pass
@@ -173,7 +185,7 @@ class InvenioAppsUrlsBuilder(InvenioUrlsBuilder):
             method=method,
             force_external=False,
         )
-        return self.prefix(self.cfg_of_other_app_prefix) + url_relative
+        return self.prefix(self.cfg_of_other_app_prefix) + url_relative + anchor_str
 
 
 def create_invenio_apps_urls_builder_factory(
