@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 2.4.0 (released 2025-12-02)
+
+- feat: add support for anchor in invenio_url_for
+
 Version 2.3.2 (released 2025-07-01)
 
 - fix: python3.9 can contain duplicates
