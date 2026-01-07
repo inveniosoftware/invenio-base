@@ -15,12 +15,12 @@ try:
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from werkzeug.middleware.proxy_fix import ProxyFix
 
-    WERKZEUG_GTE_014 = False
+    WERKZEUG_LTE_014 = False
 except ImportError:
     from werkzeug.contrib.fixers import ProxyFix
     from werkzeug.wsgi import DispatcherMiddleware
 
-    WERKZEUG_GTE_014 = True
+    WERKZEUG_LTE_014 = True
 
 
 def create_wsgi_factory(mounts_factories):
@@ -105,7 +105,7 @@ def wsgi_proxyfix(factory=None):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
         num_proxies = app.config.get("WSGI_PROXIES")
         proxy_config = app.config.get("PROXYFIX_CONFIG")
-        if proxy_config and not WERKZEUG_GTE_014:
+        if proxy_config and not WERKZEUG_LTE_014:
             return ProxyFix(wsgi_app, **proxy_config)
         elif num_proxies:
             warnings.warn(
@@ -113,7 +113,7 @@ def wsgi_proxyfix(factory=None):
                 "it will be removed, use PROXYFIX_CONFIG instead",
                 PendingDeprecationWarning,
             )
-            if WERKZEUG_GTE_014:
+            if WERKZEUG_LTE_014:
                 return ProxyFix(wsgi_app, num_proxies=num_proxies)
             else:
                 return ProxyFix(wsgi_app, x_for=num_proxies)
