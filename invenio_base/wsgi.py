@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 TU Wien.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -111,7 +112,7 @@ def wsgi_proxyfix(factory=None):
             warnings.warn(
                 "The WSGI_PROXIES configuration is deprecated and "
                 "it will be removed, use PROXYFIX_CONFIG instead",
-                PendingDeprecationWarning,
+                DeprecationWarning,
             )
             if WERKZEUG_LTE_014:
                 return ProxyFix(wsgi_app, num_proxies=num_proxies)
