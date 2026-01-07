@@ -11,17 +11,8 @@
 
 import warnings
 
-# They were moved in the same version so they can be in one try/except
-try:
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from werkzeug.middleware.proxy_fix import ProxyFix
-
-    WERKZEUG_LTE_014 = False
-except ImportError:
-    from werkzeug.contrib.fixers import ProxyFix
-    from werkzeug.wsgi import DispatcherMiddleware
-
-    WERKZEUG_LTE_014 = True
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_wsgi_factory(mounts_factories):
@@ -104,20 +95,9 @@ def wsgi_proxyfix(factory=None):
 
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
-        num_proxies = app.config.get("WSGI_PROXIES")
         proxy_config = app.config.get("PROXYFIX_CONFIG")
-        if proxy_config and not WERKZEUG_LTE_014:
+        if proxy_config:
             return ProxyFix(wsgi_app, **proxy_config)
-        elif num_proxies:
-            warnings.warn(
-                "The WSGI_PROXIES configuration is deprecated and "
-                "it will be removed, use PROXYFIX_CONFIG instead",
-                DeprecationWarning,
-            )
-            if WERKZEUG_LTE_014:
-                return ProxyFix(wsgi_app, num_proxies=num_proxies)
-            else:
-                return ProxyFix(wsgi_app, x_for=num_proxies)
         return wsgi_app
 
     return create_wsgi

@@ -42,25 +42,6 @@ def test_create_wsgi_factory():
         assert b"api" in client.get("/api/").data
 
 
-@pytest.mark.parametrize("proxies,data", [(2, b"4.3.2.1"), (None, b"1.2.3.4")])
-def test_proxyfix_wsgi_proxies(proxies, data):
-    """Test wsgi factory creation."""
-    app = Flask("app")
-    app.config["WSGI_PROXIES"] = proxies
-
-    @app.route("/")
-    def appview():
-        return str(request.remote_addr)
-
-    # Test factory creation
-    app.wsgi_app = wsgi_proxyfix()(app)
-    e = {"REMOTE_ADDR": "1.2.3.4"}
-
-    with app.test_client() as client:
-        h = {"X-Forwarded-For": "5.6.7.8, 4.3.2.1, 8.7.6.5"}
-        assert client.get("/", headers=h, environ_base=e).data == data
-
-
 @pytest.mark.parametrize(
     "num_proxies,proxy_config",
     [
