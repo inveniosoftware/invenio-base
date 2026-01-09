@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2026 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -42,84 +43,74 @@ def test_create_wsgi_factory():
         assert b"api" in client.get("/api/").data
 
 
-@pytest.mark.parametrize("proxies,data", [(2, b"4.3.2.1"), (None, b"1.2.3.4")])
-def test_proxyfix_wsgi_proxies(proxies, data):
-    """Test wsgi factory creation."""
-    app = Flask("app")
-    app.config["WSGI_PROXIES"] = proxies
-
-    @app.route("/")
-    def appview():
-        return str(request.remote_addr)
-
-    # Test factory creation
-    app.wsgi_app = wsgi_proxyfix()(app)
-    e = {"REMOTE_ADDR": "1.2.3.4"}
-
-    with app.test_client() as client:
-        h = {"X-Forwarded-For": "5.6.7.8, 4.3.2.1, 8.7.6.5"}
-        assert client.get("/", headers=h, environ_base=e).data == data
-
-
 @pytest.mark.parametrize(
-    "num_proxies,proxy_config",
-    [
-        (n, {"x_for": n, "x_proto": n, "x_host": n, "x_port": n, "x_prefix": n})
-        for n in range(2)
-    ],
+    "num_proxies",
+    # We test with a configuration expecting 0 up to 3 proxies even though information
+    # for 2 proxies only is sent. This is to test/illustrate how edge case
+    # configurations are interpreted.
+    [n for n in range(4)],
 )
-def test_proxyfix_wsgi_config(num_proxies, proxy_config):
-    """Test wsgi factory creation with APP_WSGI_CONFIG set."""
+def test_proxyfix_wsgi_config(num_proxies):
     app = Flask("app")
-    app.config["PROXYFIX_CONFIG"] = proxy_config
-
-    data = [
-        # application instance
-        {
-            "x_for": "1.2.3.4",
-            "x_proto": "http",
-            "x_host": "localhost",
-            "x_port": "80",
-            "x_prefix": "",
-        },
-        # proxy number 1
-        {
-            "x_for": "5.6.7.8",
-            "x_proto": "https",
-            "x_host": "host.external",
-            "x_port": "443",
-            "x_prefix": "prefix.external",
-        },
-    ]
+    app.config["PROXYFIX_CONFIG"] = {
+        "x_for": num_proxies,
+        "x_proto": num_proxies,
+        "x_host": num_proxies,
+        "x_port": num_proxies,
+        "x_prefix": num_proxies,
+    }
 
     @app.route("/")
     def appview():
         data = {
-            "x_for": request.environ.get("REMOTE_ADDR"),
-            "x_proto": request.environ.get("wsgi.url_scheme"),
-            "x_host": request.environ.get("SERVER_NAME"),
-            "x_port": request.environ.get("SERVER_PORT"),
-            "x_prefix": request.environ.get("SCRIPT_NAME"),
+            "REMOTE_ADDR": request.environ.get("REMOTE_ADDR"),
+            "wsgi.url_scheme": request.environ.get("wsgi.url_scheme"),
+            "SERVER_NAME": request.environ.get("SERVER_NAME"),
+            "SERVER_PORT": request.environ.get("SERVER_PORT"),
+            "SCRIPT_NAME": request.environ.get("SCRIPT_NAME"),
         }
-        return jsonify(data)
+        return data
 
-    # Test factory creation
+    # last value being that of the last client itself (proxy) before the application
+    # i.e. the first 2 will be part of X-FORWARDED-* headers but not the last
+    remote_addrs = ["1.2.3.4", "5.6.7.8", "9.10.11.12"]
+    # last values of the lists below being that of the test server
+    # Flask+Werkzeug sets those and we are just being explicit.
+    wsgi_url_schemes = ["https", "https", "http"]
+    server_names = ["host1.client", "host2.client", "localhost"]
+    server_ports = ["443", "443", "80"]
+    script_names = ["/prefix1", "/prefix2", ""]
+
     app.wsgi_app = wsgi_proxyfix()(app)
-    e = {
-        "REMOTE_ADDR": data[0].get("x_for"),
-        "wsgi.url_scheme": data[0].get("x_proto"),
-        "HTTP_HOST": data[0].get("x_host"),
-        "SERVER_PORT": data[0].get("x_port"),
-        "SCRIPT_NAME": data[0].get("x_prefix"),
-    }
 
     with app.test_client() as client:
-        h = {
-            "X-Forwarded-For": data[1].get("x_for"),
-            "X-Forwarded-Proto": data[1].get("x_proto"),
-            "X-Forwarded-Host": data[1].get("x_host"),
-            "X-Forwarded-Port": data[1].get("x_port"),
-            "X-Forwarded-Prefix": data[1].get("x_prefix"),
+        res = client.get(
+            "/",
+            # headers sent by last client/proxy to application
+            # always sent as though 2 proxies in front
+            headers={
+                "X-Forwarded-For": ",".join(remote_addrs[:2]),
+                "X-Forwarded-Proto": ",".join(wsgi_url_schemes[:2]),
+                "X-Forwarded-Host": ",".join(server_names[:2]),
+                "X-Forwarded-Port": ",".join(server_ports[:2]),
+                "X-Forwarded-Prefix": ",".join(script_names[:2]),
+            },
+            # this explicitly sets the REMOTE_ADDR to be that of the last client/proxy
+            # by "default"
+            environ_base={"REMOTE_ADDR": remote_addrs[-1]},
+        )
+
+        num_proxies_to_expected_index = [-1, 1, 0, -1]
+        # The index of the list represents num of proxies (first element for 0 proxy
+        # and so on). Indeed werkzeug will take the same values as no proxies, if the
+        # app expects more proxies than passed.
+
+        i = num_proxies_to_expected_index[num_proxies]
+        expected = {
+            "REMOTE_ADDR": remote_addrs[i],
+            "wsgi.url_scheme": wsgi_url_schemes[i],
+            "SERVER_NAME": server_names[i],
+            "SERVER_PORT": server_ports[i],
+            "SCRIPT_NAME": script_names[i],
         }
-        res = client.get("/", headers=h, environ_base=e)
-        assert json.loads(res.get_data(as_text=True)) == data[num_proxies]
+        assert expected == res.json
