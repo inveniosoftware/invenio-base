@@ -8,7 +8,6 @@
 
 """Pytest configuration."""
 
-
 import tempfile
 
 import pytest
