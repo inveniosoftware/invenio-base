@@ -10,6 +10,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Invenio application factory."""
+
 import gc
 import logging
 import os.path
