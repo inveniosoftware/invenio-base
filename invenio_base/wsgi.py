@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 TU Wien.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,17 +11,8 @@
 
 import warnings
 
-# They were moved in the same version so they can be in one try/except
-try:
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from werkzeug.middleware.proxy_fix import ProxyFix
-
-    WERKZEUG_GTE_014 = False
-except ImportError:
-    from werkzeug.contrib.fixers import ProxyFix
-    from werkzeug.wsgi import DispatcherMiddleware
-
-    WERKZEUG_GTE_014 = True
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_wsgi_factory(mounts_factories):
@@ -103,20 +95,9 @@ def wsgi_proxyfix(factory=None):
 
     def create_wsgi(app, **kwargs):
         wsgi_app = factory(app, **kwargs) if factory else app.wsgi_app
-        num_proxies = app.config.get("WSGI_PROXIES")
         proxy_config = app.config.get("PROXYFIX_CONFIG")
-        if proxy_config and not WERKZEUG_GTE_014:
+        if proxy_config:
             return ProxyFix(wsgi_app, **proxy_config)
-        elif num_proxies:
-            warnings.warn(
-                "The WSGI_PROXIES configuration is deprecated and "
-                "it will be removed, use PROXYFIX_CONFIG instead",
-                PendingDeprecationWarning,
-            )
-            if WERKZEUG_GTE_014:
-                return ProxyFix(wsgi_app, num_proxies=num_proxies)
-            else:
-                return ProxyFix(wsgi_app, x_for=num_proxies)
         return wsgi_app
 
     return create_wsgi
