@@ -20,8 +20,6 @@ classifiers = [
 dependencies = [
   "blinker>=1.4",
   "flask>=3.0.0",
-  "importlib-metadata>=4.4",
-  "importlib-resources>=5.0",
   "itsdangerous>=2.1.0",
   "markupsafe>=0.23",
   "watchdog>2.0.0",

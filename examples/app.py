@@ -8,7 +8,7 @@
 import os
 import sys
 
-from invenio_base.app import create_app_factory, create_cli
+from invenio_base.app import create_app_factory
 from invenio_base.wsgi import create_wsgi_factory
 
 # sphinxdoc-example-import-end

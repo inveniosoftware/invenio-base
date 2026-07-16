@@ -8,6 +8,7 @@
 import importlib.metadata
 import logging
 import warnings
+from importlib.metadata import EntryPoint
 from os.path import exists, join
 from unittest.mock import patch
 
@@ -15,7 +16,6 @@ import click
 import pytest
 from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
-from importlib_metadata import EntryPoint
 from werkzeug.routing import BaseConverter
 
 from invenio_base import __version__
