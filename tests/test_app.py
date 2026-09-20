@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2015-2022 CERN.
 # SPDX-FileCopyrightText: 2022 RERO.
-# SPDX-FileCopyrightText: 2025 Graz University of Technology.
+# SPDX-FileCopyrightText: 2025-2026 Graz University of Technology.
 # SPDX-License-Identifier: MIT
 
 """Test basic application."""
@@ -16,6 +16,7 @@ import pytest
 from click.testing import CliRunner
 from flask import Blueprint, Flask, current_app
 from importlib_metadata import EntryPoint
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.routing import BaseConverter
 
 from invenio_base import __version__
@@ -30,11 +31,6 @@ from invenio_base.app import (
     create_cli,
 )
 from invenio_base.cli import generate_secret_key
-
-try:
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-except ImportError:
-    from werkzeug.wsgi import DispatcherMiddleware
 
 
 class ListConverter(BaseConverter):
